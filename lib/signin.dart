@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 
 class Signin extends StatefulWidget {
   const Signin({Key? key});
@@ -24,10 +24,10 @@ class _Signin extends State<Signin> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
+            const SizedBox(
               height: 88,
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,28 +46,28 @@ class _Signin extends State<Signin> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Expanded(
                 child: Container(
                     width: double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(60),
                             topRight: Radius.circular(60))),
                     child: Form(
                         child: Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 60,
                           ),
                           Container(
-                            padding: EdgeInsets.all(20),
-                            decoration: BoxDecoration(
+                            padding: const EdgeInsets.all(20),
+                            decoration: const BoxDecoration(
                                 color: Colors.white,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10)),
@@ -81,13 +81,13 @@ class _Signin extends State<Signin> {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                       border: Border(
                                           bottom: BorderSide(
                                               color: Color.fromARGB(
                                                   255, 238, 238, 238)))),
                                   child: TextFormField(
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                         hintText: "Email",
                                         hintStyle:
                                             TextStyle(color: Colors.grey),
@@ -96,13 +96,13 @@ class _Signin extends State<Signin> {
                                 ),
                                 Container(
                                   padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                       border: Border(
                                           bottom: BorderSide(
                                               color: Color.fromARGB(
                                                   255, 238, 238, 238)))),
                                   child: TextFormField(
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                         hintText: "Password",
                                         hintStyle:
                                             TextStyle(color: Colors.grey),
@@ -112,20 +112,20 @@ class _Signin extends State<Signin> {
                               ],
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 30,
                           ),
                           GestureDetector(
                             onTap: (){},
-                            child: Text("Forget Password?", style: TextStyle(color: Colors.grey), ),
+                            child: const Text("Forgot Password?", style: TextStyle(color: Colors.grey), ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                            Text("Don't have an account? "),
+                            const Text("Don't have an account? "),
                             GestureDetector(
                               onTap: (){},
-                              child: Padding(
+                              child: const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child:
                                   Text("Sign up", style: TextStyle(color: Color.fromARGB(255, 230, 81, 0), decoration: TextDecoration.underline),),
@@ -133,14 +133,14 @@ class _Signin extends State<Signin> {
                               ),
                             )
                           ],),
-                          SizedBox(height: 10,),
+                          const SizedBox(height: 10,),
                           MaterialButton(onPressed: (){},
-                          color: Color.fromARGB(255, 230, 81, 0),
+                          color: const Color.fromARGB(255, 230, 81, 0),
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                           minWidth: 200,
                           height: 50,
-                          child: Text("Login", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),),)
+                          child: const Text("Login", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),),)
                         ],
                       ),
                     ))))
