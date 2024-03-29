@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class Signin extends StatefulWidget {
   const Signin({Key? key});
 
@@ -9,6 +8,7 @@ class Signin extends StatefulWidget {
 }
 
 class _Signin extends State<Signin> {
+  bool _passwordVisible = false;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -73,7 +73,8 @@ class _Signin extends State<Signin> {
                                     BorderRadius.all(Radius.circular(10)),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: Color.fromRGBO(240, 144, 104, 0.988),
+                                      color:
+                                          Color.fromRGBO(240, 144, 104, 0.988),
                                       blurRadius: 20,
                                       offset: Offset(0, 10)),
                                 ]),
@@ -102,11 +103,25 @@ class _Signin extends State<Signin> {
                                               color: Color.fromARGB(
                                                   255, 238, 238, 238)))),
                                   child: TextFormField(
-                                    decoration: const InputDecoration(
-                                        hintText: "Password",
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        border: InputBorder.none),
+                                    decoration: InputDecoration(
+                                      hintText: "Password",
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      border: InputBorder.none,
+                                      suffixIcon: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _passwordVisible =
+                                                !_passwordVisible;
+                                          });
+                                        },
+                                        child: Icon(
+                                          _passwordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -116,31 +131,49 @@ class _Signin extends State<Signin> {
                             height: 30,
                           ),
                           GestureDetector(
-                            onTap: (){},
-                            child: const Text("Forgot Password?", style: TextStyle(color: Colors.grey), ),
+                            onTap: () {},
+                            child: const Text(
+                              "Forgot Password?",
+                              style: TextStyle(color: Colors.grey),
+                            ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                            const Text("Don't have an account? "),
-                            GestureDetector(
-                              onTap: (){},
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                child:
-                                  Text("Sign up", style: TextStyle(color: Color.fromARGB(255, 230, 81, 0), decoration: TextDecoration.underline),),
-                                
-                              ),
-                            )
-                          ],),
-                          const SizedBox(height: 10,),
-                          MaterialButton(onPressed: (){},
-                          color: const Color.fromARGB(255, 230, 81, 0),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                          minWidth: 200,
-                          height: 50,
-                          child: const Text("Login", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15),),)
+                              const Text("Don't have an account? "),
+                              GestureDetector(
+                                onTap: () {},
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    "Sign up",
+                                    style: TextStyle(
+                                        color: Color.fromARGB(255, 230, 81, 0),
+                                        decoration: TextDecoration.underline),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          MaterialButton(
+                            onPressed: () {},
+                            color: const Color.fromARGB(255, 230, 81, 0),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50)),
+                            minWidth: 200,
+                            height: 50,
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15),
+                            ),
+                          )
                         ],
                       ),
                     ))))
