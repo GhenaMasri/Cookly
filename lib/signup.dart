@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key});
@@ -9,6 +10,8 @@ class Signup extends StatefulWidget {
 
 class _Signup extends State<Signup> {
   String? user;
+  bool _passwordVisible = false;
+  bool _confirmPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -139,11 +142,25 @@ class _Signup extends State<Signup> {
                                               color: Color.fromARGB(
                                                   255, 238, 238, 238)))),
                                   child: TextFormField(
-                                    decoration: const InputDecoration(
-                                        hintText: "Password",
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        border: InputBorder.none),
+                                    obscureText: !_passwordVisible,
+                                    decoration: InputDecoration(
+                                      hintText: "Password",
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      border: InputBorder.none,
+                                      suffixIcon: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _passwordVisible = !_passwordVisible;
+                                          });
+                                        },
+                                        child: Icon(
+                                          _passwordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -154,11 +171,25 @@ class _Signup extends State<Signup> {
                                               color: Color.fromARGB(
                                                   255, 238, 238, 238)))),
                                   child: TextFormField(
-                                    decoration: const InputDecoration(
-                                        hintText: "Confirm Password",
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        border: InputBorder.none),
+                                    obscureText: !_confirmPasswordVisible,
+                                    decoration: InputDecoration(
+                                      hintText: "Confirm Password",
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      border: InputBorder.none,
+                                      suffixIcon: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _confirmPasswordVisible = !_confirmPasswordVisible;
+                                          });
+                                        },
+                                        child: Icon(
+                                         _confirmPasswordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Container(
@@ -188,10 +219,8 @@ class _Signup extends State<Signup> {
                                   ),
                                   child: Row(
                                     children: [
-                                      const Text(
-                                        "User:",
-                                        style: TextStyle(fontSize: 16)
-                                      ),
+                                      const Text("User:",
+                                          style: TextStyle(fontSize: 16)),
                                       const SizedBox(
                                           width:
                                               10), // Add spacing between the label and radio button
@@ -199,7 +228,8 @@ class _Signup extends State<Signup> {
                                         child: Row(
                                           children: [
                                             Radio(
-                                              activeColor: Color.fromARGB(255, 239, 108, 0),
+                                              activeColor: Color.fromARGB(
+                                                  255, 239, 108, 0),
                                               value: "Normal",
                                               groupValue: user,
                                               onChanged: (value) {
@@ -219,7 +249,8 @@ class _Signup extends State<Signup> {
                                         child: Row(
                                           children: [
                                             Radio(
-                                              activeColor: Color.fromARGB(255, 239, 108, 0),
+                                              activeColor: Color.fromARGB(
+                                                  255, 239, 108, 0),
                                               value: "Chef",
                                               groupValue: user,
                                               onChanged: (value) {
@@ -228,10 +259,8 @@ class _Signup extends State<Signup> {
                                                 });
                                               },
                                             ),
-                                            const Text(
-                                              "Chef",
-                                              style: TextStyle(fontSize: 16)
-                                            ),
+                                            const Text("Chef",
+                                                style: TextStyle(fontSize: 16)),
                                           ],
                                         ),
                                       ),
