@@ -41,7 +41,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               height: media.width * 0.1,
             ),
             Text(
-              "Discover the best and most delicious\n home made food with urants and fast delivery to your\ndoorstep",
+              "Discover the best and most delicious\n home made food with fast delivery to your\ndoorstep",
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: TColor.secondaryText,
