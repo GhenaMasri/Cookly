@@ -48,15 +48,15 @@ class _Signup extends State<Signup> {
     }
     return null;
   }
-String? _validateConfirmPassword(String? value) {
-  String? password = _passwordController.text;
 
-  if (password == null || value == null || password != value) {
-    return 'Passwords do not match';
+  String? _validateConfirmPassword(String? value) {
+    String? password = _passwordController.text;
+
+    if (password == null || value == null || password != value) {
+      return 'Passwords do not match';
+    }
+    return null;
   }
-  return null;
-}
-
 
   String? _validatePhoneNumber(String? value) {
     if (value == null || value.isEmpty) {
@@ -446,7 +446,7 @@ String? _validateConfirmPassword(String? value) {
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 15),
+                                      fontSize: 16),
                                 ),
                               )
                             ],
