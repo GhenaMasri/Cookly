@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:untitled/signin.dart';
 import 'package:untitled/signup.dart';
 
-
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 
@@ -21,13 +20,16 @@ class _WelcomeViewState extends State<WelcomeView> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Stack(
+            // Stack with two images
+             Stack(
               alignment: Alignment.bottomCenter,
               children: [
                 Image.asset(
                   "assets/img/welcome_top_shape.png",
                   width: media.width,
+                  fit: BoxFit.fitWidth,
                 ),
                 Image.asset(
                   "assets/img/app_cookly.png",
@@ -38,7 +40,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               ],
             ),
             SizedBox(
-              height: media.width * 0.1,
+              height: MediaQuery.of(context).size.width * 0.1,
             ),
             Text(
               "Discover the best and most delicious\n home made food with fast delivery to your\ndoorstep",
@@ -49,7 +51,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   fontWeight: FontWeight.w500),
             ),
             SizedBox(
-              height: media.width * 0.1,
+              height: MediaQuery.of(context).size.width * 0.1,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -74,7 +76,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                 title: "Create an Account",
                 type: RoundButtonType.textPrimary,
                 onPressed: () {
-                   Navigator.push(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Signup(),

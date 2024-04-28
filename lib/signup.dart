@@ -30,7 +30,6 @@ class _Signup extends State<Signup> {
     //Default Value
     user = "Normal";
   }
-
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   void signUp() async {
     const url = 'http://192.168.1.106:3000/signup';
@@ -59,7 +58,6 @@ class _Signup extends State<Signup> {
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
-
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email';
@@ -110,22 +108,24 @@ class _Signup extends State<Signup> {
     return null;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              colors: [
-                Color.fromARGB(255, 230, 81, 0),
-                Color.fromARGB(255, 239, 108, 0),
-                Color.fromARGB(255, 239, 167, 38)
-              ],
-            ),
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    home: Scaffold(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            colors: [
+              Color.fromARGB(255, 230, 81, 0),
+              Color.fromARGB(255, 239, 108, 0),
+              Color.fromARGB(255, 239, 167, 38)
+            ],
           ),
+        ),
+        child: SingleChildScrollView(
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -148,63 +148,55 @@ class _Signup extends State<Signup> {
                 ),
               ),
               const SizedBox(height: 10),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(60),
-                      topRight: Radius.circular(60),
-                    ),
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(60),
+                    topRight: Radius.circular(60),
                   ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
                   child: Form(
                     key: formState,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromRGBO(240, 144, 104, 0.988),
-                                  blurRadius: 20,
-                                  offset: Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child:
-                                          CustomFormFields.buildTextFormField(
-                                        hintText: "First Name",
-                                        validator: (value) => value!.isEmpty
-                                            ? "Couldn't be empty"
-                                            : null,
-                                        onSaved: (newValue) =>
-                                            _firstName = newValue,
-                                      ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color.fromRGBO(240, 144, 104, 0.988),
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: CustomFormFields.buildTextFormField(
+                                      hintText: "First Name",
+                                      validator: (value) =>
+                                          value!.isEmpty ? "Couldn't be empty" : null,
+                                      onSaved: (newValue) => _firstName = newValue,
                                     ),
-                                    SizedBox(width: 15),
-                                    Expanded(
-                                      child:
-                                          CustomFormFields.buildTextFormField(
-                                        hintText: "Last Name",
-                                        validator: (value) => value!.isEmpty
-                                            ? "Couldn't be empty"
-                                            : null,
-                                        onSaved: (newValue) =>
-                                            _lastName = newValue,
-                                      ),
+                                  ),
+                                  SizedBox(width: 15),
+                                  Expanded(
+                                    child: CustomFormFields.buildTextFormField(
+                                      hintText: "Last Name",
+                                      validator: (value) =>
+                                          value!.isEmpty ? "Couldn't be empty" : null,
+                                      onSaved: (newValue) => _lastName = newValue,
+
                                     ),
                                   ],
                                 ),
@@ -213,6 +205,7 @@ class _Signup extends State<Signup> {
                                   validator: _validateEmail,
                                   onSaved: (value) => _email = value,
                                 ),
+
                                 CustomFormFields.buildTextFormField(
                                   hintText: "Password",
                                   validator: _validatePassword,
@@ -309,47 +302,55 @@ class _Signup extends State<Signup> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 30),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Already have an account? "),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) => Signin()));
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    "Sign in",
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 230, 81, 0),
-                                      decoration: TextDecoration.underline,
-                                    ),
+                        ),
+                        SizedBox(height: 30),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Already have an account? "),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(builder: (context) => Signin()));
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                child: Text(
+                                  "Sign in",
+                                  style: TextStyle(
+                                    color: Color.fromARGB(255, 230, 81, 0),
+                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
-                              )
-                            ],
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        MaterialButton(
+                          onPressed: () {
+                            if (formState.currentState!.validate()) {
+                              formState.currentState!.save();
+                              //check the credentials in db if correct navigate to next page
+                              /*if( valid credentials ) {
+                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+                                  }*/
+                            }
+                          },
+                          color: Color.fromARGB(255, 230, 81, 0),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
                           ),
-                          SizedBox(height: 10),
-                          MaterialButton(
-                            onPressed: () {
-                              if (formState.currentState!.validate()) {
-                                formState.currentState!.save();
-                                signUp();
-                                //check the credentials in db if correct navigate to next page
-                                /*if( valid credentials ) {
-                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-                              }*/
-                              }
-                            },
-                            color: Color.fromARGB(255, 230, 81, 0),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
+                          minWidth: 200,
+                          height: 50,
+                          child: Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+
                             ),
                             minWidth: 200,
                             height: 50,
@@ -372,6 +373,8 @@ class _Signup extends State<Signup> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
