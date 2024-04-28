@@ -24,14 +24,12 @@ class _Signup extends State<Signup> {
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
 
-   @override
+  @override
   void initState() {
     super.initState();
     //Default Value
     user = "Normal";
   }
-
-  
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -82,7 +80,8 @@ class _Signup extends State<Signup> {
     }
     return null;
   }
-  @override
+
+@override
 Widget build(BuildContext context) {
   return MaterialApp(
     home: Scaffold(
@@ -98,30 +97,30 @@ Widget build(BuildContext context) {
             ],
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome To Cookly!",
-                    style: TextStyle(color: Colors.white, fontSize: 30),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    "Let's create your account",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Welcome To Cookly!",
+                      style: TextStyle(color: Colors.white, fontSize: 30),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "Let's create your account",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: Container(
+              const SizedBox(height: 10),
+              Container(
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -130,10 +129,10 @@ Widget build(BuildContext context) {
                     topRight: Radius.circular(60),
                   ),
                 ),
-                child: Form(
-                  key: formState,
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Form(
+                    key: formState,
                     child: Column(
                       children: [
                         const SizedBox(height: 10),
@@ -157,7 +156,8 @@ Widget build(BuildContext context) {
                                   Expanded(
                                     child: CustomFormFields.buildTextFormField(
                                       hintText: "First Name",
-                                      validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
+                                      validator: (value) =>
+                                          value!.isEmpty ? "Couldn't be empty" : null,
                                       onSaved: (newValue) => _firstName = newValue,
                                     ),
                                   ),
@@ -165,7 +165,8 @@ Widget build(BuildContext context) {
                                   Expanded(
                                     child: CustomFormFields.buildTextFormField(
                                       hintText: "Last Name",
-                                      validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
+                                      validator: (value) =>
+                                          value!.isEmpty ? "Couldn't be empty" : null,
                                       onSaved: (newValue) => _lastName = newValue,
                                     ),
                                   ),
@@ -221,7 +222,7 @@ Widget build(BuildContext context) {
                               Row(
                                 children: [
                                   Text("User:", style: TextStyle(fontSize: 16)),
-                                  SizedBox(width: 10), 
+                                  SizedBox(width: 10),
                                   Flexible(
                                     child: Row(
                                       children: [
@@ -268,7 +269,8 @@ Widget build(BuildContext context) {
                             Text("Already have an account? "),
                             GestureDetector(
                               onTap: () {
-                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Signin()));
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(builder: (context) => Signin()));
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -290,8 +292,8 @@ Widget build(BuildContext context) {
                               formState.currentState!.save();
                               //check the credentials in db if correct navigate to next page
                               /*if( valid credentials ) {
-                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-                              }*/
+                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+                                  }*/
                             }
                           },
                           color: Color.fromARGB(255, 230, 81, 0),
@@ -315,14 +317,13 @@ Widget build(BuildContext context) {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),
   );
 }
 
-}
 
-   
+}

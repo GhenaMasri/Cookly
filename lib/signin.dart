@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/reset_password.dart';
 import 'package:untitled/signup.dart';
 
 class Signin extends StatefulWidget {
@@ -163,7 +164,9 @@ class _Signin extends State<Signin> {
                               ),
                               GestureDetector(
                                 onTap: () {
-                                  //Navigate to reset password page
+                                  Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) => ResetPassword()));
                                 },
                                 child: const Text(
                                   "Forgot Password?",
