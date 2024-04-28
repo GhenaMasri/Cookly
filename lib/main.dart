@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/signin.dart';
-import 'package:untitled/signup.dart';
 import 'package:untitled/splash.dart';
 void main() {
   runApp(const MyApp());
