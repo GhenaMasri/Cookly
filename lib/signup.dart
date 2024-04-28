@@ -125,7 +125,6 @@ Widget build(BuildContext context) {
           ),
         ),
         child: SingleChildScrollView(
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -179,128 +178,121 @@ Widget build(BuildContext context) {
                           ),
                           child: Column(
                             children: [
+                              CustomFormFields.buildTextFormField(
+                                hintText: "First Name",
+                                validator: (value) =>
+                                    value!.isEmpty ? "Couldn't be empty" : null,
+                                onSaved: (newValue) => _firstName = newValue,
+                              ),
+                              SizedBox(height: 10),
+                              CustomFormFields.buildTextFormField(
+                                hintText: "Last Name",
+                                validator: (value) =>
+                                    value!.isEmpty ? "Couldn't be empty" : null,
+                                onSaved: (newValue) => _lastName = newValue,
+                              ),
+                              SizedBox(height: 10),
+                              CustomFormFields.buildTextFormField(
+                                hintText: "Email",
+                                validator: _validateEmail,
+                                onSaved: (value) => _email = value,
+                              ),
+                              SizedBox(height: 10),
+                              CustomFormFields.buildTextFormField(
+                                hintText: "Password",
+                                validator: _validatePassword,
+                                controller: _passwordController,
+                                onSaved: (value) => _password = value,
+                                obscureText: !_passwordVisible,
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _passwordVisible = !_passwordVisible;
+                                    });
+                                  },
+                                  child: Icon(
+                                    _passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              CustomFormFields.buildTextFormField(
+                                hintText: "Confirm Password",
+                                validator: (value) =>
+                                    _validateConfirmPassword(value),
+                                onSaved: (value) => _confirmPassword = value,
+                                obscureText: !_confirmPasswordVisible,
+                                suffixIcon: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _confirmPasswordVisible =
+                                          !_confirmPasswordVisible;
+                                    });
+                                  },
+                                  child: Icon(
+                                    _confirmPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              CustomFormFields.buildTextFormField(
+                                hintText: "Phone Number",
+                                keyboardType: TextInputType.number,
+                                validator: _validatePhoneNumber,
+                                onSaved: (value) => _phone = value,
+                              ),
+                              SizedBox(height: 10),
                               Row(
                                 children: [
-                                  Expanded(
-                                    child: CustomFormFields.buildTextFormField(
-                                      hintText: "First Name",
-                                      validator: (value) =>
-                                          value!.isEmpty ? "Couldn't be empty" : null,
-                                      onSaved: (newValue) => _firstName = newValue,
+                                  Text("User:", style: TextStyle(fontSize: 16)),
+                                  SizedBox(width: 10),
+                                  Flexible(
+                                    child: Row(
+                                      children: [
+                                        Radio(
+                                          activeColor: Color.fromARGB(
+                                              255, 239, 108, 0),
+                                          value: "Normal",
+                                          groupValue: user,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              user = value.toString();
+                                            });
+                                          },
+                                        ),
+                                        Text("Normal",
+                                            style: TextStyle(fontSize: 16)),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(width: 15),
-                                  Expanded(
-                                    child: CustomFormFields.buildTextFormField(
-                                      hintText: "Last Name",
-                                      validator: (value) =>
-                                          value!.isEmpty ? "Couldn't be empty" : null,
-                                      onSaved: (newValue) => _lastName = newValue,
-
-                                    ),
-                                  ],
-                                ),
-                                CustomFormFields.buildTextFormField(
-                                  hintText: "Email",
-                                  validator: _validateEmail,
-                                  onSaved: (value) => _email = value,
-                                ),
-
-                                CustomFormFields.buildTextFormField(
-                                  hintText: "Password",
-                                  validator: _validatePassword,
-                                  controller: _passwordController,
-                                  onSaved: (value) => _password = value,
-                                  obscureText: !_passwordVisible,
-                                  suffixIcon: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _passwordVisible = !_passwordVisible;
-                                      });
-                                    },
-                                    child: Icon(
-                                      _passwordVisible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                      color: Colors.grey,
+                                  Flexible(
+                                    child: Row(
+                                      children: [
+                                        Radio(
+                                          activeColor: Color.fromARGB(
+                                              255, 239, 108, 0),
+                                          value: "Chef",
+                                          groupValue: user,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              user = value.toString();
+                                            });
+                                          },
+                                        ),
+                                        Text("Chef",
+                                            style: TextStyle(fontSize: 16)),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                CustomFormFields.buildTextFormField(
-                                  hintText: "Confirm Password",
-                                  validator: (value) =>
-                                      _validateConfirmPassword(value),
-                                  onSaved: (value) => _confirmPassword = value,
-                                  obscureText: !_confirmPasswordVisible,
-                                  suffixIcon: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _confirmPasswordVisible =
-                                            !_confirmPasswordVisible;
-                                      });
-                                    },
-                                    child: Icon(
-                                      _confirmPasswordVisible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                                CustomFormFields.buildTextFormField(
-                                  hintText: "Phone Number",
-                                  keyboardType: TextInputType.number,
-                                  validator: _validatePhoneNumber,
-                                  onSaved: (value) => _phone = value,
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Text("User:",
-                                        style: TextStyle(fontSize: 16)),
-                                    SizedBox(width: 10),
-                                    Flexible(
-                                      child: Row(
-                                        children: [
-                                          Radio(
-                                            activeColor: Color.fromARGB(
-                                                255, 239, 108, 0),
-                                            value: "Normal",
-                                            groupValue: user,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                user = value.toString();
-                                              });
-                                            },
-                                          ),
-                                          Text("Normal",
-                                              style: TextStyle(fontSize: 16)),
-                                        ],
-                                      ),
-                                    ),
-                                    Flexible(
-                                      child: Row(
-                                        children: [
-                                          Radio(
-                                            activeColor: Color.fromARGB(
-                                                255, 239, 108, 0),
-                                            value: "Chef",
-                                            groupValue: user,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                user = value.toString();
-                                              });
-                                            },
-                                          ),
-                                          Text("Chef",
-                                              style: TextStyle(fontSize: 16)),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: 30),
@@ -331,7 +323,8 @@ Widget build(BuildContext context) {
                           onPressed: () {
                             if (formState.currentState!.validate()) {
                               formState.currentState!.save();
-                              //check the credentials in db if correct navigate to next page
+                              signUp();
+                              // Check the credentials in db if correct navigate to next page
                               /*if( valid credentials ) {
                                     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
                                   }*/
@@ -350,21 +343,10 @@ Widget build(BuildContext context) {
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                               fontSize: 16,
-
                             ),
-                            minWidth: 200,
-                            height: 50,
-                            child: Text(
-                              "Sign Up",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -376,5 +358,6 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
 
 }
