@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/main_page.dart';
 import 'package:untitled/reset_password.dart';
 import 'package:untitled/signup.dart';
 
@@ -208,6 +209,9 @@ class _Signin extends State<Signin> {
                                               });
                                       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
                                     }*/
+                                    Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) => const MainView()));
                               } else {
                                 setState(() {
                                   errorMessage =
