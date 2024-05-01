@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:untitled/main_page.dart';
 import 'package:untitled/reset_password.dart';
 import 'package:untitled/signup.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Signin extends StatefulWidget {
   const Signin({Key? key});
@@ -16,6 +18,37 @@ class _Signin extends State<Signin> {
   String? email;
   String? password;
   String errorMessage = '';
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> signIn() async {
+    const url = 'http://192.168.1.106:3000/signin';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'password': password
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'Sign in successful'};
+      } else if (response.statusCode == 401) {
+        return {
+          'success': false,
+          'message': response.body
+        };
+      } else {
+        return {
+          'success': false,
+          'message': response.body
+        };
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -199,9 +232,14 @@ class _Signin extends State<Signin> {
                             height: 10,
                           ),
                           MaterialButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
+                                Map<String, dynamic> result = await signIn();
+                                bool success = result['success'];
+                                String message = result['message'];
+                                print(success);
+                                print(message);
                                 //check the credintials in db if correct navigate to home page
                                 /*if( valid credintials ) {
                                         setState(() {
@@ -209,9 +247,9 @@ class _Signin extends State<Signin> {
                                               });
                                       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
                                     }*/
-                                    Navigator.of(context).pushReplacement(
+                                    /*Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (context) => const MainView()));
+                                      builder: (context) => const MainView()));*/
                               } else {
                                 setState(() {
                                   errorMessage =

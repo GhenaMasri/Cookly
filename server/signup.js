@@ -4,6 +4,7 @@ const pool = require("./db");
 
 router.post("/", (req, res) => {
   var { firstName, lastName, email, password, phone, userType } = req.body;
+  
   if (userType == "Normal") {
     userType = "normal";
   } else {
@@ -21,21 +22,21 @@ router.post("/", (req, res) => {
         if (results.length > 0) {
           res.status(400).send("Phone number already exists");
           return;
+        } else {
+          const query = 'INSERT INTO user (first_name, last_name, email, password, phone, type) VALUES (?, ?, ?, ?, ?, ?)';
+
+          pool.execute(query, [firstName, lastName, email, password, phone, userType], (error, results, fields) => {
+            if (error) {
+              console.error('Error inserting values:', error);
+              res.status(500).send('Error inserting values');
+              return;
+            }
+            res.status(200).send('Sign up successful');
+          });
         }
       });
     }
   });
-
-  /*const query = 'INSERT INTO user (first_name, last_name, email, password, phone, type) VALUES (?, ?, ?, ?, ?, ?)';
-
-    pool.execute(query, [firstName, lastName, email, password, phone, userType], (error, results, fields) => {
-        if (error) {
-            console.error('Error inserting values:', error);
-            res.status(500).send('Error inserting values');
-            return;
-        }
-        res.status(200).send('Sign up successful');
-    });*/
 });
 
 module.exports = router;
