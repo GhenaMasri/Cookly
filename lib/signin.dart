@@ -4,6 +4,7 @@ import 'package:untitled/reset_password.dart';
 import 'package:untitled/signup.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Signin extends StatefulWidget {
   const Signin({Key? key});
@@ -29,7 +30,9 @@ class _Signin extends State<Signin> {
         body: jsonEncode({'email': email, 'password': password}),
       );
       if (response.statusCode == 200) {
-        return {'success': true, 'message': 'Sign in successful'};
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        Map<String, dynamic> userData = responseData['user'];
+        return {'success': true, 'message': 'Sign in successful', 'user': userData};
       } else if (response.statusCode == 401) {
         return {'success': false, 'message': response.body};
       } else {
@@ -233,6 +236,14 @@ class _Signin extends State<Signin> {
                                 print(message);
                                 //check the credintials in db if correct navigate to home page
                                 if (success) {
+                                  //save user information in shared preferences
+                                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                                  Map<String, dynamic> userData = result['user'];
+                                  await prefs.setInt('id', userData['id']);
+                                  await prefs.setString('first_name', userData['first_name']);
+                                  await prefs.setString('email', userData['email']);
+                                  await prefs.setString('phone', userData['phone']);
+                                  await prefs.setString('type', userData['type']);
                                   setState(() {
                                     errorMessage = "";
                                   });
