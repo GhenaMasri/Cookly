@@ -26,23 +26,14 @@ class _Signin extends State<Signin> {
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password
-        }),
+        body: jsonEncode({'email': email, 'password': password}),
       );
       if (response.statusCode == 200) {
         return {'success': true, 'message': 'Sign in successful'};
       } else if (response.statusCode == 401) {
-        return {
-          'success': false,
-          'message': response.body
-        };
+        return {'success': false, 'message': response.body};
       } else {
-        return {
-          'success': false,
-          'message': response.body
-        };
+        return {'success': false, 'message': response.body};
       }
     } catch (error) {
       return {'success': false, 'message': '$error'};
@@ -241,20 +232,19 @@ class _Signin extends State<Signin> {
                                 print(success);
                                 print(message);
                                 //check the credintials in db if correct navigate to home page
-                                /*if( valid credintials ) {
-                                        setState(() {
-                                                errorMessage = "";
-                                              });
-                                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-                                    }*/
-                                    /*Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) => const MainView()));*/
-                              } else {
-                                setState(() {
-                                  errorMessage =
-                                      'Your email or password is incorrect';
-                                });
+                                if (success) {
+                                  setState(() {
+                                    errorMessage = "";
+                                  });
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) => MainView()));
+                                          //Save the credentials
+                                } else {
+                                  setState(() {
+                                    errorMessage = message;
+                                  });
+                                }
                               }
                             },
                             color: const Color.fromARGB(255, 230, 81, 0),
@@ -271,6 +261,7 @@ class _Signin extends State<Signin> {
                                   fontSize: 16),
                             ),
                           ),
+                          SizedBox(height: 4),
                           Text(
                             errorMessage,
                             style: TextStyle(

@@ -340,12 +340,15 @@ class _Signup extends State<Signup> {
                                 Map<String, dynamic> result = await signUp();
                                 bool success = result['success'];
                                 String message = result['message'];
-                                print(success);
+                                //print(success);
                                 print(message);
                                 // Check the credentials in db if correct navigate to next page
-                                /*if( valid credentials ) {
-                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-                                  }*/
+                                if(success) {
+                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Signin()));
+                                }
+                                  else {
+
+                                  }
                               }
                             },
                             color: Color.fromARGB(255, 230, 81, 0),

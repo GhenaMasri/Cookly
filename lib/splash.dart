@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/welcome_page.dart';
-
-import '../../common/globs.dart';
+import 'package:untitled/common/globs.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -21,13 +20,13 @@ class _StarupViewState extends State<SplashView> {
 
       await Future.delayed( const Duration(seconds: 3) );
       Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const WelcomeView()));
+        context, MaterialPageRoute(builder: (context) => const WelcomeView())); //replave it with welcomePage()
   }
  /* void welcomePage(){
 
     if (Globs.udValueBool(Globs.userLogin)) {
        Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const MainTabView()));
+          MaterialPageRoute(builder: (context) => const MainView()));
     }else{
        Navigator.push(
         context, MaterialPageRoute(builder: (context) => const WelcomeView()));
