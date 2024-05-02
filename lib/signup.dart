@@ -19,6 +19,7 @@ class _Signup extends State<Signup> {
   String? _password;
   String? _confirmPassword;
   String? _phone;
+  String errorMessage = '';
   TextEditingController _passwordController = TextEditingController();
   GlobalKey<FormState> formState = GlobalKey();
   bool _passwordVisible = false;
@@ -50,15 +51,9 @@ class _Signup extends State<Signup> {
       if (response.statusCode == 200) {
         return {'success': true, 'message': 'Sign up successful'};
       } else if (response.statusCode == 400) {
-        return {
-          'success': false,
-          'message': response.body
-        };
+        return {'success': false, 'message': response.body};
       } else {
-        return {
-          'success': false,
-          'message': response.body
-        };
+        return {'success': false, 'message': response.body};
       }
     } catch (error) {
       return {'success': false, 'message': '$error'};
@@ -343,12 +338,19 @@ class _Signup extends State<Signup> {
                                 //print(success);
                                 print(message);
                                 // Check the credentials in db if correct navigate to next page
-                                if(success) {
-                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Signin()));
+                                if (success) {
+                                  setState(() {
+                                    errorMessage = "";
+                                  });
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Signin()));
+                                } else {
+                                  setState(() {
+                                    errorMessage = message;
+                                  });
                                 }
-                                  else {
-
-                                  }
                               }
                             },
                             color: Color.fromARGB(255, 230, 81, 0),
@@ -367,6 +369,14 @@ class _Signup extends State<Signup> {
                               ),
                             ),
                           ),
+                          SizedBox(height: 4),
+                          Text(
+                            errorMessage,
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 230, 81, 0),
+                              fontSize: 12,
+                            ),
+                          )
                         ],
                       ),
                     ),
