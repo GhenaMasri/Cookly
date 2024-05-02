@@ -15,7 +15,8 @@ router.post("/", (req, res) => {
     if (results.length === 0) {
       res.status(401).send("Invalid email or password");
     } else {
-      res.status(200).send("Sign in successful");
+      const user = results[0];
+      res.status(200).send({ message: "Sign in successful", user: user });
     }
   });
 });
