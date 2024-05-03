@@ -24,6 +24,7 @@ class _Signup extends State<Signup> {
   GlobalKey<FormState> formState = GlobalKey();
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
+  bool errorFlag = false;
 
   @override
   void initState() {
@@ -303,6 +304,16 @@ class _Signup extends State<Signup> {
                             ),
                           ),
                           SizedBox(height: 30),
+                          Visibility(
+                            visible: errorFlag,
+                            child: Text(errorMessage,
+                                style: TextStyle(
+                                  color: const Color.fromARGB(255, 230, 81, 0),
+                                  fontSize: 16,
+                                )),
+                          ),
+                          Visibility(
+                              visible: errorFlag, child: SizedBox(height: 8)),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -340,6 +351,7 @@ class _Signup extends State<Signup> {
                                 // Check the credentials in db if correct navigate to next page
                                 if (success) {
                                   setState(() {
+                                    errorFlag = false;
                                     errorMessage = "";
                                   });
                                   Navigator.of(context).pushReplacement(
@@ -348,6 +360,7 @@ class _Signup extends State<Signup> {
                                               const Signin()));
                                 } else {
                                   setState(() {
+                                    errorFlag = true;
                                     errorMessage = message;
                                   });
                                 }

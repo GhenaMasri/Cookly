@@ -19,6 +19,7 @@ class _Signin extends State<Signin> {
   String? email;
   String? password;
   String errorMessage = '';
+  bool errorFlag = false;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> signIn() async {
@@ -32,7 +33,11 @@ class _Signin extends State<Signin> {
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(response.body);
         Map<String, dynamic> userData = responseData['user'];
-        return {'success': true, 'message': 'Sign in successful', 'user': userData};
+        return {
+          'success': true,
+          'message': 'Sign in successful',
+          'user': userData
+        };
       } else if (response.statusCode == 401) {
         return {'success': false, 'message': response.body};
       } else {
@@ -189,6 +194,16 @@ class _Signin extends State<Signin> {
                           const SizedBox(
                             height: 30,
                           ),
+                          Visibility(
+                            visible: errorFlag,
+                            child: Text(errorMessage,
+                                style: TextStyle(
+                                  color: const Color.fromARGB(255, 230, 81, 0),
+                                  fontSize: 16,
+                                )),
+                          ),
+                          Visibility(
+                              visible: errorFlag, child: SizedBox(height: 8)),
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).pushReplacement(
@@ -208,7 +223,8 @@ class _Signin extends State<Signin> {
                                 onTap: () {
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                          builder: (context) => Signup()));
+                                          builder: (context) =>
+                                              const Signup()));
                                 },
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 10),
@@ -237,22 +253,29 @@ class _Signin extends State<Signin> {
                                 //check the credintials in db if correct navigate to home page
                                 if (success) {
                                   //save user information in shared preferences
-                                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                                  Map<String, dynamic> userData = result['user'];
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  Map<String, dynamic> userData =
+                                      result['user'];
                                   await prefs.setInt('id', userData['id']);
-                                  await prefs.setString('first_name', userData['first_name']);
-                                  await prefs.setString('email', userData['email']);
-                                  await prefs.setString('phone', userData['phone']);
-                                  await prefs.setString('type', userData['type']);
+                                  await prefs.setString(
+                                      'first_name', userData['first_name']);
+                                  await prefs.setString(
+                                      'email', userData['email']);
+                                  await prefs.setString(
+                                      'phone', userData['phone']);
+                                  await prefs.setString(
+                                      'type', userData['type']);
                                   setState(() {
+                                    errorFlag = false;
                                     errorMessage = "";
                                   });
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) => MainView()));
-                                  //Save the credentials
                                 } else {
                                   setState(() {
+                                    errorFlag = true;
                                     errorMessage = message;
                                   });
                                 }
@@ -272,14 +295,6 @@ class _Signin extends State<Signin> {
                                   fontSize: 16),
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            errorMessage,
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 230, 81, 0),
-                              fontSize: 12,
-                            ),
-                          )
                         ],
                       ),
                     )))
