@@ -1,10 +1,8 @@
 import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import '../common_widget/tab_button.dart';
 import '../home/home_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -22,17 +20,6 @@ class _MainViewState extends State<MainView> {
   void initState() {
     super.initState();
     selectPageView = const HomeView();
-    _getUserDataFromSharedPreferences();
-  }
-
-  // Method to retrieve user data from shared preferences
-  Future<void> _getUserDataFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int? userId = prefs.getInt('id');
-    String? firstName = prefs.getString('first_name');
-    String? email = prefs.getString('email');
-    String? phone = prefs.getString('phone');
-    String? type = prefs.getString('type');
   }
 
   @override

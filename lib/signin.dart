@@ -258,14 +258,11 @@ class _Signin extends State<Signin> {
                                   Map<String, dynamic> userData =
                                       result['user'];
                                   await prefs.setInt('id', userData['id']);
-                                  await prefs.setString(
-                                      'first_name', userData['first_name']);
-                                  await prefs.setString(
-                                      'email', userData['email']);
-                                  await prefs.setString(
-                                      'phone', userData['phone']);
-                                  await prefs.setString(
-                                      'type', userData['type']);
+                                  await prefs.setString('first_name', userData['first_name']);
+                                  await prefs.setString('email', userData['email']);
+                                  await prefs.setString('phone', userData['phone']);
+                                  await prefs.setString('type', userData['type']);
+                                  await prefs.setBool('isSet', true);
                                   setState(() {
                                     errorFlag = false;
                                     errorMessage = "";
