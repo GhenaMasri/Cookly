@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/chef_signup.dart';
+import 'package:untitled/chef_signup_more.dart';
+import 'package:untitled/common/kitchenData.dart';
 import 'package:untitled/main_page.dart';
 import 'package:untitled/splash.dart';
 void main() {
@@ -8,16 +11,18 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       title: "Cookly",
       theme: ThemeData(
         fontFamily: "Metropolis",
       ),
       // ignore: prefer_const_constructors
-      home:  SplashView()
+      home: SplashView()
     );
   }
 }

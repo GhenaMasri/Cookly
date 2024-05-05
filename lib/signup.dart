@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/chef_signup.dart';
 import 'package:untitled/common_widget/customformfield.dart';
 import 'package:untitled/signin.dart';
 import 'dart:convert';
@@ -354,10 +355,17 @@ class _Signup extends State<Signup> {
                                     errorFlag = false;
                                     errorMessage = "";
                                   });
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const Signin()));
+                                  if (user == "Normal") {
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Signin()));
+                                  } else {
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ChefSignup()));
+                                  }
                                 } else {
                                   setState(() {
                                     errorFlag = true;
