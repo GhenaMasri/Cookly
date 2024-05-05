@@ -114,7 +114,7 @@ class _ChefSignup extends State<ChefSignup> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Complete Registeration",
+                        "Complete Registration",
                         style: TextStyle(color: Colors.white, fontSize: 30),
                       ),
                       SizedBox(height: 4),

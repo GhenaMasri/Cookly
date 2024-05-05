@@ -15,23 +15,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-  KitchenData kitchenData = KitchenData(
-  location: "Some location",
-  name: "John Doe",
-  phone: "1234567890",
-  street: "Some street",
-  category: "Some category",
-  description: "Some description",
-  orderingSystem: "Some ordering system",
-  specialOrders: "Yes",
-);
+
     return MaterialApp(
       title: "Cookly",
       theme: ThemeData(
         fontFamily: "Metropolis",
       ),
       // ignore: prefer_const_constructors
-      home:  ChefSignupDetails(MykitchenData: kitchenData,)
+      home: SplashView()
     );
   }
 }
