@@ -119,14 +119,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                           String message = "";
                           print(result);
                           if (success) {
+                            /*Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => NewPassword()));*/
                           } else {
                             setState(() {
                               errorFlag = true;
                               errorMessage = message;
                             });
                           }
-                          /*Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => NewPassword()));*/
                         }
                       }),
                 ],
