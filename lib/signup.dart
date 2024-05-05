@@ -382,14 +382,6 @@ class _Signup extends State<Signup> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            errorMessage,
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 230, 81, 0),
-                              fontSize: 12,
-                            ),
-                          )
                         ],
                       ),
                     ),

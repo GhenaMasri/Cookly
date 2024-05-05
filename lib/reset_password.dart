@@ -15,7 +15,20 @@ class ResetPassword extends StatefulWidget {
 
 class _ResetPasswordState extends State<ResetPassword> {
   TextEditingController txtEmail = TextEditingController();
-  String? email = "wasanjehad75@gmail.com";
+  GlobalKey<FormState> formState = GlobalKey();
+
+  String? email;
+
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    return null;
+  }
+
+  void saveEmail(String? value) {
+    email = value;
+  }
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<String> resetPassword() async {
@@ -24,9 +37,7 @@ class _ResetPasswordState extends State<ResetPassword> {
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email
-        }),
+        body: jsonEncode({'email': email}),
       );
       if (response.statusCode == 200) {
         return response.body;
@@ -47,51 +58,55 @@ class _ResetPasswordState extends State<ResetPassword> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 64,
-              ),
-              Text(
-                "Reset Password",
-                style: TextStyle(
-                    color: TColor.primaryText,
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Text(
-                "Please enter your email to receive a\n reset email to create a new password",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: TColor.secondaryText,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(
-                height: 60,
-              ),
-              RoundTextfield(
-                hintText: "Your Email",
-                controller: txtEmail,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              RoundButton(
-                  title: "Send",
-                  onPressed: () async {
-                    String result = await resetPassword();
-                    print(result);
-                    /*Navigator.of(context).pushReplacement(
+          child: Form(
+              key: formState,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 64,
+                  ),
+                  Text(
+                    "Reset Password",
+                    style: TextStyle(
+                        color: TColor.primaryText,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    "Please enter your email to receive a\n reset email to create a new password",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: TColor.secondaryText,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(
+                    height: 60,
+                  ),
+                  RoundTextfield(
+                    validator: validateEmail,
+                    onSaved: saveEmail,
+                    hintText: "Your Email",
+                    controller: txtEmail,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  RoundButton(
+                      title: "Send",
+                      onPressed: () async {
+                        String result = await resetPassword();
+                        print(result);
+                        /*Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) => NewPassword()));*/
-                  }),
-            ],
-          ),
+                      }),
+                ],
+              )),
         ),
       ),
     );
