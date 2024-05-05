@@ -9,15 +9,20 @@ class RoundTextfield extends StatelessWidget {
   final bool obscureText;
   final Color? bgColor;
   final Widget? left;
+  final String? Function(String?)? validator;
+  final void Function(String?)? onSaved;
 
-  const RoundTextfield(
-      {super.key,
-      required this.hintText,
-      this.controller,
-      this.keyboardType,
-      this.bgColor,
-      this.left,
-      this.obscureText = false});
+  const RoundTextfield({
+    super.key,
+    required this.hintText,
+    this.controller,
+    this.keyboardType,
+    this.bgColor,
+    this.left,
+    this.obscureText = false,
+    this.validator,
+    this.onSaved,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +40,9 @@ class RoundTextfield extends StatelessWidget {
               child: left!,
             ),
           Expanded(
-            child: TextField(
+            child: TextFormField(
+              validator: validator,
+              onSaved: onSaved,
               autocorrect: false,
               controller: controller,
               obscureText: obscureText,
@@ -66,16 +73,21 @@ class RoundTitleTextfield extends StatelessWidget {
   final bool obscureText;
   final Color? bgColor;
   final Widget? left;
+  final String? Function(String?)? validator;
+  final void Function(String?)? onSaved;
 
-  const RoundTitleTextfield(
-      {super.key,
-      required this.title,
-      required this.hintText,
-      this.controller,
-      this.keyboardType,
-      this.bgColor,
-      this.left,
-      this.obscureText = false});
+  const RoundTitleTextfield({
+    super.key,
+    required this.title,
+    required this.hintText,
+    this.controller,
+    this.keyboardType,
+    this.bgColor,
+    this.left,
+    this.obscureText = false,
+    this.validator,
+    this.onSaved,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -98,9 +110,13 @@ class RoundTitleTextfield extends StatelessWidget {
               children: [
                 Container(
                   height: 55,
-                  margin: const EdgeInsets.only(top: 8,),
+                  margin: const EdgeInsets.only(
+                    top: 8,
+                  ),
                   alignment: Alignment.topLeft,
-                  child: TextField(
+                  child: TextFormField(
+                    validator: validator,
+                    onSaved: onSaved,
                     autocorrect: false,
                     controller: controller,
                     obscureText: obscureText,
