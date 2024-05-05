@@ -23,6 +23,9 @@ class _ResetPasswordState extends State<ResetPassword> {
     if (value == null || value.isEmpty) {
       return 'Email is required';
     }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
     return null;
   }
 
@@ -100,10 +103,13 @@ class _ResetPasswordState extends State<ResetPassword> {
                   RoundButton(
                       title: "Send",
                       onPressed: () async {
-                        String result = await resetPassword();
-                        print(result);
-                        /*Navigator.of(context).pushReplacement(
+                        if (formState.currentState!.validate()) {
+                          formState.currentState!.save();
+                          String result = await resetPassword();
+                          print(result);
+                          /*Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) => NewPassword()));*/
+                        }
                       }),
                 ],
               )),

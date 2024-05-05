@@ -73,16 +73,21 @@ class RoundTitleTextfield extends StatelessWidget {
   final bool obscureText;
   final Color? bgColor;
   final Widget? left;
+  final String? Function(String?)? validator;
+  final void Function(String?)? onSaved;
 
-  const RoundTitleTextfield(
-      {super.key,
-      required this.title,
-      required this.hintText,
-      this.controller,
-      this.keyboardType,
-      this.bgColor,
-      this.left,
-      this.obscureText = false});
+  const RoundTitleTextfield({
+    super.key,
+    required this.title,
+    required this.hintText,
+    this.controller,
+    this.keyboardType,
+    this.bgColor,
+    this.left,
+    this.obscureText = false,
+    this.validator,
+    this.onSaved,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +115,8 @@ class RoundTitleTextfield extends StatelessWidget {
                   ),
                   alignment: Alignment.topLeft,
                   child: TextFormField(
+                    validator: validator,
+                    onSaved: onSaved,
                     autocorrect: false,
                     controller: controller,
                     obscureText: obscureText,
