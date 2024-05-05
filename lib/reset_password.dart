@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import '../../common_widget/round_textfield.dart';
-import 'new_password.dart';
+import 'package:untitled/new_password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -120,7 +120,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                           print(result);
                           if (success) {
                             /*Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => NewPassword()));*/
+                        MaterialPageRoute(builder: (context) => NewPasswordState()));*/
                           } else {
                             setState(() {
                               errorFlag = true;
