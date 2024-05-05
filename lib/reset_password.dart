@@ -16,7 +16,8 @@ class ResetPassword extends StatefulWidget {
 class _ResetPasswordState extends State<ResetPassword> {
   TextEditingController txtEmail = TextEditingController();
   GlobalKey<FormState> formState = GlobalKey();
-
+  String errorMessage = '';
+  bool errorFlag = false;
   String? email;
 
   String? validateEmail(String? value) {
@@ -100,13 +101,30 @@ class _ResetPasswordState extends State<ResetPassword> {
                   const SizedBox(
                     height: 30,
                   ),
+                  Visibility(
+                    visible: errorFlag,
+                    child: Text(errorMessage,
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 230, 81, 0),
+                          fontSize: 16,
+                        )),
+                  ),
                   RoundButton(
                       title: "Send",
                       onPressed: () async {
                         if (formState.currentState!.validate()) {
                           formState.currentState!.save();
                           String result = await resetPassword();
+                          bool success = true;
+                          String message = "";
                           print(result);
+                          if (success) {
+                          } else {
+                            setState(() {
+                              errorFlag = true;
+                              errorMessage = message;
+                            });
+                          }
                           /*Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) => NewPassword()));*/
                         }
