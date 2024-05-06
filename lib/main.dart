@@ -7,10 +7,10 @@ import 'package:untitled/common/kitchenData.dart';
 import 'package:untitled/main_page.dart';
 import 'package:untitled/splash.dart';
 
-void main() async{
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
-  await  Firebase.initializeApp(
+    await Firebase.initializeApp(
         options: FirebaseOptions(
             apiKey: "AIzaSyDBr3kDt_-WmqxXkVSlxyPle7XAbrgcRHo",
             authDomain: "cookly-495b4.firebaseapp.com",
@@ -19,7 +19,7 @@ void main() async{
             messagingSenderId: "13158533461",
             appId: "1:13158533461:web:118e6c10b556e6bd6287dc",
             measurementId: "G-S3NFN865JQ"));
-  } else{
+  } else {
     await Firebase.initializeApp();
   }
   runApp(const MyApp());
