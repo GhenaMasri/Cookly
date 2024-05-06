@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/welcome_page.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/main_page.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -17,21 +18,19 @@ class _StarupViewState extends State<SplashView> {
   }
 
   void goWelcomePage() async {
-
       await Future.delayed( const Duration(seconds: 3) );
-      Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const WelcomeView())); //replave it with welcomePage()
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const WelcomeView()));
+      //welcomePage();
   }
- /* void welcomePage(){
 
-    if (Globs.udValueBool(Globs.userLogin)) {
-       Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const MainView()));
-    }else{
-       Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const WelcomeView()));
+  void welcomePage() async{
+    bool? isSet = await SharedPreferencesService.getIsSet();
+    if (isSet == true) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const MainView()));
+    } else{
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const WelcomeView()));
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {

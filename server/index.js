@@ -1,17 +1,27 @@
 const express = require('express');
 const app = express();
+const pool = require("./db");
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-const signupRoute = require('./signup');
+const signupRoute = require('./routes/signup');
 app.use('/signup', signupRoute);
 
-const signinRoute = require('./signin');
+const signinRoute = require('./routes/signin');
 app.use('/signin', signinRoute);
 
-const resetPasswordRoute = require('./reset_password');
+const resetPasswordRoute = require('./routes/reset_password');
 app.use('/reset-password', resetPasswordRoute);
+
+const verifyChefdRoute = require('./routes/verify_chef');
+app.use('/verify-chef', verifyChefdRoute);
+
+const chefSignupdRoute = require('./routes/chef_signup');
+app.use('/chef-signup', chefSignupdRoute);
+
+const kitchenCategoriesRoute = require('./routes/kitchen_categories');
+app.use('/kitchen-categories', kitchenCategoriesRoute);
 
 const port = 3000;
 app.listen(port, () => {

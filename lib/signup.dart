@@ -345,12 +345,12 @@ class _Signup extends State<Signup> {
                             onPressed: () async {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
+                                /////////////////////// BACKEND SECTION /////////////////////////
                                 Map<String, dynamic> result = await signUp();
                                 bool success = result['success'];
                                 String message = result['message'];
-                                //print(success);
                                 print(message);
-                                // Check the credentials in db if correct navigate to next page
+                                ////////////////////////////////////////////////////////////////
                                 if (success) {
                                   setState(() {
                                     errorFlag = false;

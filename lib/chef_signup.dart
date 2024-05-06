@@ -1,16 +1,14 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:flutter/material.dart';
 import 'package:untitled/chef_signup_more.dart';
 import 'package:untitled/common/kitchenData.dart';
-import 'package:untitled/common_widget/customformfield.dart';
 import 'package:untitled/common_widget/dropdownfield.dart';
 import 'package:untitled/common_widget/image_selection.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
-import 'package:untitled/signin.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class ChefSignup extends StatefulWidget {
   const ChefSignup({Key? key});
@@ -21,6 +19,8 @@ class ChefSignup extends StatefulWidget {
 
 class _ChefSignup extends State<ChefSignup> {
   TextEditingController txtName = TextEditingController();
+  TextEditingController txtPhone = TextEditingController();
+  TextEditingController txtStreet = TextEditingController();
   String errorMessage = '';
   File? _image;
   String? location;
@@ -28,6 +28,31 @@ class _ChefSignup extends State<ChefSignup> {
   String? phone;
   String? street;
   late KitchenData kitchenData;
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> verifyChef() async {
+    const url = '${SharedPreferencesService.url}verify-chef';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': name,
+          'contact': phone,
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'Verified successfully'};
+      } else if (response.statusCode == 400) {
+        return {'success': false, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////////
 
   Future<void> _getImageFromGallery() async {
     final picker = ImagePicker();
@@ -75,14 +100,13 @@ class _ChefSignup extends State<ChefSignup> {
       return 'Please enter your phone number';
     }
     // Check if the phone number is 10 digits long
-    if (value.length != 10 || value.length != 9) {
-      return 'Phone number must be 9 or 10 digits long';
+    if (value.length != 10) {
+      return 'Phone number must be 10 digits long';
     }
     // Check if the phone number starts with either 059 or 056
     if (!value.startsWith('059') &&
-        !value.startsWith('056') &&
-        !value.startsWith('092')) {
-      return 'Phone number must start with 092 or 059 or 056';
+        !value.startsWith('056')) {
+      return 'Phone number must start with 059 or 056';
     }
     return null;
   }
@@ -159,7 +183,7 @@ class _ChefSignup extends State<ChefSignup> {
                             child: Column(
                               children: [
                                 RoundTextfield(
-                                  hintText: "Business Name",
+                                  hintText: "Kitchen Name",
                                   controller: txtName,
                                   validator: validateField,
                                   onSaved: saveName,
@@ -185,7 +209,7 @@ class _ChefSignup extends State<ChefSignup> {
                                 SizedBox(height: 15),
                                 RoundTextfield(
                                   hintText: "Street",
-                                  controller: txtName,
+                                  controller: txtStreet,
                                   validator: validateField,
                                   onSaved: saveStreet,
                                 ),
@@ -195,7 +219,7 @@ class _ChefSignup extends State<ChefSignup> {
                                   keyboardType: TextInputType.number,
                                   validator: _validatePhoneNumber,
                                   onSaved: savePhone,
-                                  controller: txtName,
+                                  controller: txtPhone,
                                 ),
                                 SizedBox(height: 15),
                               ],
@@ -217,12 +241,12 @@ class _ChefSignup extends State<ChefSignup> {
                             onPressed: () async {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
-
-                                bool success = true;
-                                String message = "";
-                                //print(success);
+                                /////////////////////// BACKEND SECTION /////////////////////////
+                                Map<String, dynamic> result = await verifyChef();
+                                bool success = result['success'];
+                                String message = result['message'];
                                 print(message);
-                                // Check the credentials in db if correct navigate to next page
+                                ////////////////////////////////////////////////////////////////
                                 if (success) {
                                   setState(() {
                                     errorFlag = false;
