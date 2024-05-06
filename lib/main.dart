@@ -6,21 +6,24 @@ import 'package:untitled/chef_signup_more.dart';
 import 'package:untitled/common/kitchenData.dart';
 import 'package:untitled/main_page.dart';
 import 'package:untitled/splash.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 
-Future main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
+void main() async{
+   WidgetsFlutterBinding.ensureInitialized();
+  try {
     await Firebase.initializeApp(
-        options: FirebaseOptions(
+        options: const FirebaseOptions(
             apiKey: "AIzaSyDBr3kDt_-WmqxXkVSlxyPle7XAbrgcRHo",
             authDomain: "cookly-495b4.firebaseapp.com",
             projectId: "cookly-495b4",
             storageBucket: "cookly-495b4.appspot.com",
             messagingSenderId: "13158533461",
             appId: "1:13158533461:web:118e6c10b556e6bd6287dc",
-            measurementId: "G-S3NFN865JQ"));
-  } else {
-    await Firebase.initializeApp();
+            measurementId: "G-S3NFN865JQ")
+    );
+    await FirebaseAppCheck.instance.activate();
+  } catch (e) {
+    print('Error initializing Firebase: $e');
   }
   runApp(const MyApp());
 }
