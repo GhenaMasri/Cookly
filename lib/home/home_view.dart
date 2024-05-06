@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled/common/globs.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -23,13 +23,8 @@ class _HomeViewState extends State<HomeView> {
     _loadUserName();
   }
 
-  Future<String?> getUserNameFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('first_name');
-  }
-
   Future<void> _loadUserName() async {
-    String? name = await getUserNameFromSharedPreferences();
+    String? name = await SharedPreferencesService.getUserName();
     setState(() {
       username = name;
     });

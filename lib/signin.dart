@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/common/globs.dart';
 import 'package:untitled/main_page.dart';
 import 'package:untitled/reset_password.dart';
 import 'package:untitled/signup.dart';
@@ -23,7 +24,7 @@ class _Signin extends State<Signin> {
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> signIn() async {
-    const url = 'http://192.168.1.106:3000/signin';
+    const url = '${SharedPreferencesService.url}signin';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -252,17 +253,16 @@ class _Signin extends State<Signin> {
                                 print(message);
                                 //check the credintials in db if correct navigate to home page
                                 if (success) {
-                                  //save user information in shared preferences
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  Map<String, dynamic> userData =
-                                      result['user'];
+                                  ////////////////////////// BACKEND SECTION ///////////////////////////
+                                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                                  Map<String, dynamic> userData = result['user'];
                                   await prefs.setInt('id', userData['id']);
                                   await prefs.setString('first_name', userData['first_name']);
                                   await prefs.setString('email', userData['email']);
                                   await prefs.setString('phone', userData['phone']);
                                   await prefs.setString('type', userData['type']);
                                   await prefs.setBool('isSet', true);
+                                  ////////////////////////////////////////////////////////////////////////
                                   setState(() {
                                     errorFlag = false;
                                     errorMessage = "";

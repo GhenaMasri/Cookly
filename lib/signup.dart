@@ -3,6 +3,7 @@ import 'package:untitled/common_widget/customformfield.dart';
 import 'package:untitled/signin.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key});
@@ -35,7 +36,7 @@ class _Signup extends State<Signup> {
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> signUp() async {
-    const url = 'http://192.168.1.106:3000/signup';
+    const url = '${SharedPreferencesService.url}signup';
     try {
       final response = await http.post(
         Uri.parse(url),
