@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "13158533461",
+    "project_id": "cookly-495b4",
+    "storage_bucket": "cookly-495b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13158533461:android:3aa0351c965becba6287dc",
+        "android_client_info": {
+          "package_name": "com.example.untitled"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADOq54ib7TjYiD_N9wlRM6SH6qWEV12xw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
