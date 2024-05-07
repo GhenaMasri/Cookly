@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 
 // Define the class
 class KitchenData {
-  File? image;
+  String? image;
   String? location;
   String? name;
   String? phone;
   String? street;
-  String? category;
+  int? category;
   String? description;
-  String? orderingSystem;
+  int? orderingSystem;
   String? specialOrders;
+  int? userId;
 
   KitchenData({
     this.image,
@@ -22,7 +23,8 @@ class KitchenData {
     this.street,
     this.category,
     this.description,
-    this.orderingSystem,
+     this.orderingSystem,
     this.specialOrders = "Yes",
+    this.userId
   });
 }

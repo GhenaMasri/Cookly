@@ -9,6 +9,7 @@ import 'package:untitled/common_widget/round_textfield.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:untitled/common/globs.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ChefSignup extends StatefulWidget {
   const ChefSignup({Key? key});
@@ -28,6 +29,7 @@ class _ChefSignup extends State<ChefSignup> {
   String? phone;
   String? street;
   late KitchenData kitchenData;
+  String? imageUrl;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> verifyChef() async {
@@ -57,7 +59,7 @@ class _ChefSignup extends State<ChefSignup> {
   Future<void> _getImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
@@ -65,6 +67,18 @@ class _ChefSignup extends State<ChefSignup> {
         print('No image selected.');
       }
     });
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirectory = referenceRoot.child('images');
+    Reference referenceImageToUpload = referenceDirectory.child(uniqueFileName);
+
+    try {
+      //Store the file
+      await referenceImageToUpload.putFile(File(pickedFile!.path));
+      //Success: get the download URL
+      imageUrl = await referenceImageToUpload.getDownloadURL();
+    } catch (error) {
+      //Some error occurred
+    }
   }
 
   String? validateField(String? value) {
@@ -104,8 +118,7 @@ class _ChefSignup extends State<ChefSignup> {
       return 'Phone number must be 10 digits long';
     }
     // Check if the phone number starts with either 059 or 056
-    if (!value.startsWith('059') &&
-        !value.startsWith('056')) {
+    if (!value.startsWith('059') && !value.startsWith('056')) {
       return 'Phone number must start with 059 or 056';
     }
     return null;
@@ -152,6 +165,7 @@ class _ChefSignup extends State<ChefSignup> {
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
+                  height: MediaQuery.of(context).size.height,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -195,7 +209,7 @@ class _ChefSignup extends State<ChefSignup> {
                                 ),
                                 SizedBox(height: 15),
                                 RoundDropdown(
-                                    value: null, // Initial value
+                                    value: location, // Initial value
                                     hintText: 'Select City',
                                     items: [
                                       'Nablus',
@@ -204,7 +218,9 @@ class _ChefSignup extends State<ChefSignup> {
                                       'Tulkarm'
                                     ],
                                     onChanged: (String? value) {
-                                      location = value;
+                                      setState(() {
+                                        location = value;
+                                      });
                                     }),
                                 SizedBox(height: 15),
                                 RoundTextfield(
@@ -242,7 +258,8 @@ class _ChefSignup extends State<ChefSignup> {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
                                 /////////////////////// BACKEND SECTION /////////////////////////
-                                Map<String, dynamic> result = await verifyChef();
+                                Map<String, dynamic> result =
+                                    await verifyChef();
                                 bool success = result['success'];
                                 String message = result['message'];
                                 print(message);
@@ -253,7 +270,7 @@ class _ChefSignup extends State<ChefSignup> {
                                     errorMessage = "";
                                   });
                                   kitchenData = KitchenData(
-                                      image: this._image,
+                                      image: this.imageUrl,
                                       name: this.name,
                                       location: this.location,
                                       phone: this.phone,
@@ -261,7 +278,7 @@ class _ChefSignup extends State<ChefSignup> {
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                               ChefSignupDetails(
+                                              ChefSignupDetails(
                                                 MykitchenData: kitchenData,
                                               )));
                                 } else {
