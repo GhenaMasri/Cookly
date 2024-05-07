@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const pool = require("./db");
+const pool = require("../db");
 
 router.post("/", async (req, res) => {
   var { firstName, lastName, email, password, phone, userType } = req.body;
-  
+
   if (userType == "Normal") {
     userType = "normal";
   } else {
@@ -25,16 +25,21 @@ router.post("/", async (req, res) => {
           return;
         } else {
           const hashedPassword = await bcrypt.hash(password, 10);
-          const query = 'INSERT INTO user (first_name, last_name, email, password, phone, type) VALUES (?, ?, ?, ?, ?, ?)';
+          const query =
+            "INSERT INTO user (first_name, last_name, email, password, phone, type) VALUES (?, ?, ?, ?, ?, ?)";
 
-          pool.execute(query, [firstName, lastName, email, hashedPassword, phone, userType], (error, results, fields) => {
-            if (error) {
-              console.error('Error inserting values:', error);
-              res.status(500).send('Error inserting values');
-              return;
+          pool.execute(
+            query,
+            [firstName, lastName, email, hashedPassword, phone, userType],
+            (error, results, fields) => {
+              if (error) {
+                console.error("Error inserting values:", error);
+                res.status(500).send("Error inserting values");
+                return;
+              }
+              res.status(200).send("Sign up successful");
             }
-            res.status(200).send('Sign up successful');
-          });
+          );
         }
       });
     }

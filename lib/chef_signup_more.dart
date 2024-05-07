@@ -1,15 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common/kitchenData.dart';
 import 'package:untitled/common_widget/dropdownfield.dart';
-import 'package:untitled/common_widget/image_selection.dart';
 import 'package:untitled/common_widget/round_textarea.dart';
-import 'package:untitled/common_widget/round_textfield.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:untitled/signin.dart';
+import 'package:untitled/common/globs.dart';
 
 class ChefSignupDetails extends StatefulWidget {
   KitchenData MykitchenData;
@@ -30,6 +28,49 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   String? description;
   String? orderingSystem;
   String? specialOrders = "Yes";
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> chefSignUp() async {
+    const url = '${SharedPreferencesService.url}chef-signup';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': widget.MykitchenData.name,
+          'logo': widget.MykitchenData.image,
+          'description': widget.MykitchenData.description,
+          'city': widget.MykitchenData.location,
+          'street': widget.MykitchenData.street,
+          'contact': widget.MykitchenData.phone,
+          'category_id': widget.MykitchenData.category,
+          'order_system': widget.MykitchenData.orderingSystem,
+          'special_orders': widget.MykitchenData.specialOrders,
+          'user_id': widget.MykitchenData.category,
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<List<String>> getKitchenCategories() async {
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> categoryList = data['categories'];
+      final List<String> categories = List<String>.from(categoryList);
+      return categories;
+    } else {
+      throw Exception('Failed to load kitchen categories');
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////////
 
   String? validateField(String? value) {
     if (value == null || value.isEmpty) {
@@ -233,18 +274,20 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                             onPressed: () async {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
-
-                                bool success = true;
-                                String message = "";
+                                widget.MykitchenData.description = description;
+                                widget.MykitchenData.category = category;
+                                widget.MykitchenData.orderingSystem =
+                                    orderingSystem;
+                                widget.MykitchenData.specialOrders =
+                                    specialOrders;
+                                /////////////////////// BACKEND SECTION /////////////////////////
+                                Map<String, dynamic> result =
+                                    await chefSignUp();
+                                bool success = result['success'];
+                                String message = result['message'];
+                                print(message);
+                                ////////////////////////////////////////////////////////////////
                                 if (success) {
-                                  widget.MykitchenData.description =
-                                      description;
-                                  widget.MykitchenData.category = category;
-                                  widget.MykitchenData.orderingSystem =
-                                      orderingSystem;
-                                  widget.MykitchenData.specialOrders =
-                                      specialOrders;
-
                                   setState(() {
                                     errorFlag = false;
                                     errorMessage = "";
