@@ -25,9 +25,12 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   TextEditingController txtName = TextEditingController();
   String errorMessage = '';
   String? category;
+  int? selectedCategory;
   String? description;
   String? orderingSystem;
   String? specialOrders = "Yes";
+  List<String> categories = {""}.toList();
+  
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> chefSignUp() async {
@@ -60,11 +63,12 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   }
 
   Future<List<String>> getKitchenCategories() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> categoryList = data['categories'];
-      final List<String> categories = List<String>.from(categoryList);
+      categories = List<String>.from(categoryList);
       return categories;
     } else {
       throw Exception('Failed to load kitchen categories');
@@ -91,6 +95,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   void initState() {
     super.initState();
     specialOrders = "Yes";
+    getKitchenCategories();
   }
 
   @override
@@ -134,6 +139,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                 const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
+                  height: MediaQuery.of(context).size.height,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -172,27 +178,27 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                                 ),
                                 SizedBox(height: 15),
                                 RoundDropdown(
-                                    value: null, // Initial value
+                                    value: category, // Initial value
                                     hintText: 'Select Category',
-                                    items: [
-                                      'Food',
-                                      'Dessert',
-                                      'Bakery',
-                                      'Yalanji'
-                                    ],
+                                    items: categories,
                                     onChanged: (String? value) {
-                                      category = value;
+                                      setState(() {
+                                        category = value;
+                                        selectedCategory = categories.indexOf(value!);
+                                      });
                                     }),
                                 SizedBox(height: 15),
                                 RoundDropdown(
-                                    value: null, // Initial value
+                                    value: orderingSystem, // Initial value
                                     hintText: 'Ordering System',
                                     items: [
                                       'Order in the same day',
                                       'Order the day before'
                                     ],
                                     onChanged: (String? value) {
-                                      orderingSystem = value;
+                                      setState(() {
+                                        orderingSystem = value;
+                                      });
                                     }),
                                 SizedBox(height: 15),
                                 Row(
@@ -275,9 +281,12 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
                                 widget.MykitchenData.description = description;
-                                widget.MykitchenData.category = category;
-                                widget.MykitchenData.orderingSystem =
-                                    orderingSystem;
+                                widget.MykitchenData.category = selectedCategory;
+                                if (orderingSystem == 'Order the day before') {
+                                  widget.MykitchenData.orderingSystem = 0;
+                                } else {
+                                  widget.MykitchenData.orderingSystem = 1;
+                                }
                                 widget.MykitchenData.specialOrders =
                                     specialOrders;
                                 /////////////////////// BACKEND SECTION /////////////////////////
