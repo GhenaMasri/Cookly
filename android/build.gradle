@@ -1,12 +1,19 @@
-buildscript{
-    repositories{
+buildscript {
+    repositories {
+        // Check that you have the following line (if not, add it):
         google()
-        jcenter()
+        mavenCentral() // Google's Maven repository
     }
-     dependencies{
-        //classpath 'com.google.gms.google-services:4.4.1'
+
+    // Set the Kotlin version here
+    ext.kotlin_version = '1.9.20'
+
+    dependencies {
+        classpath 'com.google.gms:google-services:4.4.1' // Google Services plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // Kotlin Gradle plugin
     }
 }
+
 
 allprojects {
     repositories {
