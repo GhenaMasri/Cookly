@@ -185,7 +185,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                     child: RoundTitleTextfield(
-                      title: "Estimated Preperation Time",
+                      title: "Estimated Preparation Time",
                       hintText: "Enter Time",
                       keyboardType: TextInputType.datetime,
                       controller: txtTime,
