@@ -4,6 +4,7 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/menu/menu_item.dart';
 
 class ChefHomeView extends StatefulWidget {
   const ChefHomeView({Key? key}) : super(key: key);
@@ -15,6 +16,8 @@ class ChefHomeView extends StatefulWidget {
 class _ChefHomeViewState extends State<ChefHomeView> {
   String? selectedLocation;
   TextEditingController txtSearch = TextEditingController();
+
+  
 
   List<MenuItem> menuArr = List.generate(
     8,
@@ -28,7 +31,11 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       quantity: "4 slices",
     ),
   );
-
+void addItemToList(MenuItem item) {
+  setState(() {
+    menuArr.add(item);
+  });
+}
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -134,13 +141,14 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                           ],
                         ),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            const SizedBox(width: 3),
                             ClipOval(
                               child: Image.network(
                                 menuItem.image!,
-                                width: 80,
-                                height: 80,
+                                width: 70,
+                                height: 70,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -167,6 +175,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                                       fontSize: 12,
                                     ),
                                   ),
+                                  const SizedBox(height: 12),
                                 ],
                               ),
                             ),
@@ -175,7 +184,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                                 /*Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MenuItemsView(
+                builder: (context) => MenuItemView(
                   menuItem: menuItem,
                 ),
               ),
@@ -215,7 +224,12 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Handle floating action button press
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MenuItemView(menu: menuArr,addItemToList: addItemToList),
+            ),
+          );
         },
         shape: const CircleBorder(),
         backgroundColor: TColor.primary,

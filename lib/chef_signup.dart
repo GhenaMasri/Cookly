@@ -275,7 +275,7 @@ class _ChefSignup extends State<ChefSignup> {
                                       location: this.location,
                                       phone: this.phone,
                                       street: this.street);
-                                  Navigator.of(context).pushReplacement(
+                                  Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               ChefSignupDetails(

@@ -75,6 +75,7 @@ class RoundTitleTextfield extends StatelessWidget {
   final Widget? left;
   final String? Function(String?)? validator;
   final void Function(String?)? onSaved;
+  final int? maxLines;
 
   const RoundTitleTextfield({
     super.key,
@@ -87,34 +88,39 @@ class RoundTitleTextfield extends StatelessWidget {
     this.obscureText = false,
     this.validator,
     this.onSaved,
+    this.maxLines = 1,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 55,
-      decoration: BoxDecoration(
-          color: bgColor ?? TColor.textfield,
-          borderRadius: BorderRadius.circular(25)),
-      child: Row(
-        children: [
-          if (left != null)
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 15,
-              ),
-              child: left!,
+ @override
+Widget build(BuildContext context) {
+  return Container(
+    height: maxLines! * 55.0,
+    decoration: BoxDecoration(
+      color: bgColor ?? TColor.textfield,
+      borderRadius: BorderRadius.circular(25),
+    ),
+    child: Row(
+      children: [
+        if (left != null)
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 15,
             ),
-          Expanded(
-            child: Stack(
-              children: [
-                Container(
-                  height: 55,
-                  margin: const EdgeInsets.only(
-                    top: 8,
-                  ),
-                  alignment: Alignment.topLeft,
+            child: left!,
+          ),
+        Expanded(
+          child: Stack(
+            children: [
+              Container(
+                height: maxLines! * 55.0,
+                margin: EdgeInsets.only(
+                  top: maxLines == 1 ? 8 : 10,
+                ),
+                alignment: Alignment.topLeft,
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 0), 
                   child: TextFormField(
+                    maxLines: maxLines,
                     validator: validator,
                     onSaved: onSaved,
                     autocorrect: false,
@@ -124,30 +130,43 @@ class RoundTitleTextfield extends StatelessWidget {
                     decoration: InputDecoration(
                       contentPadding:
                           const EdgeInsets.symmetric(horizontal: 20),
+                          
+                      errorBorder: InputBorder.none, 
+                      focusedErrorBorder: InputBorder.none,
+                      errorStyle: TextStyle(
+                        fontSize: 10,
+                      ),
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
                       hintText: hintText,
                       hintStyle: TextStyle(
-                          color: TColor.placeholder,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500),
+                        color: TColor.placeholder,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        height: maxLines! > 1 ? 4 : 0,
+                      ),
                     ),
                   ),
                 ),
-                Container(
-                  height: 55,
-                  margin: const EdgeInsets.only(top: 10, left: 20),
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    title,
-                    style: TextStyle(color: TColor.placeholder, fontSize: 11),
-                  ),
-                )
-              ],
-            ),
+              ),
+              Container(
+                height: maxLines! * 55.0,
+                margin: EdgeInsets.only(
+                  top: 10 ,
+                  left: 20,
+                ),
+                alignment: Alignment.topLeft,
+                child: Text(
+                  title,
+                  style: TextStyle(color: TColor.placeholder, fontSize: 11),
+                ),
+              )
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 }

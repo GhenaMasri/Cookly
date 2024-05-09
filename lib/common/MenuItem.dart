@@ -10,6 +10,7 @@ class MenuItem {
   String? name;
   String? notes;
   String? quantity;
+  String? category;
  
   MenuItem({
     this.kitchenId,
@@ -18,5 +19,6 @@ class MenuItem {
     this.name,
     this.notes,
     this.quantity,
+    this.category,
   });
 }
