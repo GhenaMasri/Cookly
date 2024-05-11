@@ -44,7 +44,7 @@ class _ChefSignup extends State<ChefSignup> {
         }),
       );
       if (response.statusCode == 200) {
-        return {'success': true, 'message': 'Verified successfully'};
+        return {'success': true, 'message': response.body};
       } else if (response.statusCode == 400) {
         return {'success': false, 'message': response.body};
       } else {
@@ -52,6 +52,20 @@ class _ChefSignup extends State<ChefSignup> {
       }
     } catch (error) {
       return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<int> getUserId(String email) async {
+    final response = await http.post(
+      Uri.parse('${SharedPreferencesService.url}userId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data['userId'];
+    } else {
+      throw Exception('Failed to load user id');
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
@@ -261,25 +275,24 @@ class _ChefSignup extends State<ChefSignup> {
                                 Map<String, dynamic> result = await verifyChef();
                                 bool success = result['success'];
                                 String message = result['message'];
-                                print(message);
+                                int userId = await getUserId("chef@gmail.com"); //replace it with the email from the previous page
+                                kitchenData = KitchenData(
+                                      image: this.imageUrl,
+                                      name: this.name,
+                                      location: this.location,
+                                      phone: this.phone,
+                                      street: this.street,
+                                      userId: userId);
                                 ////////////////////////////////////////////////////////////////
                                 if (success) {
                                   setState(() {
                                     errorFlag = false;
                                     errorMessage = "";
                                   });
-                                  kitchenData = KitchenData(
-                                      image: this.imageUrl,
-                                      name: this.name,
-                                      location: this.location,
-                                      phone: this.phone,
-                                      street: this.street);
                                   Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              ChefSignupDetails(
-                                                MykitchenData: kitchenData,
-                                              )));
+                                              ChefSignupDetails(MykitchenData: kitchenData)));
                                 } else {
                                   setState(() {
                                     errorFlag = true;

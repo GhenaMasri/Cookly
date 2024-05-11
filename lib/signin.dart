@@ -48,6 +48,20 @@ class _Signin extends State<Signin> {
       return {'success': false, 'message': '$error'};
     }
   }
+
+  Future<int> getChefId(String email) async {
+    final response = await http.post(
+      Uri.parse('${SharedPreferencesService.url}chefId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data['chefId'];
+    } else {
+      throw Exception('Failed to load chef id');
+    }
+  }
   //////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -246,14 +260,13 @@ class _Signin extends State<Signin> {
                             onPressed: () async {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
+                                ////////////////////////// BACKEND SECTION ///////////////////////////
                                 Map<String, dynamic> result = await signIn();
                                 bool success = result['success'];
                                 String message = result['message'];
                                 print(success);
                                 print(message);
-                                //check the credintials in db if correct navigate to home page
                                 if (success) {
-                                  ////////////////////////// BACKEND SECTION ///////////////////////////
                                   SharedPreferences prefs = await SharedPreferences.getInstance();
                                   Map<String, dynamic> userData = result['user'];
                                   await prefs.setInt('id', userData['id']);
@@ -262,6 +275,11 @@ class _Signin extends State<Signin> {
                                   await prefs.setString('phone', userData['phone']);
                                   await prefs.setString('type', userData['type']);
                                   await prefs.setBool('isSet', true);
+                                  if (userData['type'] == "chef") {
+                                    //store kitchen id in shared preferences 
+                                    int chefId = await getChefId(userData['email']);
+                                    await prefs.setInt('kitchen_id', chefId);
+                                  }
                                   ////////////////////////////////////////////////////////////////////////
                                   setState(() {
                                     errorFlag = false;

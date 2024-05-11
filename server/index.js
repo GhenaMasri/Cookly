@@ -23,6 +23,12 @@ app.use('/chef-signup', chefSignupdRoute);
 const kitchenCategoriesRoute = require('./routes/kitchen_categories');
 app.use('/kitchen-categories', kitchenCategoriesRoute);
 
+const chefIdRoute = require('./routes/get_chef_id');
+app.use('/chefId', chefIdRoute);
+
+const userIdRoute = require('./routes/get_user_id');
+app.use('/userId', userIdRoute);
+
 const port = 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

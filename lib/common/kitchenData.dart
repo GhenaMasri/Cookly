@@ -23,7 +23,7 @@ class KitchenData {
     this.street,
     this.category,
     this.description,
-     this.orderingSystem,
+    this.orderingSystem,
     this.specialOrders = "Yes",
     this.userId
   });

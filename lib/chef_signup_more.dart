@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
@@ -12,10 +13,7 @@ import 'package:untitled/common/globs.dart';
 class ChefSignupDetails extends StatefulWidget {
   KitchenData MykitchenData;
 
-  ChefSignupDetails({
-    Key? key,
-    required this.MykitchenData,
-  });
+  ChefSignupDetails({Key? key, required this.MykitchenData,});
 
   @override
   State<StatefulWidget> createState() => _ChefSignupDetails();
@@ -30,7 +28,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   String? orderingSystem;
   String? specialOrders = "Yes";
   List<String> categories = {""}.toList();
-  
+  int? id;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> chefSignUp() async {
@@ -46,10 +44,10 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
           'city': widget.MykitchenData.location,
           'street': widget.MykitchenData.street,
           'contact': widget.MykitchenData.phone,
-          'category_id': widget.MykitchenData.category,
+          'category_id': 1,
           'order_system': widget.MykitchenData.orderingSystem,
           'special_orders': widget.MykitchenData.specialOrders,
-          'user_id': widget.MykitchenData.category,
+          'user_id': id,
         }),
       );
       if (response.statusCode == 200) {
@@ -62,17 +60,28 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
     }
   }
 
-  Future<List<String>> getKitchenCategories() async {
-    final response = await http
-        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+  Future<List<Map<String, dynamic>>> getKitchenCategories() async {
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> categoryList = data['categories'];
-      categories = List<String>.from(categoryList);
+      final List<Map<String, dynamic>> categories = categoryList.map((category) {
+        return {
+          'id': category['id'],
+          'category': category['category']
+        };
+      }).toList();
       return categories;
     } else {
       throw Exception('Failed to load kitchen categories');
     }
+  }
+
+  Future<void> _loadUserId() async {
+    int? userid = await SharedPreferencesService.getId();
+    setState(() {
+      id = userid;
+    });
   }
   //////////////////////////////////////////////////////////////////////////////////
 
@@ -96,6 +105,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
     super.initState();
     specialOrders = "Yes";
     getKitchenCategories();
+    _loadUserId();
   }
 
   @override
@@ -287,13 +297,12 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                                 } else {
                                   widget.MykitchenData.orderingSystem = 1;
                                 }
-                                widget.MykitchenData.specialOrders =
-                                    specialOrders;
+                                widget.MykitchenData.specialOrders = specialOrders;
                                 /////////////////////// BACKEND SECTION /////////////////////////
-                                Map<String, dynamic> result =
-                                    await chefSignUp();
+                                Map<String, dynamic> result = await chefSignUp();
                                 bool success = result['success'];
                                 String message = result['message'];
+                                print(success);
                                 print(message);
                                 ////////////////////////////////////////////////////////////////
                                 if (success) {

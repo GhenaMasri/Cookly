@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
   } = req.body;
 
   const query = `
-  INSERT INTO user (name, logo, description, city, street, contact, category_id, order_system, special_orders, user_id) 
+  INSERT INTO kitchen (name, logo, description, city, street, contact, category_id, order_system, special_orders, user_id) 
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 

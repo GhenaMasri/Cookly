@@ -1,13 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled/chef_signup.dart';
-import 'package:untitled/chef_signup_more.dart';
-import 'package:untitled/common/MenuItem.dart';
-import 'package:untitled/common/kitchenData.dart';
-import 'package:untitled/home/chef_home_view.dart';
-import 'package:untitled/main_page.dart';
-import 'package:untitled/menu/menu_item.dart';
 import 'package:untitled/splash.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 
