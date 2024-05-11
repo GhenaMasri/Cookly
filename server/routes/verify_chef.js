@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
           res.status(400).send("Contact number already exists");
           return;
         } else {
-          res.status(200);
+          res.status(200).send("Chef verified successfully");
         }
       });
     }
