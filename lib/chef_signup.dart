@@ -258,8 +258,7 @@ class _ChefSignup extends State<ChefSignup> {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
                                 /////////////////////// BACKEND SECTION /////////////////////////
-                                Map<String, dynamic> result =
-                                    await verifyChef();
+                                Map<String, dynamic> result = await verifyChef();
                                 bool success = result['success'];
                                 String message = result['message'];
                                 print(message);

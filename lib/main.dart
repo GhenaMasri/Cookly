@@ -12,7 +12,7 @@ import 'package:untitled/splash.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 
 void main() async{
-   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
         options: const FirebaseOptions(
