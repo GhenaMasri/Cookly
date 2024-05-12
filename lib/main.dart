@@ -37,6 +37,6 @@ class MyApp extends StatelessWidget {
           fontFamily: "Metropolis",
         ),
         // ignore: prefer_const_constructors
-        home: ChefHomeView());
+        home: SplashView());
   }
 }

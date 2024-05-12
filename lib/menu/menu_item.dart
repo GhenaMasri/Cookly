@@ -1,15 +1,15 @@
 import 'dart:io';
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/MenuItem.dart';
 import 'package:untitled/common_widget/dropdownfield.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:untitled/home/chef_home_view.dart';
-
+import 'package:untitled/common/globs.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MenuItemView extends StatefulWidget {
   final List<MenuItem> menu;
@@ -35,11 +35,82 @@ class _MenuItemViewState extends State<MenuItemView> {
   String? time;
   String errorMessage = '';
   bool errorFlag = false;
+  int? kitchenId;
 
   TextEditingController txtName = TextEditingController();
   TextEditingController txtNotes = TextEditingController();
   TextEditingController txtPrice = TextEditingController();
   TextEditingController txtTime = TextEditingController();
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> addMenuItem() async {
+    const url = '${SharedPreferencesService.url}add-menu-item';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': name,
+          'image': imageUrl,
+          'notes': notes,
+          'kitchen_id': kitchenId,
+          'category_id': category,
+          'quantity_id': quantity,
+          'price': 1,
+          'time': time,
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getId();
+    setState(() {
+      kitchenId = kitchenid;
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getFoodCategories() async { //should call it inside initState()
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}food-categories'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> categoryList = data['categories'];
+      final List<Map<String, dynamic>> categories = categoryList.map((category) {
+        return {'id': category['id'], 'category': category['category']};
+      }).toList();
+      return categories;
+    } else {
+      throw Exception('Failed to load food categories');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getFoodQuantities() async { //should call it inside initState()
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}food-quantities'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> quantityList = data['quantities'];
+      final List<Map<String, dynamic>> quantities = quantityList.map((quantity) {
+        return {'id': quantity['id'], 'category': quantity['quantity']};
+      }).toList();
+      return quantities;
+    } else {
+      throw Exception('Failed to load food quantities');
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////////
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadKitchenId();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +302,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: RoundButton(
                         title: "Save",
-                        onPressed: () {
+                        onPressed: () async {
                           if (imageUrl == null ||
                               category == null ||
                               quantity == null ||
@@ -262,6 +333,13 @@ class _MenuItemViewState extends State<MenuItemView> {
                             widget.addItemToList(menuItem!);
                             Navigator.pop(context);
                           }
+                          /////////////////////// BACKEND SECTION /////////////////////////
+                          Map<String, dynamic> result = await addMenuItem();
+                          bool success = result['success'];
+                          String message = result['message'];
+                          print(success);
+                          print(message);
+                          ////////////////////////////////////////////////////////////////
                         }),
                   ),
                   const SizedBox(
