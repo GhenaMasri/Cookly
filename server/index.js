@@ -29,6 +29,18 @@ app.use('/chefId', chefIdRoute);
 const userIdRoute = require('./routes/get_user_id');
 app.use('/userId', userIdRoute);
 
+const kitchenNameRoute = require('./routes/get_kitchen_name');
+app.use('/kitchenName', kitchenNameRoute);
+
+const newMenuItemRoute = require('./routes/menu_item');
+app.use('/add-menu-item', newMenuItemRoute);
+
+const foodCategoriesRoute = require('./routes/food_categories');
+app.use('/food-categories', foodCategoriesRoute);
+
+const foodQuantitiesRoute = require('./routes/food_quantities');
+app.use('/food-quantities', foodQuantitiesRoute);
+
 const port = 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

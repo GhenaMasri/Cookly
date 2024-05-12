@@ -32,7 +32,6 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   String? specialOrders = "Yes";
   List<String> categoriesList = {""}.toList();
   late List<Map<String, dynamic>> categories;
-  int? id;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> chefSignUp() async {
@@ -51,7 +50,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
           'category_id': 1,
           'order_system': widget.MykitchenData.orderingSystem,
           'special_orders': widget.MykitchenData.specialOrders,
-          'user_id': id,
+          'user_id': widget.MykitchenData.userId,
         }),
       );
       if (response.statusCode == 200) {
@@ -65,26 +64,17 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   }
 
   Future<List<Map<String, dynamic>>> getKitchenCategories() async {
-    final response = await http
-        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> categoryList = data['categories'];
-      final List<Map<String, dynamic>> categories =
-          categoryList.map((category) {
+      final List<Map<String, dynamic>> categories = categoryList.map((category) {
         return {'id': category['id'], 'category': category['category']};
       }).toList();
       return categories;
     } else {
       throw Exception('Failed to load kitchen categories');
     }
-  }
-
-  Future<void> _loadUserId() async {
-    int? userid = await SharedPreferencesService.getId();
-    setState(() {
-      id = userid;
-    });
   }
   //////////////////////////////////////////////////////////////////////////////////
 
@@ -107,14 +97,19 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   void initState() {
     super.initState();
     specialOrders = "Yes";
+    getKitchenCategories().then((value) {
+    categories = value;
     categories.forEach((element) {
       if (element.containsKey('category')) {
         categoriesList.add(element['category']);
       }
     });
-   // category = categories[0]['category'];
-    //orderingSystem = 'Order in the same day';
-    _loadUserId();
+    // category = categories[0]['category'];
+    // orderingSystem = 'Order in the same day';
+    }).catchError((error) {
+      // Handle error if needed
+      print(error);
+    });
   }
 
   @override
@@ -319,8 +314,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                                 widget.MykitchenData.specialOrders =
                                     specialOrders;
                                 /////////////////////// BACKEND SECTION /////////////////////////
-                                Map<String, dynamic> result =
-                                    await chefSignUp();
+                                Map<String, dynamic> result = await chefSignUp();
                                 bool success = result['success'];
                                 String message = result['message'];
                                 print(success);

@@ -6,6 +6,7 @@ import 'package:untitled/signup.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled/home/chef_home_view.dart';
 
 class Signin extends StatefulWidget {
   const Signin({Key? key});
@@ -60,6 +61,20 @@ class _Signin extends State<Signin> {
       return data['chefId'];
     } else {
       throw Exception('Failed to load chef id');
+    }
+  }
+
+  Future<String> getKitchenName(int chefId) async {
+    final response = await http.post(
+      Uri.parse('${SharedPreferencesService.url}kitchenName'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'chefId': chefId}),
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data['kitchenName'];
+    } else {
+      throw Exception('Failed to load kitchen name');
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
@@ -279,15 +294,24 @@ class _Signin extends State<Signin> {
                                     //store kitchen id in shared preferences 
                                     int chefId = await getChefId(userData['email']);
                                     await prefs.setInt('kitchen_id', chefId);
+                                    //store kitchen name in shared preferences
+                                    String kitchenName = await getKitchenName(chefId);
+                                    await prefs.setString('kitchen_name', kitchenName);
                                   }
                                   ////////////////////////////////////////////////////////////////////////
                                   setState(() {
                                     errorFlag = false;
                                     errorMessage = "";
                                   });
-                                  Navigator.of(context).pushReplacement(
+                                  if (userData['type'] == "chef") {
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) => ChefHomeView()));
+                                  } else {
+                                    Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) => MainView()));
+                                  }
                                 } else {
                                   setState(() {
                                     errorFlag = true;

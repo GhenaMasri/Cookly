@@ -279,7 +279,7 @@ class _ChefSignup extends State<ChefSignup> {
                                 bool success = result['success'];
                                 String message = result['message'];
                                 if(imageUrl == null) imageUrl = "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fcookly.png?alt=media&token=24a53307-3c41-489b-a94b-e687751722b8";
-                                int userId = await getUserId(widget.email); //replace it with the email from the previous page
+                                int userId = await getUserId(widget.email);
                                 kitchenData = KitchenData(
                                       image: this.imageUrl,
                                       name: this.name,
