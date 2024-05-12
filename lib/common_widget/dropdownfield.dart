@@ -7,6 +7,7 @@ class RoundDropdown extends StatelessWidget {
   final String hintText;
   final List<String> items;
   final void Function(String?)? onChanged;
+  final String? Function(String?)? validator; // Validator function
 
   const RoundDropdown({
     Key? key,
@@ -14,6 +15,7 @@ class RoundDropdown extends StatelessWidget {
     required this.hintText,
     required this.items,
     required this.onChanged,
+    this.validator, // Include the validator in the constructor
   }) : super(key: key);
 
   @override
@@ -21,50 +23,45 @@ class RoundDropdown extends StatelessWidget {
     return Container(
       height: 50, // Set the height to match other fields
       decoration: BoxDecoration(
-        color:
-            TColor.textfield, // Using the same background color as other fields
+        color: TColor.textfield, // Using the same background color as other fields
         borderRadius: BorderRadius.circular(25),
       ),
-      child: Row(
+      child: Stack(
         children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Container(
-                  height: 50,
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 15), 
-                  margin: const EdgeInsets.only(top: 4),
-                  alignment: Alignment.centerLeft,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value,
-                      isExpanded: true,
-                      hint: Text(
-                        hintText,
-                        style: TextStyle(
-                          color: TColor
-                              .placeholder, // Using placeholder color for hint text
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      onChanged: onChanged,
-                      items: items.map((String item) {
-                        return DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+          Container(
+            height: 50,
+            padding: const EdgeInsets.only(left: 20, right: 15),
+            margin: const EdgeInsets.only(top: 4),
+            alignment: Alignment.centerLeft,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButtonFormField<String>(
+                value: value,
+                isExpanded: true,
+                hint: Text(
+                  hintText,
+                  style: TextStyle(
+                    color: TColor.placeholder, // Using placeholder color for hint text
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
+                onChanged: onChanged,
+                items: items.map((String item) {
+                  return DropdownMenuItem<String>(
+                    value: item,
+                    child: Text(
+                      item,
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                validator: validator, // Assign the validator function
+                decoration: InputDecoration.collapsed(
+                  hintText: '', // Remove the underline
+                ),
+              ),
             ),
           ),
         ],

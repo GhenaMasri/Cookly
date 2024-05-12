@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/chef_signup.dart';
 import 'package:untitled/splash.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 
@@ -35,6 +36,6 @@ class MyApp extends StatelessWidget {
           fontFamily: "Metropolis",
         ),
         // ignore: prefer_const_constructors
-        home: SplashView());
+        home: ChefSignup(email:"ghrnama@gmail.com"));
   }
 }
