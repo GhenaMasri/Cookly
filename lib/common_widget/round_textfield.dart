@@ -48,6 +48,8 @@ class RoundTextfield extends StatelessWidget {
               obscureText: obscureText,
               keyboardType: keyboardType,
               decoration: InputDecoration(
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -91,82 +93,80 @@ class RoundTitleTextfield extends StatelessWidget {
     this.maxLines = 1,
   });
 
- @override
-Widget build(BuildContext context) {
-  return Container(
-    height: maxLines! * 55.0,
-    decoration: BoxDecoration(
-      color: bgColor ?? TColor.textfield,
-      borderRadius: BorderRadius.circular(25),
-    ),
-    child: Row(
-      children: [
-        if (left != null)
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 15,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: maxLines! * 55.0,
+      decoration: BoxDecoration(
+        color: bgColor ?? TColor.textfield,
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: Row(
+        children: [
+          if (left != null)
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 15,
+              ),
+              child: left!,
             ),
-            child: left!,
-          ),
-        Expanded(
-          child: Stack(
-            children: [
-              Container(
-                height: maxLines! * 55.0,
-                margin: EdgeInsets.only(
-                  top: maxLines == 1 ? 8 : 10,
-                ),
-                alignment: Alignment.topLeft,
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 0), 
-                  child: TextFormField(
-                    maxLines: maxLines,
-                    validator: validator,
-                    onSaved: onSaved,
-                    autocorrect: false,
-                    controller: controller,
-                    obscureText: obscureText,
-                    keyboardType: keyboardType,
-                    decoration: InputDecoration(
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20),
-                          
-                      errorBorder: InputBorder.none, 
-                      focusedErrorBorder: InputBorder.none,
-                      errorStyle: TextStyle(
-                        fontSize: 10,
-                      ),
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      hintText: hintText,
-                      hintStyle: TextStyle(
-                        color: TColor.placeholder,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        height: maxLines! > 1 ? 4 : 0,
+          Expanded(
+            child: Stack(
+              children: [
+                Container(
+                  height: maxLines! * 55.0,
+                  margin: EdgeInsets.only(
+                    top: maxLines == 1 ? 8 : 10,
+                  ),
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 0),
+                    child: TextFormField(
+                      maxLines: maxLines,
+                      validator: validator,
+                      onSaved: onSaved,
+                      autocorrect: false,
+                      controller: controller,
+                      obscureText: obscureText,
+                      keyboardType: keyboardType,
+                      decoration: InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 20),
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        errorStyle: TextStyle(
+                          fontSize: 10,
+                        ),
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        hintText: hintText,
+                        hintStyle: TextStyle(
+                          color: TColor.placeholder,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          height: maxLines! > 1 ? 4 : 0,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: maxLines! * 55.0,
-                margin: EdgeInsets.only(
-                  top: 10 ,
-                  left: 20,
-                ),
-                alignment: Alignment.topLeft,
-                child: Text(
-                  title,
-                  style: TextStyle(color: TColor.placeholder, fontSize: 11),
-                ),
-              )
-            ],
+                Container(
+                  height: maxLines! * 55.0,
+                  margin: EdgeInsets.only(
+                    top: 10,
+                    left: 20,
+                  ),
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    title,
+                    style: TextStyle(color: TColor.placeholder, fontSize: 11),
+                  ),
+                )
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+    );
+  }
 }

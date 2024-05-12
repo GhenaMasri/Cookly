@@ -13,7 +13,10 @@ import 'package:untitled/common/globs.dart';
 class ChefSignupDetails extends StatefulWidget {
   KitchenData MykitchenData;
 
-  ChefSignupDetails({Key? key, required this.MykitchenData,});
+  ChefSignupDetails({
+    Key? key,
+    required this.MykitchenData,
+  });
 
   @override
   State<StatefulWidget> createState() => _ChefSignupDetails();
@@ -23,11 +26,12 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   TextEditingController txtName = TextEditingController();
   String errorMessage = '';
   String? category;
-  int? selectedCategory;
+  int? selectedCategory; //id of the selected category
   String? description;
   String? orderingSystem;
   String? specialOrders = "Yes";
-  List<String> categories = {""}.toList();
+  List<String> categoriesList = {""}.toList();
+  late List<Map<String, dynamic>> categories;
   int? id;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
@@ -61,15 +65,14 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   }
 
   Future<List<Map<String, dynamic>>> getKitchenCategories() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> categoryList = data['categories'];
-      final List<Map<String, dynamic>> categories = categoryList.map((category) {
-        return {
-          'id': category['id'],
-          'category': category['category']
-        };
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
+        return {'id': category['id'], 'category': category['category']};
       }).toList();
       return categories;
     } else {
@@ -104,7 +107,13 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   void initState() {
     super.initState();
     specialOrders = "Yes";
-    getKitchenCategories();
+    categories.forEach((element) {
+      if (element.containsKey('category')) {
+        categoriesList.add(element['category']);
+      }
+    });
+   // category = categories[0]['category'];
+    //orderingSystem = 'Order in the same day';
     _loadUserId();
   }
 
@@ -190,17 +199,26 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                                 RoundDropdown(
                                     value: category, // Initial value
                                     hintText: 'Select Category',
-                                    items: categories,
+                                    items: categoriesList,
+                                    validator: validateField,
                                     onChanged: (String? value) {
                                       setState(() {
                                         category = value;
-                                        selectedCategory = categories.indexOf(value!);
+                                        if (value != null) {
+                                          var selectedItem =
+                                              categories.firstWhere(
+                                                  (element) =>
+                                                      element['name'] == value,
+                                                  orElse: () => {});
+                                          selectedCategory = selectedItem['id'];
+                                        }
                                       });
                                     }),
                                 SizedBox(height: 15),
                                 RoundDropdown(
                                     value: orderingSystem, // Initial value
                                     hintText: 'Ordering System',
+                                    validator: validateField,
                                     items: [
                                       'Order in the same day',
                                       'Order the day before'
@@ -291,15 +309,18 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                               if (formState.currentState!.validate()) {
                                 formState.currentState!.save();
                                 widget.MykitchenData.description = description;
-                                widget.MykitchenData.category = selectedCategory;
+                                widget.MykitchenData.category =
+                                    selectedCategory;
                                 if (orderingSystem == 'Order the day before') {
                                   widget.MykitchenData.orderingSystem = 0;
                                 } else {
                                   widget.MykitchenData.orderingSystem = 1;
                                 }
-                                widget.MykitchenData.specialOrders = specialOrders;
+                                widget.MykitchenData.specialOrders =
+                                    specialOrders;
                                 /////////////////////// BACKEND SECTION /////////////////////////
-                                Map<String, dynamic> result = await chefSignUp();
+                                Map<String, dynamic> result =
+                                    await chefSignUp();
                                 bool success = result['success'];
                                 String message = result['message'];
                                 print(success);

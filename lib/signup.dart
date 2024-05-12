@@ -365,7 +365,7 @@ class _Signup extends State<Signup> {
                                     Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const ChefSignup()));
+                                                 ChefSignup(email: _email,)));
                                   }
                                 } else {
                                   setState(() {

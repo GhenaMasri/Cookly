@@ -12,7 +12,8 @@ import 'package:untitled/common/globs.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class ChefSignup extends StatefulWidget {
-  const ChefSignup({Key? key});
+  final email;
+  const ChefSignup({Key? key, required this.email});
 
   @override
   State<StatefulWidget> createState() => _ChefSignup();
@@ -91,7 +92,7 @@ class _ChefSignup extends State<ChefSignup> {
       //Success: get the download URL
       imageUrl = await referenceImageToUpload.getDownloadURL();
     } catch (error) {
-      //Some error occurred
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fcookly.png?alt=media&token=24a53307-3c41-489b-a94b-e687751722b8";
     }
   }
 
@@ -121,6 +122,7 @@ class _ChefSignup extends State<ChefSignup> {
   @override
   void initState() {
     super.initState();
+   // location = "Nablus";
   }
 
   String? _validatePhoneNumber(String? value) {
@@ -231,6 +233,7 @@ class _ChefSignup extends State<ChefSignup> {
                                       'Ramallah',
                                       'Tulkarm'
                                     ],
+                                    validator: validateField,
                                     onChanged: (String? value) {
                                       setState(() {
                                         location = value;
@@ -275,6 +278,7 @@ class _ChefSignup extends State<ChefSignup> {
                                 Map<String, dynamic> result = await verifyChef();
                                 bool success = result['success'];
                                 String message = result['message'];
+                                if(imageUrl == null) imageUrl = "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fcookly.png?alt=media&token=24a53307-3c41-489b-a94b-e687751722b8";
                                 int userId = await getUserId("chef@gmail.com"); //replace it with the email from the previous page
                                 kitchenData = KitchenData(
                                       image: this.imageUrl,
