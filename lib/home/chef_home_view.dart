@@ -4,6 +4,7 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/menu/manage_menu_item.dart';
 import 'package:untitled/menu/menu_item.dart';
 
 class ChefHomeView extends StatefulWidget {
@@ -17,25 +18,46 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   String? selectedLocation;
   TextEditingController txtSearch = TextEditingController();
 
-  
-
   List<MenuItem> menuArr = List.generate(
     8,
     (index) => MenuItem(
       kitchenId: 1,
-      itemId: 1,
+      itemId: index,
       image:
           "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fmenu_1.png?alt=media&token=e50f35aa-5224-4c69-ba9c-054861ba4610",
       name: "Food",
       notes: "This section will contain the ingredients",
-      quantity: "4 slices",
+      category: "Desserts",
+      quantity: "Small",
+      price: "30.0",
+      time: "00:01:00",
     ),
   );
-void addItemToList(MenuItem item) {
-  setState(() {
-    menuArr.add(item);
-  });
-}
+  void addItemToList(MenuItem item) {
+    setState(() {
+      menuArr.add(item);
+      //Also Add to DB
+    });
+  }
+
+  void RemoveItemFromList(MenuItem item) {
+    setState(() {
+      menuArr.remove(item);
+      //Also remove from DB
+    });
+  }
+
+  void updateMenuItem(MenuItem updatedItem) {
+    setState(() {
+      final index =
+          menuArr.indexWhere((item) => item.itemId == updatedItem.itemId);
+      if (index != -1) {
+        menuArr[index] = updatedItem;
+        //Also update in DB
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -181,14 +203,17 @@ void addItemToList(MenuItem item) {
                             ),
                             IconButton(
                               onPressed: () {
-                                /*Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MenuItemView(
-                  menuItem: menuItem,
-                ),
-              ),
-            );*/
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ManageMenuItemView(
+                                      menu: menuArr,
+                                      RemoveItemFromList: RemoveItemFromList,
+                                      updateMenuItem: updateMenuItem,
+                                      item: menuItem,
+                                    ),
+                                  ),
+                                );
                               },
                               icon: Container(
                                 width: 35,
@@ -227,7 +252,8 @@ void addItemToList(MenuItem item) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MenuItemView(menu: menuArr,addItemToList: addItemToList),
+              builder: (context) =>
+                  MenuItemView(menu: menuArr, addItemToList: addItemToList),
             ),
           );
         },

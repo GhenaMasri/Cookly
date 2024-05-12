@@ -11,17 +11,23 @@ import 'package:untitled/home/chef_home_view.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 
-class MenuItemView extends StatefulWidget {
+class ManageMenuItemView extends StatefulWidget {
   final List<MenuItem> menu;
-  final Function(MenuItem) addItemToList; // Callback function
-  const MenuItemView(
-      {Key? key, required this.menu, required this.addItemToList});
+  final MenuItem item;
+  final Function(MenuItem) RemoveItemFromList; // Callback function
+  final Function(MenuItem) updateMenuItem;
+  const ManageMenuItemView(
+      {Key? key,
+      required this.menu,
+      required this.RemoveItemFromList,
+      required this.updateMenuItem,
+      required this.item});
 
   @override
-  State<MenuItemView> createState() => _MenuItemViewState();
+  State<ManageMenuItemView> createState() => _ManageMenuItemViewState();
 }
 
-class _MenuItemViewState extends State<MenuItemView> {
+class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   MenuItem? menuItem;
   final ImagePicker picker = ImagePicker();
   XFile? pickedFile;
@@ -40,6 +46,18 @@ class _MenuItemViewState extends State<MenuItemView> {
   TextEditingController txtNotes = TextEditingController();
   TextEditingController txtPrice = TextEditingController();
   TextEditingController txtTime = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    txtName.text = widget.item.name!;
+    txtNotes.text = widget.item.notes!;
+    txtPrice.text = widget.item.price!;
+    txtTime.text = widget.item.time!;
+    category = widget.item.category!;
+    quantity = widget.item.quantity;
+    imageUrl = widget.item.image!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +85,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                         Expanded(
                           child: Center(
                             child: Text(
-                              "Add Menu Item",
+                              "Manage Menu Item",
                               style: TextStyle(
                                 color: TColor.primaryText,
                                 fontSize: 20,
@@ -92,12 +110,12 @@ class _MenuItemViewState extends State<MenuItemView> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     alignment: Alignment.center,
-                    child: pickedFile != null
+                    child: widget.item.image != null
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(
                                 20), // Half of the width (or height)
-                            child: Image.file(
-                              File(pickedFile!.path),
+                            child: Image.network(
+                              widget.item.image!,
                               width: 300,
                               height: 200,
                               fit: BoxFit.fill,
@@ -145,7 +163,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                       size: 12,
                     ),
                     label: Text(
-                      "Add Image",
+                      "Edit Image",
                       style: TextStyle(color: TColor.primary, fontSize: 12),
                     ),
                   ),
@@ -228,40 +246,39 @@ class _MenuItemViewState extends State<MenuItemView> {
                   ),
                   Visibility(visible: errorFlag, child: SizedBox(height: 8)),
                   Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: RoundButton(
+                      title: "Edit",
+                      type: RoundButtonType.textPrimary,
+                      onPressed: () {
+                        MenuItem updatedItem = MenuItem(
+                          itemId: widget.item.itemId,
+                          kitchenId: widget.item.kitchenId,
+                          name: txtName.text,
+                          notes: txtNotes.text,
+                          price: txtPrice.text,
+                          time: txtTime.text,
+                          category: category,
+                          quantity: quantity,
+                          image: widget.item.image,
+                        );
+
+                        widget.updateMenuItem(updatedItem);
+
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: RoundButton(
-                        title: "Save",
+                        title: "Delete",
                         onPressed: () {
-                          if (imageUrl == null ||
-                              category == null ||
-                              quantity == null ||
-                              txtName.text == "" ||
-                              txtNotes.text == "" ||
-                              txtPrice.text == "" ||
-                              txtTime.text == "") {
-                            setState(() {
-                              errorFlag = true;
-                              errorMessage = "All Fields Are Required";
-                            });
-                          } else {
-                            setState(() {
-                              errorFlag = false;
-                              errorMessage = "";
-                            });
-                            menuItem = MenuItem(
-                                kitchenId: 1,
-                                itemId: 2,
-                                image: imageUrl,
-                                name: txtName.text,
-                                notes: txtNotes.text,
-                                quantity: quantity,
-                                category: category,
-                                price: price,
-                                time: time);
-
-                            widget.addItemToList(menuItem!);
-                            Navigator.pop(context);
-                          }
+                          widget.RemoveItemFromList(widget.item);
+                          Navigator.pop(context);
                         }),
                   ),
                   const SizedBox(
