@@ -11,6 +11,8 @@ class MenuItem {
   String? notes;
   String? quantity;
   String? category;
+  String? price;
+  String? time;
  
   MenuItem({
     this.kitchenId,
@@ -20,5 +22,7 @@ class MenuItem {
     this.notes,
     this.quantity,
     this.category,
+    this.price,
+    this.time,
   });
 }
