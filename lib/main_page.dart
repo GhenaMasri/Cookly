@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/more/more_view.dart';
 import '../common_widget/tab_button.dart';
 import '../home/home_view.dart';
 
@@ -81,7 +82,7 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 4) {
                       selectTab = 4;
-                      selectPageView = Container();
+                      selectPageView = MoreView();
                     }
                     if (mounted) {
                       setState(() {});
