@@ -23,6 +23,11 @@ class SharedPreferencesService {
     return prefs.getInt('id');
   }
 
+  static Future<int?> getKitchenId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('kitchen_id');
+  }
+
   static Future<void> clearSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("isSet");

@@ -1,10 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/more/more_view.dart';
 import 'package:untitled/profile/profile_tab_bar.dart';
 import '../common_widget/tab_button.dart';
 import '../home/home_view.dart';
+import 'package:untitled/home/chef_home_view.dart';
+import 'package:untitled/common/globs.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -16,12 +17,27 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int selectTab = 0;
   PageStorageBucket storageBucket = PageStorageBucket();
-  late Widget selectPageView;
+  late Widget selectPageView = const HomeView();
+  String? type;
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> _loadUserType() async {
+    String? userType = await SharedPreferencesService.getType();
+    setState(() {
+      type = userType;
+      if (type == "chef") {
+        selectPageView = const ChefHomeView();
+      } else {
+        selectPageView = const HomeView();
+      }
+    });
+  }
+  ////////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
     super.initState();
-    selectPageView = const HomeView();
+    _loadUserType();
   }
 
   @override

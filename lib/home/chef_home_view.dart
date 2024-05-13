@@ -6,6 +6,8 @@ import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/menu/manage_menu_item.dart';
 import 'package:untitled/menu/menu_item.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ChefHomeView extends StatefulWidget {
   const ChefHomeView({Key? key}) : super(key: key);
@@ -17,6 +19,7 @@ class ChefHomeView extends StatefulWidget {
 class _ChefHomeViewState extends State<ChefHomeView> {
   String? selectedLocation;
   TextEditingController txtSearch = TextEditingController();
+  int? kitchenId;
 
   List<MenuItem> menuArr = List.generate(
     8,
@@ -56,6 +59,60 @@ class _ChefHomeViewState extends State<ChefHomeView> {
         //Also update in DB
       }
     });
+  }
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<List<MenuItem>> chefMenuItems() async {
+    const url = '${SharedPreferencesService.url}chef-menu-items';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'kitchenId': kitchenId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body)['items'];
+        List<MenuItem> menuItems = data.map((item) {
+          return MenuItem(
+            kitchenId: item['kitchen_id'],
+            itemId: item['id'],
+            image: item['image'],
+            name: item['name'],
+            notes: item['notes'],
+            quantity: item['quantity_id'],
+            category: item['category_id'],
+            price: item['price'].toDouble(),
+            time: item['time'],
+          );
+        }).toList();
+        return menuItems;
+      } else {
+        throw Exception('Failed to load menu items');
+      }
+    } catch (error) {
+      throw Exception('Error: $error');
+    }
+  }
+
+  Future<void> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
+    setState(() {
+      kitchenId = kitchenid;
+    });
+    try {
+      menuArr = await chefMenuItems();
+    } catch (error) {
+      print('Error loading menu items: $error');
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////////
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadKitchenId();
   }
 
   @override

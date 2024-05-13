@@ -61,14 +61,14 @@ class _MenuItemViewState extends State<MenuItemView> {
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'name': name,
+          'name': txtName.text,
           'image': imageUrl,
-          'notes': notes,
+          'notes': txtNotes.text,
           'kitchen_id': kitchenId,
           'category_id': selectedCategory,
           'quantity_id': selectedQuantity,
           'price': dbPrice,
-          'time': time,
+          'time': txtTime.text,
         }),
       );
       if (response.statusCode == 200) {
@@ -82,14 +82,13 @@ class _MenuItemViewState extends State<MenuItemView> {
   }
 
   Future<void> _loadKitchenId() async {
-    int? kitchenid = await SharedPreferencesService.getId();
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
     setState(() {
       kitchenId = kitchenid;
     });
   }
 
   Future<List<Map<String, dynamic>>> getFoodCategories() async {
-    //should call it inside initState()
     final response = await http
         .get(Uri.parse('${SharedPreferencesService.url}food-categories'));
     if (response.statusCode == 200) {
@@ -106,7 +105,6 @@ class _MenuItemViewState extends State<MenuItemView> {
   }
 
   Future<List<Map<String, dynamic>>> getFoodQuantities() async {
-    //should call it inside initState()
     final response = await http
         .get(Uri.parse('${SharedPreferencesService.url}food-quantities'));
     if (response.statusCode == 200) {
@@ -366,13 +364,13 @@ class _MenuItemViewState extends State<MenuItemView> {
                             });
                           } else {
                             setState(() {
-                              dbPrice = (double.parse(price!));
+                              dbPrice = (double.parse(txtPrice.text));
                               errorFlag = false;
                               errorMessage = "";
                             });
                             menuItem = MenuItem(
-                                kitchenId: 1,
-                                itemId: 2,
+                                kitchenId: kitchenId,
+                                itemId: 0,
                                 image: imageUrl,
                                 name: txtName.text,
                                 notes: txtNotes.text,

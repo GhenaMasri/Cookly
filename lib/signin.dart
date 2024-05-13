@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/main_page.dart';
@@ -303,15 +304,9 @@ class _Signin extends State<Signin> {
                                     errorFlag = false;
                                     errorMessage = "";
                                   });
-                                  if (userData['type'] == "chef") {
-                                    Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) => ChefHomeView()));
-                                  } else {
-                                    Navigator.of(context).pushReplacement(
+                                  Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) => MainView()));
-                                  }
                                 } else {
                                   setState(() {
                                     errorFlag = true;

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const pool = require("../db");
+const pool = require("../../db");
 
 router.post("/", (req, res) => {
   const { email } = req.body;
