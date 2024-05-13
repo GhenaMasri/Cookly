@@ -5,41 +5,48 @@ const pool = require("./db");
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-const signupRoute = require('./routes/signup');
-app.use('/signup', signupRoute);
-
-const signinRoute = require('./routes/signin');
-app.use('/signin', signinRoute);
-
-const resetPasswordRoute = require('./routes/reset_password');
-app.use('/reset-password', resetPasswordRoute);
-
-const verifyChefdRoute = require('./routes/verify_chef');
-app.use('/verify-chef', verifyChefdRoute);
-
-const chefSignupdRoute = require('./routes/chef_signup');
+//chef routes
+const chefSignupdRoute = require('./routes/chef/chef_signup');
 app.use('/chef-signup', chefSignupdRoute);
 
-const kitchenCategoriesRoute = require('./routes/kitchen_categories');
-app.use('/kitchen-categories', kitchenCategoriesRoute);
+const verifyChefdRoute = require('./routes/chef/verify_chef');
+app.use('/verify-chef', verifyChefdRoute);
 
-const chefIdRoute = require('./routes/get_chef_id');
+const chefIdRoute = require('./routes/chef/get_chef_id');
 app.use('/chefId', chefIdRoute);
 
-const userIdRoute = require('./routes/get_user_id');
-app.use('/userId', userIdRoute);
-
-const kitchenNameRoute = require('./routes/get_kitchen_name');
+const kitchenNameRoute = require('./routes/chef/get_kitchen_name');
 app.use('/kitchenName', kitchenNameRoute);
 
-const newMenuItemRoute = require('./routes/menu_item');
-app.use('/add-menu-item', newMenuItemRoute);
-
-const foodCategoriesRoute = require('./routes/food_categories');
+//general routes
+const foodCategoriesRoute = require('./routes/general/food_categories');
 app.use('/food-categories', foodCategoriesRoute);
 
-const foodQuantitiesRoute = require('./routes/food_quantities');
+const foodQuantitiesRoute = require('./routes/general/food_quantities');
 app.use('/food-quantities', foodQuantitiesRoute);
+
+const signupRoute = require('./routes/general/signup');
+app.use('/signup', signupRoute);
+
+const signinRoute = require('./routes/general/signin');
+app.use('/signin', signinRoute);
+
+const resetPasswordRoute = require('./routes/general/reset_password');
+app.use('/reset-password', resetPasswordRoute);
+
+const kitchenCategoriesRoute = require('./routes/general/kitchen_categories');
+app.use('/kitchen-categories', kitchenCategoriesRoute);
+
+//menu item routes
+const newMenuItemRoute = require('./routes/menu item/menu_item');
+app.use('/add-menu-item', newMenuItemRoute);
+
+const chefMenuItemsRoute = require('./routes/menu item/get_menu_items_for_chef');
+app.use('/chef-menu-items', chefMenuItemsRoute);
+
+//user routes
+const userIdRoute = require('./routes/user/get_user_id');
+app.use('/userId', userIdRoute);
 
 const port = 3000;
 app.listen(port, () => {
