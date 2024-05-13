@@ -27,9 +27,9 @@ class _ChefHomeViewState extends State<ChefHomeView> {
           "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fmenu_1.png?alt=media&token=e50f35aa-5224-4c69-ba9c-054861ba4610",
       name: "Food",
       notes: "This section will contain the ingredients",
-      category: "Desserts",
-      quantity: "Small",
-      price: "30.0",
+      category: 1,
+      quantity: 1,
+      price: 20.0,
       time: "00:01:00",
     ),
   );
@@ -207,7 +207,6 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ManageMenuItemView(
-                                      menu: menuArr,
                                       RemoveItemFromList: RemoveItemFromList,
                                       updateMenuItem: updateMenuItem,
                                       item: menuItem,

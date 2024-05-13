@@ -9,9 +9,9 @@ class MenuItem {
   String? image;
   String? name;
   String? notes;
-  String? quantity;
-  String? category;
-  String? price;
+  int? quantity;
+  int? category;
+  double? price;
   String? time;
  
   MenuItem({
