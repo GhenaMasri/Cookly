@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/more/more_view.dart';
+import 'package:untitled/profile/profile_tab_bar.dart';
 import '../common_widget/tab_button.dart';
 import '../home/home_view.dart';
 
@@ -69,7 +70,7 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 3) {
                       selectTab = 3;
-                      selectPageView = Container();
+                      selectPageView = ProfileTabBar();
                     }
                     if (mounted) {
                       setState(() {});
