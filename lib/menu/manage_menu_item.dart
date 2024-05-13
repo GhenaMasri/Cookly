@@ -1,24 +1,25 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/MenuItem.dart';
+import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/dropdownfield.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:untitled/home/chef_home_view.dart';
 
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 
 class ManageMenuItemView extends StatefulWidget {
-  final List<MenuItem> menu;
   final MenuItem item;
   final Function(MenuItem) RemoveItemFromList; // Callback function
   final Function(MenuItem) updateMenuItem;
   const ManageMenuItemView(
       {Key? key,
-      required this.menu,
       required this.RemoveItemFromList,
       required this.updateMenuItem,
       required this.item});
@@ -47,16 +48,89 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   TextEditingController txtPrice = TextEditingController();
   TextEditingController txtTime = TextEditingController();
 
+  List<String> categoriesList = {""}.toList();
+  late List<Map<String, dynamic>> categories;
+  int? selectedCategory; //id of the selected category
+
+  List<String> quantityList = {""}.toList();
+  late List<Map<String, dynamic>> quantities;
+  int? selectedQuantity; //id of the selected quantity
+
+  double dbPrice = 0.0; //price to store in db
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+
+  Future<List<Map<String, dynamic>>> getFoodCategories() async {
+    //should call it inside initState()
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}food-categories'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> categoryList = data['categories'];
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
+        return {'id': category['id'], 'category': category['category']};
+      }).toList();
+      return categories;
+    } else {
+      throw Exception('Failed to load food categories');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getFoodQuantities() async {
+    //should call it inside initState()
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}food-quantities'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> quantityList = data['quantities'];
+      final List<Map<String, dynamic>> quantities =
+          quantityList.map((quantity) {
+        return {'id': quantity['id'], 'quantity': quantity['quantity']};
+      }).toList();
+      return quantities;
+    } else {
+      throw Exception('Failed to load food quantities');
+    }
+  }
+  //////////////////////////////////////////////////////////////////////////////////
+
   @override
   void initState() {
     super.initState();
     txtName.text = widget.item.name!;
     txtNotes.text = widget.item.notes!;
-    txtPrice.text = widget.item.price!;
+    txtPrice.text = widget.item.price! as String;
     txtTime.text = widget.item.time!;
-    category = widget.item.category!;
-    quantity = widget.item.quantity;
     imageUrl = widget.item.image!;
+
+    getFoodCategories().then((value) {
+      categories = value;
+      categories.forEach((element) {
+        if (element['id'] == widget.item.category!) {
+          category = element['category'];
+        }
+        if (element.containsKey('category')) {
+          categoriesList.add(element['category']);
+        }
+      });
+    }).catchError((error) {
+      print(error);
+    });
+
+    getFoodQuantities().then((value) {
+      quantities = value;
+      quantities.forEach((element) {
+        if (element['id'] == widget.item.quantity!) {
+          quantity = element['quantity'];
+        }
+        if (element.containsKey('quantity')) {
+          quantityList.add(element['quantity']);
+        }
+      });
+    }).catchError((error) {
+      print(error);
+    });
   }
 
   @override
@@ -215,10 +289,16 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                       child: RoundDropdown(
                           value: category, // Initial value
                           hintText: 'Select Category',
-                          items: ["Default", "Food", "Yalanji", "Desserts"],
+                          items: categoriesList,
                           onChanged: (String? value) {
                             setState(() {
                               category = value;
+                               if (value != null) {
+                                var selectedItem = categories.firstWhere(
+                                    (element) => element['category'] == value,
+                                    orElse: () => {});
+                                selectedCategory = selectedItem['id'];
+                              }
                             });
                           })),
                   Padding(
@@ -227,10 +307,16 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                       child: RoundDropdown(
                           value: quantity, // Initial value
                           hintText: 'Select Quantity',
-                          items: ["Small", "Medium", "Large"],
+                          items: quantityList,
                           onChanged: (String? value) {
                             setState(() {
                               quantity = value;
+                                if (value != null) {
+                                var selectedItem = quantities.firstWhere(
+                                    (element) => element['quantity'] == value,
+                                    orElse: () => {});
+                                selectedQuantity = selectedItem['id'];
+                              }
                             });
                           })),
                   const SizedBox(
@@ -256,10 +342,10 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                           kitchenId: widget.item.kitchenId,
                           name: txtName.text,
                           notes: txtNotes.text,
-                          price: txtPrice.text,
+                          price: double.parse(txtPrice.text),
                           time: txtTime.text,
-                          category: category,
-                          quantity: quantity,
+                          category: selectedCategory,
+                          quantity: selectedQuantity,
                           image: widget.item.image,
                         );
 

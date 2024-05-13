@@ -47,7 +47,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
           'city': widget.MykitchenData.location,
           'street': widget.MykitchenData.street,
           'contact': widget.MykitchenData.phone,
-          'category_id': 1,
+          'category_id': selectedCategory,
           'order_system': widget.MykitchenData.orderingSystem,
           'special_orders': widget.MykitchenData.specialOrders,
           'user_id': widget.MykitchenData.userId,
@@ -64,11 +64,13 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   }
 
   Future<List<Map<String, dynamic>>> getKitchenCategories() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> categoryList = data['categories'];
-      final List<Map<String, dynamic>> categories = categoryList.map((category) {
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
         return {'id': category['id'], 'category': category['category']};
       }).toList();
       return categories;
@@ -97,15 +99,15 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   void initState() {
     super.initState();
     specialOrders = "Yes";
-    getKitchenCategories().then((value) {
-    categories = value;
-    categories.forEach((element) {
-      if (element.containsKey('category')) {
-        categoriesList.add(element['category']);
-      }
-    });
-    // category = categories[0]['category'];
-    // orderingSystem = 'Order in the same day';
+   getKitchenCategories().then((value) {
+      categories = value;
+      categories.forEach((element) {
+        if (element.containsKey('category')) {
+          categoriesList.add(element['category']);
+        }
+      });
+      // category = categories[0]['category'];
+      // orderingSystem = 'Order in the same day';
     }).catchError((error) {
       // Handle error if needed
       print(error);
@@ -132,9 +134,26 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 25),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.arrow_back, size: 25,color: TColor.white,),
+                      ),
+
+                     // SizedBox(width: 40), // Add SizedBox to provide spacing
+                    ],
+                  ),
+                ),
+                //const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal:20,vertical:5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -203,7 +222,8 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                                           var selectedItem =
                                               categories.firstWhere(
                                                   (element) =>
-                                                      element['name'] == value,
+                                                      element['category'] ==
+                                                      value,
                                                   orElse: () => {});
                                           selectedCategory = selectedItem['id'];
                                         }
@@ -314,7 +334,8 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
                                 widget.MykitchenData.specialOrders =
                                     specialOrders;
                                 /////////////////////// BACKEND SECTION /////////////////////////
-                                Map<String, dynamic> result = await chefSignUp();
+                                Map<String, dynamic> result =
+                                    await chefSignUp();
                                 bool success = result['success'];
                                 String message = result['message'];
                                 print(success);

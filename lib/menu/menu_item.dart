@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,16 @@ class _MenuItemViewState extends State<MenuItemView> {
   TextEditingController txtPrice = TextEditingController();
   TextEditingController txtTime = TextEditingController();
 
+  List<String> categoriesList = {""}.toList();
+  late List<Map<String, dynamic>> categories;
+  int? selectedCategory; //id of the selected category
+
+  List<String> quantityList = {""}.toList();
+  late List<Map<String, dynamic>> quantities;
+  int? selectedQuantity; //id of the selected quantity
+
+  double dbPrice = 0.0; //price to store in db
+
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> addMenuItem() async {
     const url = '${SharedPreferencesService.url}add-menu-item';
@@ -54,9 +65,9 @@ class _MenuItemViewState extends State<MenuItemView> {
           'image': imageUrl,
           'notes': notes,
           'kitchen_id': kitchenId,
-          'category_id': category,
-          'quantity_id': quantity,
-          'price': 1,
+          'category_id': selectedCategory,
+          'quantity_id': selectedQuantity,
+          'price': dbPrice,
           'time': time,
         }),
       );
@@ -77,12 +88,15 @@ class _MenuItemViewState extends State<MenuItemView> {
     });
   }
 
-  Future<List<Map<String, dynamic>>> getFoodCategories() async { //should call it inside initState()
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}food-categories'));
+  Future<List<Map<String, dynamic>>> getFoodCategories() async {
+    //should call it inside initState()
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}food-categories'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> categoryList = data['categories'];
-      final List<Map<String, dynamic>> categories = categoryList.map((category) {
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
         return {'id': category['id'], 'category': category['category']};
       }).toList();
       return categories;
@@ -91,13 +105,16 @@ class _MenuItemViewState extends State<MenuItemView> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getFoodQuantities() async { //should call it inside initState()
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}food-quantities'));
+  Future<List<Map<String, dynamic>>> getFoodQuantities() async {
+    //should call it inside initState()
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}food-quantities'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> quantityList = data['quantities'];
-      final List<Map<String, dynamic>> quantities = quantityList.map((quantity) {
-        return {'id': quantity['id'], 'category': quantity['quantity']};
+      final List<Map<String, dynamic>> quantities =
+          quantityList.map((quantity) {
+        return {'id': quantity['id'], 'quantity': quantity['quantity']};
       }).toList();
       return quantities;
     } else {
@@ -105,11 +122,32 @@ class _MenuItemViewState extends State<MenuItemView> {
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
-  
+
   @override
   void initState() {
     super.initState();
     _loadKitchenId();
+    getFoodCategories().then((value) {
+      categories = value;
+      categories.forEach((element) {
+        if (element.containsKey('category')) {
+          categoriesList.add(element['category']);
+        }
+      });
+    }).catchError((error) {
+      print(error);
+    });
+
+    getFoodQuantities().then((value) {
+      quantities = value;
+      quantities.forEach((element) {
+        if (element.containsKey('quantity')) {
+          quantityList.add(element['quantity']);
+        }
+      });
+    }).catchError((error) {
+      print(error);
+    });
   }
 
   @override
@@ -268,10 +306,16 @@ class _MenuItemViewState extends State<MenuItemView> {
                       child: RoundDropdown(
                           value: category, // Initial value
                           hintText: 'Select Category',
-                          items: ["Default", "Food", "Yalanji", "Desserts"],
+                          items: categoriesList,
                           onChanged: (String? value) {
                             setState(() {
                               category = value;
+                              if (value != null) {
+                                var selectedItem = categories.firstWhere(
+                                    (element) => element['category'] == value,
+                                    orElse: () => {});
+                                selectedCategory = selectedItem['id'];
+                              }
                             });
                           })),
                   Padding(
@@ -280,10 +324,16 @@ class _MenuItemViewState extends State<MenuItemView> {
                       child: RoundDropdown(
                           value: quantity, // Initial value
                           hintText: 'Select Quantity',
-                          items: ["Small", "Medium", "Large"],
+                          items: quantityList,
                           onChanged: (String? value) {
                             setState(() {
                               quantity = value;
+                              if (value != null) {
+                                var selectedItem = quantities.firstWhere(
+                                    (element) => element['quantity'] == value,
+                                    orElse: () => {});
+                                selectedQuantity = selectedItem['id'];
+                              }
                             });
                           })),
                   const SizedBox(
@@ -316,6 +366,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                             });
                           } else {
                             setState(() {
+                              dbPrice = (double.parse(price!));
                               errorFlag = false;
                               errorMessage = "";
                             });
@@ -325,9 +376,9 @@ class _MenuItemViewState extends State<MenuItemView> {
                                 image: imageUrl,
                                 name: txtName.text,
                                 notes: txtNotes.text,
-                                quantity: quantity,
-                                category: category,
-                                price: price,
+                                quantity: selectedQuantity,
+                                category: selectedCategory,
+                                price: dbPrice,
                                 time: time);
 
                             widget.addItemToList(menuItem!);
