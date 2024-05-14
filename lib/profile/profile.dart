@@ -33,17 +33,6 @@ class _ProfileViewState extends State<ProfileView> {
     txtMobile.text = "0597280457";
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your email';
-    }
-    // Regular Expression for email validation
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Please enter a valid email';
-    }
-    return null;
-  }
-
   String? _validatePhoneNumber(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your phone number';
@@ -114,7 +103,7 @@ class _ProfileViewState extends State<ProfileView> {
               hintText: "Enter Email",
               keyboardType: TextInputType.emailAddress,
               controller: txtEmail,
-              validator: _validateEmail,
+              readOnly: true,
             ),
           ),
           Padding(

@@ -78,6 +78,7 @@ class RoundTitleTextfield extends StatelessWidget {
   final String? Function(String?)? validator;
   final void Function(String?)? onSaved;
   final int? maxLines;
+  final bool readOnly;
 
   const RoundTitleTextfield({
     super.key,
@@ -91,6 +92,7 @@ class RoundTitleTextfield extends StatelessWidget {
     this.validator,
     this.onSaved,
     this.maxLines = 1,
+    this.readOnly = false,
   });
 
   @override
@@ -129,6 +131,7 @@ class RoundTitleTextfield extends StatelessWidget {
                       controller: controller,
                       obscureText: obscureText,
                       keyboardType: keyboardType,
+                      readOnly: readOnly,
                       decoration: InputDecoration(
                         contentPadding:
                             const EdgeInsets.symmetric(horizontal: 20),
