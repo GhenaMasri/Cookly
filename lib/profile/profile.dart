@@ -23,9 +23,6 @@ class _ProfileViewState extends State<ProfileView> {
   TextEditingController txtLastName = TextEditingController();
   TextEditingController txtEmail = TextEditingController();
   TextEditingController txtMobile = TextEditingController();
-  TextEditingController txtPassword = TextEditingController();
-  TextEditingController txtConfirmPassword = TextEditingController();
-
   GlobalKey<FormState> formState = GlobalKey();
   @override
   void initState() {
@@ -34,8 +31,6 @@ class _ProfileViewState extends State<ProfileView> {
     txtLastName.text = "LastName";
     txtEmail.text = "ghenama77@gmail.com";
     txtMobile.text = "0597280457";
-    txtPassword.text = "Gh1234@";
-    txtConfirmPassword.text = "Gh1234@";
   }
 
   String? _validateEmail(String? value) {
@@ -45,30 +40,6 @@ class _ProfileViewState extends State<ProfileView> {
     // Regular Expression for email validation
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
       return 'Please enter a valid email';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter your password';
-    }
-    // Password must be at least 8 characters
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    // Password must contain at least one special character
-    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-      return 'Password must contain at least one special character';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    String? password = txtPassword.text;
-
-    if (password == null || value == null || password != value) {
-      return 'Passwords do not match';
     }
     return null;
   }
@@ -156,36 +127,28 @@ class _ProfileViewState extends State<ProfileView> {
               validator: _validatePhoneNumber,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Password",
-              hintText: "* * * * * *",
-              obscureText: true,
-              controller: txtPassword,
-              validator: _validatePassword,
-            ),
+          const SizedBox(
+            height: 20,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Confirm Password",
-              hintText: "* * * * * *",
-              obscureText: true,
-              controller: txtConfirmPassword,
-              validator: _validateConfirmPassword,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: RoundButton(
+                title: "Change Password",
+                type: RoundButtonType.textPrimary,
+                onPressed: () {
+                  if (formState.currentState!.validate()) {}
+                }),
           ),
           const SizedBox(
             height: 20,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: RoundButton(title: "Save", onPressed: () {
-              if(formState.currentState!.validate()){
-
-              }
-            }),
+            child: RoundButton(
+                title: "Save",
+                onPressed: () {
+                  if (formState.currentState!.validate()) {}
+                }),
           ),
           const SizedBox(
             height: 20,
