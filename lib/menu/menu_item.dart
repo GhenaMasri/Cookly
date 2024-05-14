@@ -39,11 +39,11 @@ class _MenuItemViewState extends State<MenuItemView> {
   TextEditingController txtPrice = TextEditingController();
   TextEditingController txtTime = TextEditingController();
 
-  late List<String> categoriesList;
+  late List<String> categoriesList = [];
   late List<Map<String, dynamic>> categories;
   int? selectedCategory; //id of the selected category
 
-  late List<String> quantityList;
+  late List<String> quantityList = [];
   late List<Map<String, dynamic>> quantities;
   int? selectedQuantity; //id of the selected quantity
 

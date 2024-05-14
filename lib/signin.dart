@@ -52,10 +52,9 @@ class _Signin extends State<Signin> {
   }
 
   Future<int> getChefId(String email) async {
-    final response = await http.post(
-      Uri.parse('${SharedPreferencesService.url}chefId'),
+    final response = await http.get(
+      Uri.parse('${SharedPreferencesService.url}chefId?email=$email'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
     );
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
@@ -66,10 +65,9 @@ class _Signin extends State<Signin> {
   }
 
   Future<String> getKitchenName(int chefId) async {
-    final response = await http.post(
-      Uri.parse('${SharedPreferencesService.url}kitchenName'),
+    final response = await http.get(
+      Uri.parse('${SharedPreferencesService.url}kitchenName?chefId=$chefId'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'chefId': chefId}),
     );
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);

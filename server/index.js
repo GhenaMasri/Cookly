@@ -38,11 +38,14 @@ const kitchenCategoriesRoute = require('./routes/general/kitchen_categories');
 app.use('/kitchen-categories', kitchenCategoriesRoute);
 
 //menu item routes
-const newMenuItemRoute = require('./routes/menu item/menu_item');
+const newMenuItemRoute = require('./routes/menu item/add_menu_item');
 app.use('/add-menu-item', newMenuItemRoute);
 
 const chefMenuItemsRoute = require('./routes/menu item/get_menu_items_for_chef');
 app.use('/chef-menu-items', chefMenuItemsRoute);
+
+const deleteMenuItemRoute = require('./routes/menu item/delete_menu_item');
+app.use('/delete-menu-item', deleteMenuItemRoute);
 
 //user routes
 const userIdRoute = require('./routes/user/get_user_id');
