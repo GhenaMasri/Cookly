@@ -30,7 +30,7 @@ class _ChefSignupDetails extends State<ChefSignupDetails> {
   String? description;
   String? orderingSystem;
   String? specialOrders = "Yes";
-  List<String> categoriesList = {""}.toList();
+  late List<String> categoriesList;
   late List<Map<String, dynamic>> categories;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
