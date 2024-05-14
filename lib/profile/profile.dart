@@ -22,14 +22,77 @@ class _ProfileViewState extends State<ProfileView> {
   TextEditingController txtLasttName = TextEditingController();
   TextEditingController txtEmail = TextEditingController();
   TextEditingController txtMobile = TextEditingController();
-  TextEditingController txtAddress = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
   TextEditingController txtConfirmPassword = TextEditingController();
+
+  GlobalKey<FormState> formState = GlobalKey();
+  @override
+  void initState() {
+    super.initState();
+    txtFirstName.text = "FirstName";
+    txtLasttName.text = "LastName";
+    txtEmail.text = "ghenama77@gmail.com";
+    txtMobile.text = "0597280457";
+    txtPassword.text = "Gh1234@";
+    txtConfirmPassword.text = "Gh1234@";
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    // Regular Expression for email validation
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your password';
+    }
+    // Password must be at least 8 characters
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    // Password must contain at least one special character
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+      return 'Password must contain at least one special character';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    String? password = txtPassword.text;
+
+    if (password == null || value == null || password != value) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your phone number';
+    }
+    // Check if the phone number is 10 digits long
+    if (value.length != 10) {
+      return 'Phone number must be 10 digits long';
+    }
+    // Check if the phone number starts with either 059 or 056
+    if (!value.startsWith('059') && !value.startsWith('056')) {
+      return 'Phone number must start with 059 or 056';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
+            child: Form(
+      key: formState,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -41,7 +104,9 @@ class _ProfileViewState extends State<ProfileView> {
                 fontWeight: FontWeight.w700),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              //Set shared prefernces to false.
+            },
             child: Text(
               "Sign Out",
               style: TextStyle(
@@ -50,13 +115,13 @@ class _ProfileViewState extends State<ProfileView> {
                   fontWeight: FontWeight.w500),
             ),
           ),
-       
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
             child: RoundTitleTextfield(
               title: "First Name",
               hintText: "Enter First Name",
               controller: txtFirstName,
+              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
             ),
           ),
           Padding(
@@ -65,6 +130,7 @@ class _ProfileViewState extends State<ProfileView> {
               title: "Last Name",
               hintText: "Enter Last Name",
               controller: txtFirstName,
+              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
             ),
           ),
           Padding(
@@ -74,6 +140,7 @@ class _ProfileViewState extends State<ProfileView> {
               hintText: "Enter Email",
               keyboardType: TextInputType.emailAddress,
               controller: txtEmail,
+              validator: _validateEmail,
             ),
           ),
           Padding(
@@ -83,14 +150,7 @@ class _ProfileViewState extends State<ProfileView> {
               hintText: "Enter Mobile No",
               controller: txtMobile,
               keyboardType: TextInputType.phone,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Address",
-              hintText: "Enter Address",
-              controller: txtAddress,
+              validator: _validatePhoneNumber,
             ),
           ),
           Padding(
@@ -100,6 +160,7 @@ class _ProfileViewState extends State<ProfileView> {
               hintText: "* * * * * *",
               obscureText: true,
               controller: txtPassword,
+              validator: _validatePassword,
             ),
           ),
           Padding(
@@ -109,6 +170,7 @@ class _ProfileViewState extends State<ProfileView> {
               hintText: "* * * * * *",
               obscureText: true,
               controller: txtConfirmPassword,
+              validator: _validateConfirmPassword,
             ),
           ),
           const SizedBox(
@@ -123,6 +185,6 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ]),
       ),
-    ));
+    )));
   }
 }
