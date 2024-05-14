@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/main_page.dart';
+import 'package:untitled/profile/profile_tab_bar.dart';
+import 'package:untitled/profile/user_profile.dart';
 import 'package:untitled/splash.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 

@@ -8,14 +8,14 @@ import 'package:untitled/welcome_page.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/round_textfield.dart';
 
-class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
+class UserProfileView extends StatefulWidget {
+  const UserProfileView({super.key});
 
   @override
-  State<ProfileView> createState() => _ProfileViewState();
+  State<UserProfileView> createState() => _UserProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
+class _UserProfileViewState extends State<UserProfileView> {
   final ImagePicker picker = ImagePicker();
   XFile? image;
 
@@ -97,6 +97,37 @@ class _ProfileViewState extends State<ProfileView> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          const SizedBox(
+                height: 46,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Profile",
+                      style: TextStyle(
+                          color: TColor.primaryText,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Container()));
+                      },
+                      icon: Image.asset(
+                        "assets/img/notification.png",
+                        width: 25,
+                        height: 25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           Text(
             "Hi there UserName!",
             style: TextStyle(

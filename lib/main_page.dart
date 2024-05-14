@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/more/more_view.dart';
 import 'package:untitled/profile/profile_tab_bar.dart';
+import 'package:untitled/profile/user_profile.dart';
 import '../common_widget/tab_button.dart';
 import '../home/home_view.dart';
 import 'package:untitled/home/chef_home_view.dart';
@@ -97,7 +98,7 @@ class _MainViewState extends State<MainView> {
                       if (type == "chef") {
                         selectPageView = ProfileTabBar();
                       } else {
-                        selectPageView = Container();
+                        selectPageView = UserProfileView();
                       }
                       
                     }
