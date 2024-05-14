@@ -21,21 +21,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   TextEditingController txtSearch = TextEditingController();
   int? kitchenId;
 
-  List<MenuItem> menuArr = List.generate(
-    8,
-    (index) => MenuItem(
-      kitchenId: 1,
-      itemId: index,
-      image:
-          "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fmenu_1.png?alt=media&token=e50f35aa-5224-4c69-ba9c-054861ba4610",
-      name: "Food",
-      notes: "This section will contain the ingredients",
-      category: 1,
-      quantity: 1,
-      price: 20.0,
-      time: "00:01:00",
-    ),
-  );
+  late List<MenuItem> menuArr;
   void addItemToList(MenuItem item) {
     setState(() {
       menuArr.add(item);
@@ -96,23 +82,82 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
+  Future<List<MenuItem>> searchMenuItems(String query) async {
+    final url = '${SharedPreferencesService.url}search-menu-items';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'kitchenId': kitchenId,
+          'query': query,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body)['items'];
+        List<MenuItem> menuItems = data.map((item) {
+          return MenuItem(
+            kitchenId: item['kitchen_id'],
+            itemId: item['id'],
+            image: item['image'],
+            name: item['name'],
+            notes: item['notes'],
+            quantity: item['quantity_id'],
+            category: item['category_id'],
+            price: item['price'].toDouble(),
+            time: item['time'],
+          );
+        }).toList();
+        return menuItems;
+      } else {
+        throw Exception('Failed to load search results');
+      }
+    } catch (error) {
+      throw Exception('Error: $error');
+    }
+  }
+
   Future<void> _loadKitchenId() async {
     int? kitchenid = await SharedPreferencesService.getKitchenId();
     setState(() {
       kitchenId = kitchenid;
     });
     try {
-      menuArr = await chefMenuItems();
+      await _updateMenuArr();
+    } catch (error) {
+      print('Error loading menu items: $error');
+    }
+  }
+
+  Future<void> _updateMenuArr() async {
+    try {
+      List<MenuItem> items;
+      if (txtSearch.text.isNotEmpty) {
+        items = await searchMenuItems(txtSearch.text);
+      } else {
+        items = await chefMenuItems();
+      }
+      setState(() {
+        menuArr = items;
+      });
     } catch (error) {
       print('Error loading menu items: $error');
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
-  
+
   @override
   void initState() {
     super.initState();
     _loadKitchenId();
+    txtSearch.addListener(_updateMenuArr);
+  }
+
+  @override
+  void dispose() {
+    txtSearch.removeListener(_updateMenuArr);
+    txtSearch.dispose();
+    super.dispose();
   }
 
   @override
@@ -157,7 +202,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: RoundTextfield(
-                hintText: "Search Food",
+                hintText: "Search",
                 controller: txtSearch,
                 left: Container(
                   alignment: Alignment.center,
@@ -196,14 +241,16 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                   var menuItem = menuArr[index];
                   return GestureDetector(
                     onTap: () {
-                      /*Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MenuItemsView(
-                          menuItem: menuItem,
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ManageMenuItemView(
+                            RemoveItemFromList: RemoveItemFromList,
+                            updateMenuItem: updateMenuItem,
+                            item: menuItem,
+                          ),
                         ),
-                      ),
-                    );*/
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 20),

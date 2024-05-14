@@ -30,10 +30,6 @@ class _MenuItemViewState extends State<MenuItemView> {
   String? imageUrl;
   String? category;
   String? quantity;
-  String? name;
-  String? notes;
-  String? price;
-  String? time;
   String errorMessage = '';
   bool errorFlag = false;
   int? kitchenId;
@@ -43,11 +39,11 @@ class _MenuItemViewState extends State<MenuItemView> {
   TextEditingController txtPrice = TextEditingController();
   TextEditingController txtTime = TextEditingController();
 
-  List<String> categoriesList = {""}.toList();
+  late List<String> categoriesList;
   late List<Map<String, dynamic>> categories;
   int? selectedCategory; //id of the selected category
 
-  List<String> quantityList = {""}.toList();
+  late List<String> quantityList;
   late List<Map<String, dynamic>> quantities;
   int? selectedQuantity; //id of the selected quantity
 
@@ -377,7 +373,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                                 quantity: selectedQuantity,
                                 category: selectedCategory,
                                 price: dbPrice,
-                                time: time);
+                                time: txtTime.text);
 
                             widget.addItemToList(menuItem!);
                             Navigator.pop(context);

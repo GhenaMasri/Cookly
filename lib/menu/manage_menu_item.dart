@@ -36,10 +36,6 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   String? imageUrl;
   String? category;
   String? quantity;
-  String? name;
-  String? notes;
-  String? price;
-  String? time;
   String errorMessage = '';
   bool errorFlag = false;
 
