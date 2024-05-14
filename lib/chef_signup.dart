@@ -36,13 +36,9 @@ class _ChefSignup extends State<ChefSignup> {
   Future<Map<String, dynamic>> verifyChef() async {
     const url = '${SharedPreferencesService.url}verify-chef';
     try {
-      final response = await http.post(
-        Uri.parse(url),
+      final response = await http.get(
+        Uri.parse('$url?name=$name&contact=$phone'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': name,
-          'contact': phone,
-        }),
       );
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
@@ -57,10 +53,9 @@ class _ChefSignup extends State<ChefSignup> {
   }
 
   Future<int> getUserId(String email) async {
-    final response = await http.post(
-      Uri.parse('${SharedPreferencesService.url}userId'),
+    final response = await http.get(
+      Uri.parse('${SharedPreferencesService.url}userId?email=$email'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
     );
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);

@@ -21,7 +21,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   TextEditingController txtSearch = TextEditingController();
   int? kitchenId;
 
-  late List<MenuItem> menuArr;
+  late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
     setState(() {
       menuArr.add(item);
@@ -49,14 +49,11 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<MenuItem>> chefMenuItems() async {
-    const url = '${SharedPreferencesService.url}chef-menu-items';
+    final url = '${SharedPreferencesService.url}chef-menu-items?kitchenId=$kitchenId';
     try {
-      final response = await http.post(
+      final response = await http.get(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'kitchenId': kitchenId,
-        }),
       );
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body)['items'];

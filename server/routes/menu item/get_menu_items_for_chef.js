@@ -2,8 +2,12 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
 
-router.post("/", async (req, res) => {
-  const { kitchenId } = req.body;
+router.get("/", async (req, res) => {
+  const { kitchenId } = req.query;
+
+  if (!kitchenId) {
+    return res.status(400).send("KitchenId parameter is required");
+  }
 
   const query = "SELECT * FROM menu_item WHERE kitchen_id = ?";
   pool.execute(query, [kitchenId], async (error, results, fields) => {
@@ -13,7 +17,7 @@ router.post("/", async (req, res) => {
       return;
     }
     if (results.length === 0) {
-      res.status(401).send("Invalid kitchen id");
+      res.status(401).send("No menu items found for the provided kitchen id");
     } else {
       res.status(200).send({ items: results });
     }

@@ -55,9 +55,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   double dbPrice = 0.0; //price to store in db
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-
   Future<List<Map<String, dynamic>>> getFoodCategories() async {
-    //should call it inside initState()
     final response = await http
         .get(Uri.parse('${SharedPreferencesService.url}food-categories'));
     if (response.statusCode == 200) {
@@ -74,7 +72,6 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   }
 
   Future<List<Map<String, dynamic>>> getFoodQuantities() async {
-    //should call it inside initState()
     final response = await http
         .get(Uri.parse('${SharedPreferencesService.url}food-quantities'));
     if (response.statusCode == 200) {
@@ -89,6 +86,25 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
       throw Exception('Failed to load food quantities');
     }
   }
+
+  Future<Map<String, dynamic>> deleteMenuItem(int menuItemId) async {
+    final url = '${SharedPreferencesService.url}delete-menu-item?menuItemId=$menuItemId';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else if (response.statusCode == 404) {
+        return {'success': false, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
   //////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -96,7 +112,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
     super.initState();
     txtName.text = widget.item.name!;
     txtNotes.text = widget.item.notes!;
-    txtPrice.text = widget.item.price! as String;
+    txtPrice.text = widget.item.price!.toString();
     txtTime.text = widget.item.time!;
     imageUrl = widget.item.image!;
 
