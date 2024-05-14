@@ -275,7 +275,6 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                     child: RoundTitleTextfield(
                       title: "Estimated Preparation Time",
                       hintText: "Enter Time (day:hour:minutes)",
-                      keyboardType: TextInputType.datetime,
                       controller: txtTime,
                     ),
                   ),
@@ -289,7 +288,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                           onChanged: (String? value) {
                             setState(() {
                               category = value;
-                               if (value != null) {
+                              if (value != null) {
                                 var selectedItem = categories.firstWhere(
                                     (element) => element['category'] == value,
                                     orElse: () => {});
@@ -307,7 +306,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                           onChanged: (String? value) {
                             setState(() {
                               quantity = value;
-                                if (value != null) {
+                              if (value != null) {
                                 var selectedItem = quantities.firstWhere(
                                     (element) => element['quantity'] == value,
                                     orElse: () => {});

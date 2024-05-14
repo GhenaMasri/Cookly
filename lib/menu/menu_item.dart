@@ -290,7 +290,6 @@ class _MenuItemViewState extends State<MenuItemView> {
                     child: RoundTitleTextfield(
                       title: "Estimated Preparation Time",
                       hintText: "Enter Time (day:hour:minutes)",
-                      keyboardType: TextInputType.datetime,
                       controller: txtTime,
                     ),
                   ),

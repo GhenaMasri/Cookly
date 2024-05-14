@@ -60,7 +60,11 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 0) {
                       selectTab = 0;
-                      selectPageView = const HomeView();
+                      if (type == "chef") {
+                        selectPageView = const ChefHomeView();
+                      } else {
+                        selectPageView = const HomeView();
+                      }
                     }
                     if (mounted) {
                       setState(() {});
@@ -73,7 +77,11 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 1) {
                       selectTab = 1;
-                      selectPageView = Container();
+                      if (type == "chef") {
+                        selectPageView = Container();
+                      } else {
+                        selectPageView = Container();
+                      }
                     }
                     if (mounted) {
                       setState(() {});
@@ -86,7 +94,12 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 3) {
                       selectTab = 3;
-                      selectPageView = ProfileTabBar();
+                      if (type == "chef") {
+                        selectPageView = ProfileTabBar();
+                      } else {
+                        selectPageView = Container();
+                      }
+                      
                     }
                     if (mounted) {
                       setState(() {});
