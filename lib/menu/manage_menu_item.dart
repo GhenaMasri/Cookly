@@ -114,6 +114,45 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
     _initDataFuture = _initData();
   }
 
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want delete this item?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Approve',
+                style: TextStyle(color: Color.fromARGB(255, 230, 81, 0)),
+              ),
+              onPressed: () {
+                //Delete the item
+                widget.RemoveItemFromList(widget.item);
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => ChefHomeView()));
+              },
+            ),
+            TextButton(
+              child: const Text('Decline',
+                  style: TextStyle(color: Color.fromARGB(255, 230, 81, 0))),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _initData() async {
     txtName.text = widget.item.name ?? '';
     txtNotes.text = widget.item.notes ?? '';
@@ -405,8 +444,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                     child: RoundButton(
                         title: "Delete",
                         onPressed: () {
-                          widget.RemoveItemFromList(widget.item);
-                          Navigator.pop(context);
+                          _showMyDialog();
                         }),
                   ),
                   const SizedBox(
