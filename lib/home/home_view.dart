@@ -14,6 +14,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   String? selectedLocation;
   TextEditingController txtSearch = TextEditingController();
+  late Future<void> _initDataFuture;
 //////////////////////////////// BACKEND SECTION ///////////////////////////
   String? username;
 
@@ -21,6 +22,7 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _loadUserName();
+    _initDataFuture; //_initDataFuture = load user home page API
   }
 
   Future<void> _loadUserName() async {
@@ -70,6 +72,21 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     var media = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(

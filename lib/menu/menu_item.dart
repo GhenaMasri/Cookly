@@ -48,6 +48,7 @@ class _MenuItemViewState extends State<MenuItemView> {
   int? selectedQuantity; //id of the selected quantity
 
   double dbPrice = 0.0; //price to store in db
+  late Future<void> _initDataFuture;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> addMenuItem() async {
@@ -121,31 +122,52 @@ class _MenuItemViewState extends State<MenuItemView> {
   void initState() {
     super.initState();
     _loadKitchenId();
-    getFoodCategories().then((value) {
-      categories = value;
-      categories.forEach((element) {
-        if (element.containsKey('category')) {
-          categoriesList.add(element['category']);
-        }
-      });
-    }).catchError((error) {
-      print(error);
-    });
+    _initDataFuture = _initData();
+  }
 
-    getFoodQuantities().then((value) {
-      quantities = value;
-      quantities.forEach((element) {
-        if (element.containsKey('quantity')) {
-          quantityList.add(element['quantity']);
+  Future<void> _initData() async {
+    try {
+      var fetchedCategories = await getFoodCategories();
+      var fetchedQuantities = await getFoodQuantities();
+
+      setState(() {
+        categories = fetchedCategories;
+        quantities = fetchedQuantities;
+
+        for (var element in categories) {
+          if (element.containsKey('category')) {
+            categoriesList.add(element['category']);
+          }
+        }
+
+        for (var element in quantities) {
+          if (element.containsKey('quantity')) {
+            quantityList.add(element['quantity']);
+          }
         }
       });
-    }).catchError((error) {
+    } catch (error) {
       print(error);
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(

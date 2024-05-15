@@ -44,16 +44,16 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   TextEditingController txtPrice = TextEditingController();
   TextEditingController txtTime = TextEditingController();
 
-  List<String> categoriesList = {""}.toList();
-  late List<Map<String, dynamic>> categories;
+  List<String> categoriesList = [];
+  List<Map<String, dynamic>> categories = [];
   int? selectedCategory; //id of the selected category
 
-  List<String> quantityList = {""}.toList();
-  late List<Map<String, dynamic>> quantities;
+  List<String> quantityList = [];
+  List<Map<String, dynamic>> quantities = [];
   int? selectedQuantity; //id of the selected quantity
 
   double dbPrice = 0.0; //price to store in db
-
+  late Future<void> _initDataFuture;
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<Map<String, dynamic>>> getFoodCategories() async {
     final response = await http
@@ -88,7 +88,8 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   }
 
   Future<Map<String, dynamic>> deleteMenuItem(int menuItemId) async {
-    final url = '${SharedPreferencesService.url}delete-menu-item?menuItemId=$menuItemId';
+    final url =
+        '${SharedPreferencesService.url}delete-menu-item?menuItemId=$menuItemId';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -110,43 +111,73 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   @override
   void initState() {
     super.initState();
-    txtName.text = widget.item.name!;
-    txtNotes.text = widget.item.notes!;
-    txtPrice.text = widget.item.price!.toString();
-    txtTime.text = widget.item.time!;
-    imageUrl = widget.item.image!;
+    _initDataFuture = _initData();
+  }
 
-    getFoodCategories().then((value) {
-      categories = value;
-      categories.forEach((element) {
-        if (element['id'] == widget.item.category!) {
-          category = element['category'];
+  Future<void> _initData() async {
+    txtName.text = widget.item.name ?? '';
+    txtNotes.text = widget.item.notes ?? '';
+    txtPrice.text = widget.item.price?.toString() ?? '';
+    txtTime.text = widget.item.time ?? '';
+    imageUrl = widget.item.image ?? '';
+
+    try {
+      var fetchedCategories = await getFoodCategories();
+      var fetchedQuantities = await getFoodQuantities();
+
+      setState(() {
+        categories = fetchedCategories;
+        quantities = fetchedQuantities;
+
+        for (var element in categories) {
+          if (element['id'] == widget.item.category) {
+            category = element['category'];
+          }
+          if (element.containsKey('category')) {
+            categoriesList.add(element['category']);
+          }
         }
-        if (element.containsKey('category')) {
-          categoriesList.add(element['category']);
+
+        for (var element in quantities) {
+          if (element['id'] == widget.item.quantity) {
+            quantity = element['quantity'];
+          }
+          if (element.containsKey('quantity')) {
+            quantityList.add(element['quantity']);
+          }
         }
       });
-    }).catchError((error) {
+    } catch (error) {
       print(error);
-    });
+    }
+  }
 
-    getFoodQuantities().then((value) {
-      quantities = value;
-      quantities.forEach((element) {
-        if (element['id'] == widget.item.quantity!) {
-          quantity = element['quantity'];
-        }
-        if (element.containsKey('quantity')) {
-          quantityList.add(element['quantity']);
-        }
-      });
-    }).catchError((error) {
-      print(error);
-    });
+  @override
+  void dispose() {
+    txtName.dispose();
+    txtNotes.dispose();
+    txtPrice.dispose();
+    txtTime.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
