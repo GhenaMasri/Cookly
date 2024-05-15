@@ -21,6 +21,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   TextEditingController txtSearch = TextEditingController();
   int? kitchenId;
   late Future<void> _initDataFuture;
+   List<Map<String, dynamic>> categories = [];
 
   late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
@@ -81,6 +82,22 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
+ Future<List<Map<String, dynamic>>> getFoodCategories() async {
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}food-categories'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> categoryList = data['categories'];
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
+        return {'id': category['id'], 'category': category['category']};
+      }).toList();
+      return categories;
+    } else {
+      throw Exception('Failed to load food categories');
+    }
+  }
+
   Future<List<MenuItem>> searchMenuItems(String query) async {
     final url = '${SharedPreferencesService.url}search-menu-items';
     try {
@@ -131,6 +148,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   Future<void> _updateMenuArr() async {
     try {
       List<MenuItem> items;
+      var fetchedCategories = await getFoodCategories();
       if (txtSearch.text.isNotEmpty) {
         items = await searchMenuItems(txtSearch.text);
       } else {
@@ -138,12 +156,21 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       }
       setState(() {
         menuArr = items;
+        categories = fetchedCategories;
       });
     } catch (error) {
       print('Error loading menu items: $error');
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
+  
+  String getCategoryName(int categoryId) {
+  final category = categories.firstWhere(
+    (cat) => cat['id'] == categoryId,
+    orElse: () => {'id': categoryId, 'category': 'Unknown'},
+  );
+  return category['category'];
+}
 
   @override
   void initState() {
@@ -309,7 +336,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    "Ingredients: ${menuItem.notes}",
+                                    "Category: ${getCategoryName(menuItem.category!)}",
                                     style: TextStyle(
                                       color: TColor.secondaryText,
                                       fontSize: 12,
