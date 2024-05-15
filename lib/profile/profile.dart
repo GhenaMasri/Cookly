@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:untitled/profile/change_password.dart';
 import 'package:untitled/welcome_page.dart';
 
 import '../../common/color_extension.dart';
@@ -141,7 +142,10 @@ class _ProfileViewState extends State<ProfileView> {
                 title: "Change Password",
                 type: RoundButtonType.textPrimary,
                 onPressed: () {
-                  if (formState.currentState!.validate()) {}
+                   Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ChangePasswordView()));
                 }),
           ),
           const SizedBox(
