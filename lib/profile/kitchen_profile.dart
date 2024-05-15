@@ -23,7 +23,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   final ImagePicker picker = ImagePicker();
   XFile? pickedFile;
   String? imageUrl;
- File? _image;
+  File? _image;
 
   TextEditingController txtName = TextEditingController();
   String? location;
@@ -32,12 +32,13 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   TextEditingController txtDescription = TextEditingController();
   String? category;
   int? selectedCategory; //id of the selected category
-  late List<String> categoriesList;
-  late List<Map<String, dynamic>> categories;
+  List<String> categoriesList = [];
+  List<Map<String, dynamic>> categories = [];
   String? orderingSystem; // For UI only, db should be 0 or 1
   String? specialOrders;
   int? OrdersDb;
   GlobalKey<FormState> formState = GlobalKey();
+  late Future<void> _initDataFuture;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<Map<String, dynamic>>> getKitchenCategories() async {
@@ -60,8 +61,13 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   @override
   void initState() {
     super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
     //Filling Kitchen data
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fcookly.png?alt=media&token=24a53307-3c41-489b-a94b-e687751722b8";
+    imageUrl =
+        "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fcookly.png?alt=media&token=24a53307-3c41-489b-a94b-e687751722b8";
     txtName.text = "Cookly";
     location = 'Nablus';
     txtStreet.text = 'Itihad';
@@ -69,33 +75,49 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
     txtDescription.text = "Description about the kitchen";
     category = 'Default';
     OrdersDb = 0;
-    orderingSystem = OrdersDb == 1 ? 'Order the day before' : 'Order in the same day';
+    orderingSystem =
+        OrdersDb == 1 ? 'Order the day before' : 'Order in the same day';
     specialOrders = "Yes";
 
+    try {
+      var fetchedCategories = await getKitchenCategories();
 
-  //Wasan should remove comment and edit line 4 if statement
+      setState(() {
+        categories = fetchedCategories;
 
-   /* getKitchenCategories().then((value) {
-      categories = value;
-      categories.forEach((element) {
-        if (element['id'] == /*category from db*/) {
-          category = element['category'];
-        }
-        if (element.containsKey('category')) {
-          categoriesList.add(element['category']);
-        }
+//Wasan should remove the comment and edit line 91 if statement
+
+        /*for (var element in categories) {
+          if (element['id'] == /*category from db*/) {
+            category = element['category'];
+          }
+          if (element.containsKey('category')) {
+            categoriesList.add(element['category']);
+          }
+        }*/
       });
-    }).catchError((error) {
-      // Handle error if needed
+    } catch (error) {
       print(error);
-    });*/
-
-    //this should be removed
-    categoriesList = ['Default','Yalanji','Dessert','food'];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
         body: SingleChildScrollView(
             child: Form(
@@ -114,8 +136,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
             child: imageUrl != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(50),
-                    child: Image.network(
-                              imageUrl!,
+                    child: Image.network(imageUrl!,
                         width: 100, height: 100, fit: BoxFit.cover),
                   )
                 : Icon(
@@ -126,33 +147,29 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
           ),
           TextButton.icon(
             onPressed: () async {
-              pickedFile =
-                          await picker.pickImage(source: ImageSource.gallery);
-                      String uniqueFileName =
-                          DateTime.now().millisecondsSinceEpoch.toString();
-                      setState(() {
-                        if (pickedFile != null) {
-                          _image = File(pickedFile!.path);
-                        } else {
-                          print('No image selected.');
-                        }
-                      });
-                      Reference referenceRoot = FirebaseStorage.instance.ref();
-                      Reference referenceDirectory =
-                          referenceRoot.child('images');
-                      Reference referenceImageToUpload =
-                          referenceDirectory.child(uniqueFileName);
+              pickedFile = await picker.pickImage(source: ImageSource.gallery);
+              String uniqueFileName =
+                  DateTime.now().millisecondsSinceEpoch.toString();
+              setState(() {
+                if (pickedFile != null) {
+                  _image = File(pickedFile!.path);
+                } else {
+                  print('No image selected.');
+                }
+              });
+              Reference referenceRoot = FirebaseStorage.instance.ref();
+              Reference referenceDirectory = referenceRoot.child('images');
+              Reference referenceImageToUpload =
+                  referenceDirectory.child(uniqueFileName);
 
-                      try {
-                        //Store the file
-                        await referenceImageToUpload
-                            .putFile(File(pickedFile!.path));
-                        //Success: get the download URL
-                        imageUrl =
-                            await referenceImageToUpload.getDownloadURL();
-                      } catch (error) {
-                        //Some error occurred
-                      }
+              try {
+                //Store the file
+                await referenceImageToUpload.putFile(File(pickedFile!.path));
+                //Success: get the download URL
+                imageUrl = await referenceImageToUpload.getDownloadURL();
+              } catch (error) {
+                //Some error occurred
+              }
               setState(() {});
             },
             icon: Icon(
@@ -304,11 +321,13 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: RoundButton(title: "Save", onPressed: () {
-              if(formState.currentState!.validate()){
-                //save edits to db
-              }
-            }),
+            child: RoundButton(
+                title: "Save",
+                onPressed: () {
+                  if (formState.currentState!.validate()) {
+                    //save edits to db
+                  }
+                }),
           ),
           const SizedBox(
             height: 20,

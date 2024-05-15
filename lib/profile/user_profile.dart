@@ -18,6 +18,7 @@ class UserProfileView extends StatefulWidget {
 class _UserProfileViewState extends State<UserProfileView> {
   final ImagePicker picker = ImagePicker();
   XFile? image;
+  late Future<void> _initDataFuture;
 
   TextEditingController txtFirstName = TextEditingController();
   TextEditingController txtLastName = TextEditingController();
@@ -27,10 +28,11 @@ class _UserProfileViewState extends State<UserProfileView> {
   @override
   void initState() {
     super.initState();
-    txtFirstName.text = "FirstName";
+    _initDataFuture; //  _initDataFuture = load profile data from API as commented below;
+   /* txtFirstName.text = "FirstName";
     txtLastName.text = "LastName";
     txtEmail.text = "ghenama77@gmail.com";
-    txtMobile.text = "0597280457";
+    txtMobile.text = "0597280457";*/
   }
 
   String? _validatePhoneNumber(String? value) {
@@ -50,6 +52,21 @@ class _UserProfileViewState extends State<UserProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
         body: SingleChildScrollView(
             child: Form(

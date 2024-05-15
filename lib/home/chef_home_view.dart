@@ -20,6 +20,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   String? selectedLocation;
   TextEditingController txtSearch = TextEditingController();
   int? kitchenId;
+  late Future<void> _initDataFuture;
 
   late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
@@ -49,7 +50,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<MenuItem>> chefMenuItems() async {
-    final url = '${SharedPreferencesService.url}chef-menu-items?kitchenId=$kitchenId';
+    final url =
+        '${SharedPreferencesService.url}chef-menu-items?kitchenId=$kitchenId';
     try {
       final response = await http.get(
         Uri.parse(url),
@@ -146,7 +148,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   @override
   void initState() {
     super.initState();
-    _loadKitchenId();
+    _initDataFuture = _loadKitchenId();
     txtSearch.addListener(_updateMenuArr);
   }
 
@@ -159,6 +161,21 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     var media = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(

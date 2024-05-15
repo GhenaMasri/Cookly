@@ -137,8 +137,7 @@ class _ChefSignup extends State<ChefSignup> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         body: Container(
           width: double.infinity,
           decoration: const BoxDecoration(
@@ -325,7 +324,6 @@ class _ChefSignup extends State<ChefSignup> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
