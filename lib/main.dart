@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/home/home_view.dart';
 import 'package:untitled/main_page.dart';
+import 'package:untitled/more/payment_details_view.dart';
+import 'package:untitled/order/chef_order_view.dart';
 import 'package:untitled/profile/change_password.dart';
 import 'package:untitled/profile/profile_tab_bar.dart';
 import 'package:untitled/profile/user_profile.dart';

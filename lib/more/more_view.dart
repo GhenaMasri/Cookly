@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/more/payment_details_view.dart';
 
 class MoreView extends StatefulWidget {
   const MoreView({super.key});
@@ -98,7 +99,7 @@ class _MoreViewState extends State<MoreView> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Container()));
+                                    builder: (context) => PaymentDetailsView()));
 
                             break;
 
