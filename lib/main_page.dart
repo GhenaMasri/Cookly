@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/more/more_view.dart';
+import 'package:untitled/order/chef_order_view.dart';
+import 'package:untitled/order/orders_tab_bar.dart';
 import 'package:untitled/profile/profile_tab_bar.dart';
 import 'package:untitled/profile/user_profile.dart';
 import '../common_widget/tab_button.dart';
@@ -18,7 +20,7 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int selectTab = 0;
   PageStorageBucket storageBucket = PageStorageBucket();
-  late Widget selectPageView = const HomeView();
+  late Widget selectPageView;
   String? type;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
@@ -78,11 +80,12 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 1) {
                       selectTab = 1;
-                      if (type == "chef") {
+                      selectPageView = OrdersTabBar();
+                      /*if (type == "chef") {
                         selectPageView = Container();
                       } else {
                         selectPageView = Container();
-                      }
+                      }*/
                     }
                     if (mounted) {
                       setState(() {});
