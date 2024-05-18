@@ -39,6 +39,9 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   int? OrdersDb;
   GlobalKey<FormState> formState = GlobalKey();
   late Future<void> _initDataFuture;
+  int? kitchenId;
+  Map<String, dynamic>? kitchenData;
+  int? category_id;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<Map<String, dynamic>>> getKitchenCategories() async {
@@ -56,7 +59,33 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
       throw Exception('Failed to load kitchen categories');
     }
   }
-//////////////////////////////////////////////////////////////////////////////////
+
+  Future<Map<String, dynamic>?> getKitchenData(int chefId) async {
+    final String url = '${SharedPreferencesService.url}chef-data?id=$chefId';
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'message': response.body,
+          'kitchen': data['kitchen']
+        };
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
+    setState(() {
+      kitchenId = kitchenid;
+    });
+  }
+  //////////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
@@ -65,36 +94,46 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   }
 
   Future<void> _initData() async {
-    //Filling Kitchen data
-    imageUrl =
-        "https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2Fcookly.png?alt=media&token=24a53307-3c41-489b-a94b-e687751722b8";
-    txtName.text = "Cookly";
-    location = 'Nablus';
-    txtStreet.text = 'Itihad';
-    txtNumber.text = '0597280457';
-    txtDescription.text = "Description about the kitchen";
-    category = 'Default';
-    OrdersDb = 0;
-    orderingSystem =
-        OrdersDb == 1 ? 'Order the day before' : 'Order in the same day';
-    specialOrders = "Yes";
-
+    await _loadKitchenId();
+    if (kitchenId != null) {
+      final result = await getKitchenData(kitchenId!);
+      if (result != null && result['success'] == true) {
+        setState(() {
+          kitchenData = result['kitchen'] ?? " ";
+          imageUrl = kitchenData!['logo'] ?? " ";
+          txtName.text =  kitchenData!['name'] ?? " ";
+          location = kitchenData!['city'] ?? " "; 
+          txtStreet.text = kitchenData!['street'] ?? " "; 
+          txtNumber.text = kitchenData!['contact'] ?? " "; 
+          txtDescription.text = kitchenData!['description'] ?? " "; 
+          category_id = kitchenData!['category_id'] ?? 1; 
+          OrdersDb = kitchenData!['order_system'] ?? 0; 
+          orderingSystem = OrdersDb == 1 ? 'Order the day before' : 'Order in the same day';
+          specialOrders = kitchenData!['special_orders'] ?? "yes"; 
+        });
+      } else {
+        print('Failed to fetch kitchen data: ${result?['message']}');
+      }
+    } else {
+      print('Kitchen ID is not loaded');
+    }
+    if (specialOrders == "yes") {
+      specialOrders = "Yes";
+    } else {
+      specialOrders = "No";
+    }
     try {
       var fetchedCategories = await getKitchenCategories();
-
       setState(() {
         categories = fetchedCategories;
-
-//Wasan should remove the comment and edit line 91 if statement
-
-        /*for (var element in categories) {
-          if (element['id'] == /*category from db*/) {
+        for (var element in categories) {
+          if (element['id'] == category_id) {
             category = element['category'];
           }
           if (element.containsKey('category')) {
             categoriesList.add(element['category']);
           }
-        }*/
+        }
       });
     } catch (error) {
       print(error);

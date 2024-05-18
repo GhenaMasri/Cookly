@@ -20,7 +20,7 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int selectTab = 0;
   PageStorageBucket storageBucket = PageStorageBucket();
-  late Widget selectPageView;
+  late Widget selectPageView = const ChefHomeView();
   String? type;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
