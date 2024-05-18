@@ -1,13 +1,14 @@
 import 'dart:io';
-
+import 'package:untitled/common/globs.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:untitled/profile/change_password.dart';
 import 'package:untitled/welcome_page.dart';
-
+import 'dart:convert';
 import '../../common/color_extension.dart';
 import '../../common_widget/round_textfield.dart';
+import 'package:http/http.dart' as http;
 
 class UserProfileView extends StatefulWidget {
   const UserProfileView({super.key});
@@ -26,14 +27,52 @@ class _UserProfileViewState extends State<UserProfileView> {
   TextEditingController txtEmail = TextEditingController();
   TextEditingController txtMobile = TextEditingController();
   GlobalKey<FormState> formState = GlobalKey();
+  String? username;
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> _loadUserData() async {
+    List<String?> data = await SharedPreferencesService.getUserProfile();
+    setState(() {
+      txtFirstName.text = data[0] ?? "First Name";
+      txtLastName.text = data[1] ?? "Last Name";
+      txtEmail.text = data[2] ?? "Email";
+      txtMobile.text = data[3] ?? "Phone";
+    });
+  }
+
+  Future<void> _loadUserName() async {
+    String? name = await SharedPreferencesService.getUserName();
+    setState(() {
+      username = name;
+    });
+  }
+
+  Future<Map<String, dynamic>> editUser(int id, Map<String, dynamic> updates) async {
+    final String url = '${SharedPreferencesService.url}edit-user?id=$id'; 
+      try {
+        final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updates),
+      );
+      if (response.statusCode == 200) {
+        return {'success': false, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch(error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+  /////////////////////////////////////////////////////////////////////////////////
+
   @override
   void initState() {
     super.initState();
-    _initDataFuture; //  _initDataFuture = load profile data from API as commented below;
-   /* txtFirstName.text = "FirstName";
-    txtLastName.text = "LastName";
-    txtEmail.text = "ghenama77@gmail.com";
-    txtMobile.text = "0597280457";*/
+    _initDataFuture = _loadUserData();
+    _loadUserName();
   }
 
   String? _validatePhoneNumber(String? value) {
@@ -105,7 +144,7 @@ class _UserProfileViewState extends State<UserProfileView> {
             ),
           ),
           Text(
-            "Hi there UserName!",
+            username != null ? "Welcome to your profile $username!" : "Welcome to your profile!",
             style: TextStyle(
                 color: TColor.primaryText,
                 fontSize: 16,

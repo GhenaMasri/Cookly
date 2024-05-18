@@ -54,6 +54,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
 
   double dbPrice = 0.0; //price to store in db
   late Future<void> _initDataFuture;
+
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<Map<String, dynamic>>> getFoodCategories() async {
     final response = await http
@@ -88,8 +89,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   }
 
   Future<Map<String, dynamic>> deleteMenuItem(int menuItemId) async {
-    final url =
-        '${SharedPreferencesService.url}delete-menu-item?menuItemId=$menuItemId';
+    final url = '${SharedPreferencesService.url}delete-menu-item?id=$menuItemId';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -97,12 +97,30 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
       );
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
-      } else if (response.statusCode == 404) {
-        return {'success': false, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
       }
     } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<Map<String, dynamic>> editMenuItem(int id, Map<String, dynamic> updates) async {
+    final String url = '${SharedPreferencesService.url}edit-menu-item?id=$id';
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updates),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch(error) {
       return {'success': false, 'message': '$error'};
     }
   }
@@ -133,11 +151,19 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                 'Approve',
                 style: TextStyle(color: Color.fromARGB(255, 230, 81, 0)),
               ),
-              onPressed: () {
-                //Delete the item
-                widget.RemoveItemFromList(widget.item);
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => ChefHomeView()));
+              onPressed: () async {
+                ////////////////////////// BACKEND SECTION ///////////////////////////
+                print(widget.item.itemId);
+                Map<String, dynamic> result = await deleteMenuItem(widget.item.itemId!);
+                bool success = result['success'];
+                String message = result['message'];
+                print(success);
+                print(message);
+                //////////////////////////////////////////////////////////////////////////////////
+                if (success) {
+                  widget.RemoveItemFromList(widget.item);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChefHomeView()));
+                }
               },
             ),
             TextButton(

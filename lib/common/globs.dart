@@ -28,6 +28,15 @@ class SharedPreferencesService {
     return prefs.getInt('kitchen_id');
   }
 
+  static Future<List<String?>> getUserProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? firstName = prefs.getString('first_name');
+    String? lastName = prefs.getString('last_name');
+    String? email = prefs.getString('email');
+    String? phone = prefs.getString('phone');
+    return [firstName, lastName, email, phone];
+  }
+
   static Future<void> clearSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("isSet");

@@ -18,6 +18,9 @@ app.use('/chefId', chefIdRoute);
 const kitchenNameRoute = require('./routes/chef/get_kitchen_name');
 app.use('/kitchenName', kitchenNameRoute);
 
+const chefDataRoute = require('./routes/chef/get_chef_data');
+app.use('/chef-data', chefDataRoute);
+
 //general routes
 const foodCategoriesRoute = require('./routes/general/food_categories');
 app.use('/food-categories', foodCategoriesRoute);
@@ -47,9 +50,15 @@ app.use('/chef-menu-items', chefMenuItemsRoute);
 const deleteMenuItemRoute = require('./routes/menu item/delete_menu_item');
 app.use('/delete-menu-item', deleteMenuItemRoute);
 
+const editMenuItemRoute = require('./routes/menu item/edit_menu_item');
+app.use('/edit-menu-item', editMenuItemRoute);
+
 //user routes
 const userIdRoute = require('./routes/user/get_user_id');
 app.use('/userId', userIdRoute);
+
+const editUserRoute = require('./routes/user/edit_user_profile');
+app.use('/edit-user', editUserRoute);
 
 const port = 3000;
 app.listen(port, () => {

@@ -15,7 +15,6 @@ class _HomeViewState extends State<HomeView> {
   String? selectedLocation;
   TextEditingController txtSearch = TextEditingController();
   late Future<void> _initDataFuture;
-//////////////////////////////// BACKEND SECTION ///////////////////////////
   String? username;
 
   @override
@@ -25,6 +24,7 @@ class _HomeViewState extends State<HomeView> {
     _initDataFuture; //_initDataFuture = load user home page API
   }
 
+//////////////////////////////// BACKEND SECTION ///////////////////////////
   Future<void> _loadUserName() async {
     String? name = await SharedPreferencesService.getUserName();
     setState(() {
