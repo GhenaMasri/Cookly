@@ -13,13 +13,22 @@ class ProfileTabBar extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Cookly", style: TextStyle(color: TColor.primary, fontSize: 30),),
+          title: Text(
+            "Cookly",
+            style: TextStyle(color: TColor.primary, fontSize: 30),
+          ),
           centerTitle: true,
-          actions: [Image.asset(
-                        "assets/img/notification.png",
-                        width: 25,
-                        height: 25,
-                      ), SizedBox(width: 20,)],
+          automaticallyImplyLeading: false,
+          actions: [
+            Image.asset(
+              "assets/img/notification.png",
+              width: 25,
+              height: 25,
+            ),
+            SizedBox(
+              width: 20,
+            )
+          ],
           bottom: const TabBar(
             tabs: <Widget>[
               Tab(
@@ -28,14 +37,11 @@ class ProfileTabBar extends StatelessWidget {
               Tab(text: 'Kitchen'),
             ],
             indicatorColor: Color.fromARGB(255, 230, 81, 0),
-           labelColor: Color.fromARGB(255, 230, 81, 0),
+            labelColor: Color.fromARGB(255, 230, 81, 0),
           ),
         ),
         body: const TabBarView(
-          children: <Widget>[
-            ProfileView(),
-            KitchenProfileView()
-          ],
+          children: <Widget>[ProfileView(), KitchenProfileView()],
         ),
       ),
     );
