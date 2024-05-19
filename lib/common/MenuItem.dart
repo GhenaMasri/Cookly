@@ -25,4 +25,25 @@ class MenuItem {
     this.price,
     this.time,
   });
+
+ MenuItem copyWith({
+    String? name,
+    String? notes,
+    double? price,
+    String? time,
+    int? category,
+    int? quantity,
+    String? image,
+  }) {
+    return MenuItem(
+      name: name ?? this.name,
+      notes: notes ?? this.notes,
+      price: price ?? this.price,
+      time: time ?? this.time,
+      category: category ?? this.category,
+      quantity: quantity ?? this.quantity,
+      image: image ?? this.image,
+    );
+  }
+
 }
