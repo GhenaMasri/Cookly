@@ -5,21 +5,23 @@ import '../common/color_extension.dart';
 enum RoundButtonType { bgPrimary, textPrimary }
 
 class RoundButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final String title;
   final RoundButtonType type;
   final double fontSize;
+  final bool isEnabled;
   const RoundButton(
       {super.key,
       required this.title,
       required this.onPressed,
       this.fontSize = 16,
+       this.isEnabled = true,
       this.type = RoundButtonType.bgPrimary});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onPressed,
+      onTap: isEnabled ? onPressed : null,
       child: Container(
         height: 56,
         alignment: Alignment.center,

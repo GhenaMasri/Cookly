@@ -54,6 +54,15 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
 
   double dbPrice = 0.0; //price to store in db
   late Future<void> _initDataFuture;
+  late String initialName;
+  late String initialNotes;
+  late String initialPrice;
+  late String initialTime;
+  late String? initialCategory;
+  late String? initialQuantity;
+  late String? initialImageUrl;
+
+  bool isDataChanged = false;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<Map<String, dynamic>>> getFoodCategories() async {
@@ -89,13 +98,34 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   }
 
   Future<Map<String, dynamic>> deleteMenuItem(int menuItemId) async {
-    final url = '${SharedPreferencesService.url}delete-menu-item?id=$menuItemId';
+    final url =
+        '${SharedPreferencesService.url}delete-menu-item?id=$menuItemId';
     try {
       final response = await http.delete(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
+        widget.updateMenuItem(widget.item.copyWith(
+          name: txtName.text,
+          notes: txtNotes.text,
+          price: double.parse(txtPrice.text),
+          time: txtTime.text,
+          category: selectedCategory,
+          quantity: selectedQuantity,
+          image: imageUrl,
+        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: TColor.white,
+            content: Text(
+              'Item edited successfully',
+              style: TextStyle(color: TColor.primary),
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -105,7 +135,8 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
     }
   }
 
-  Future<Map<String, dynamic>> editMenuItem(int id, Map<String, dynamic> updates) async {
+  Future<Map<String, dynamic>> editMenuItem(
+      int id, Map<String, dynamic> updates) async {
     final String url = '${SharedPreferencesService.url}edit-menu-item?id=$id';
     try {
       final response = await http.put(
@@ -120,7 +151,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
       } else {
         return {'success': false, 'message': response.body};
       }
-    } catch(error) {
+    } catch (error) {
       return {'success': false, 'message': '$error'};
     }
   }
@@ -130,6 +161,24 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   void initState() {
     super.initState();
     _initDataFuture = _initData();
+    txtName.addListener(_checkDataChanged);
+    txtNotes.addListener(_checkDataChanged);
+    txtPrice.addListener(_checkDataChanged);
+    txtTime.addListener(_checkDataChanged);
+  }
+
+  void _checkDataChanged() {
+    bool dataChanged = txtName.text != initialName ||
+        txtNotes.text != initialNotes ||
+        txtPrice.text != initialPrice ||
+        txtTime.text != initialTime ||
+        category != initialCategory ||
+        quantity != initialQuantity ||
+        imageUrl != initialImageUrl;
+
+    setState(() {
+      isDataChanged = dataChanged;
+    });
   }
 
   Future<void> _showMyDialog() async {
@@ -154,7 +203,8 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
               onPressed: () async {
                 ////////////////////////// BACKEND SECTION ///////////////////////////
                 print(widget.item.itemId);
-                Map<String, dynamic> result = await deleteMenuItem(widget.item.itemId!);
+                Map<String, dynamic> result =
+                    await deleteMenuItem(widget.item.itemId!);
                 bool success = result['success'];
                 String message = result['message'];
                 print(success);
@@ -162,7 +212,8 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                 //////////////////////////////////////////////////////////////////////////////////
                 if (success) {
                   widget.RemoveItemFromList(widget.item);
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChefHomeView()));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => ChefHomeView()));
                 }
               },
             ),
@@ -186,6 +237,12 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
     txtTime.text = widget.item.time ?? '';
     imageUrl = widget.item.image ?? '';
 
+    initialName = txtName.text;
+    initialNotes = txtNotes.text;
+    initialPrice = txtPrice.text;
+    initialTime = txtTime.text;
+    initialImageUrl = imageUrl;
+
     try {
       var fetchedCategories = await getFoodCategories();
       var fetchedQuantities = await getFoodQuantities();
@@ -197,9 +254,11 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
         for (var element in categories) {
           if (element['id'] == widget.item.category) {
             category = element['category'];
+            initialCategory = category;
           }
           if (element.containsKey('category')) {
             categoriesList.add(element['category']);
+            initialQuantity = quantity;
           }
         }
 
@@ -335,6 +394,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                         //Success: get the download URL
                         imageUrl =
                             await referenceImageToUpload.getDownloadURL();
+                        _checkDataChanged();
                       } catch (error) {
                         //Some error occurred
                       }
@@ -405,6 +465,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                                     (element) => element['category'] == value,
                                     orElse: () => {});
                                 selectedCategory = selectedItem['id'];
+                                _checkDataChanged();
                               }
                             });
                           })),
@@ -423,6 +484,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                                     (element) => element['quantity'] == value,
                                     orElse: () => {});
                                 selectedQuantity = selectedItem['id'];
+                                _checkDataChanged();
                               }
                             });
                           })),
@@ -443,23 +505,29 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                     child: RoundButton(
                       title: "Edit",
                       type: RoundButtonType.textPrimary,
-                      onPressed: () {
-                        MenuItem updatedItem = MenuItem(
-                          itemId: widget.item.itemId,
-                          kitchenId: widget.item.kitchenId,
-                          name: txtName.text,
-                          notes: txtNotes.text,
-                          price: double.parse(txtPrice.text),
-                          time: txtTime.text,
-                          category: selectedCategory,
-                          quantity: selectedQuantity,
-                          image: widget.item.image,
-                        );
+                      isEnabled: isDataChanged,
+                      onPressed: isDataChanged
+                          ? () {
+                              Map<String, dynamic> updates = {};
 
-                        widget.updateMenuItem(updatedItem);
+                              if (txtName.text != initialName)
+                                updates['name'] = txtName.text;
+                              if (txtNotes.text != initialNotes)
+                                updates['notes'] = txtNotes.text;
+                              if (txtPrice.text != initialPrice)
+                                updates['price'] = double.parse(txtPrice.text);
+                              if (txtTime.text != initialTime)
+                                updates['time'] = txtTime.text;
+                              if (category != initialCategory)
+                                updates['category'] = selectedCategory;
+                              if (quantity != initialQuantity)
+                                updates['quantity'] = selectedQuantity;
+                              if (imageUrl != initialImageUrl)
+                                updates['image'] = imageUrl;
 
-                        Navigator.pop(context);
-                      },
+                              editMenuItem(widget.item.itemId!, updates);
+                            }
+                          : null,
                     ),
                   ),
                   const SizedBox(
