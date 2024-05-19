@@ -519,9 +519,9 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                               if (txtTime.text != initialTime)
                                 updates['time'] = txtTime.text;
                               if (category != initialCategory)
-                                updates['category'] = selectedCategory;
+                                updates['category_id'] = selectedCategory;
                               if (quantity != initialQuantity)
-                                updates['quantity'] = selectedQuantity;
+                                updates['quantity_id'] = selectedQuantity;
                               if (imageUrl != initialImageUrl)
                                 updates['image'] = imageUrl;
 
