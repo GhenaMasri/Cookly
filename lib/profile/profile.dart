@@ -57,7 +57,7 @@ class _ProfileViewState extends State<ProfileView> {
         body: jsonEncode(updates),
       );
       if (response.statusCode == 200) {
-        return {'success': false, 'message': response.body};
+        return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
       }
