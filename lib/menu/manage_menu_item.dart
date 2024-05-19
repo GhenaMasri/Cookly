@@ -106,26 +106,10 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
-        widget.updateMenuItem(widget.item.copyWith(
-          name: txtName.text,
-          notes: txtNotes.text,
-          price: double.parse(txtPrice.text),
-          time: txtTime.text,
-          category: selectedCategory,
-          quantity: selectedQuantity,
-          image: imageUrl,
-        ));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: TColor.white,
-            content: Text(
-              'Item edited successfully',
-              style: TextStyle(color: TColor.primary),
-            ),
-            duration: Duration(seconds: 2),
-          ),
-        );
-        Navigator.pop(context);
+        if (imageUrl != null) {
+          Reference imageRef = FirebaseStorage.instance.refFromURL(imageUrl!);
+          await imageRef.delete();
+        }
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -147,6 +131,26 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
         body: jsonEncode(updates),
       );
       if (response.statusCode == 200) {
+        widget.updateMenuItem(widget.item.copyWith(
+          name: txtName.text,
+          notes: txtNotes.text,
+          price: double.parse(txtPrice.text),
+          time: txtTime.text,
+          category: selectedCategory,
+          quantity: selectedQuantity,
+          image: imageUrl,
+        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: TColor.white,
+            content: Text(
+              'Item edited successfully',
+              style: TextStyle(color: TColor.primary),
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        Navigator.pop(context);
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -182,49 +186,57 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
   }
 
   Future<void> _showMyDialog() async {
+    double dialogWidth = MediaQuery.of(context).size.width * 0.7;
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return AlertDialog(
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want delete this item?'),
+        return Dialog(
+          child: Container(
+            width: dialogWidth, // Set the desired width here
+            child: AlertDialog(
+              content: const SingleChildScrollView(
+                padding: EdgeInsets.symmetric(vertical: 3),
+                child: ListBody(
+                  children: <Widget>[
+                    Center(
+                        child: Text('Are you sure you want delete this item?')),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(
+                    'Delete',
+                    style: TextStyle(color: Color.fromARGB(255, 230, 81, 0)),
+                  ),
+                  onPressed: () async {
+                    ////////////////////////// BACKEND SECTION ///////////////////////////
+                    print(widget.item.itemId);
+                    Map<String, dynamic> result =
+                        await deleteMenuItem(widget.item.itemId!);
+                    bool success = result['success'];
+                    String message = result['message'];
+                    print(success);
+                    print(message);
+                    //////////////////////////////////////////////////////////////////////////////////
+                    if (success) {
+                      widget.RemoveItemFromList(widget.item);
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ChefHomeView()));
+                    }
+                  },
+                ),
+                TextButton(
+                  child: const Text('Cancel',
+                      style: TextStyle(color: Color.fromARGB(255, 230, 81, 0))),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
               ],
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                'Approve',
-                style: TextStyle(color: Color.fromARGB(255, 230, 81, 0)),
-              ),
-              onPressed: () async {
-                ////////////////////////// BACKEND SECTION ///////////////////////////
-                print(widget.item.itemId);
-                Map<String, dynamic> result =
-                    await deleteMenuItem(widget.item.itemId!);
-                bool success = result['success'];
-                String message = result['message'];
-                print(success);
-                print(message);
-                //////////////////////////////////////////////////////////////////////////////////
-                if (success) {
-                  widget.RemoveItemFromList(widget.item);
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ChefHomeView()));
-                }
-              },
-            ),
-            TextButton(
-              child: const Text('Decline',
-                  style: TextStyle(color: Color.fromARGB(255, 230, 81, 0))),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
