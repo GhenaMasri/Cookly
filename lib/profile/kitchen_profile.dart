@@ -85,6 +85,26 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
       kitchenId = kitchenid;
     });
   }
+
+  Future<Map<String, dynamic>> editKitchen(int id, Map<String, dynamic> updates) async {
+    final String url = '${SharedPreferencesService.url}edit-chef?id=$id'; 
+      try {
+        final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updates),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch(error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
   //////////////////////////////////////////////////////////////////////////////////
 
   @override

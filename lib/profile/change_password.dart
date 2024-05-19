@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class ChangePasswordView extends StatefulWidget {
   const ChangePasswordView({super.key});
@@ -17,6 +20,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
   String errorMessage = '';
   GlobalKey<FormState> formState = GlobalKey();
   bool errorFlag = false;
+  int? id;
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -41,6 +45,38 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
     }
     return null;
   }
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> changePassword(int id) async {
+    final String url = '${SharedPreferencesService.url}change-password?id=$id'; 
+      try {
+        final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'oldPassword': txtOldPassword.text,
+          'newPassword': txtPassword.text
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch(error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    setState(() {
+      this.id = id;
+    });
+  }
+  /////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -134,26 +170,28 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: RoundButton(
                         title: "Save",
-                        onPressed: () {
+                        onPressed: () async {
                           if (formState.currentState!.validate()) {
-                            //Check if the old password == the one in the db
-
-                            //Don't forget to hash the new password
-
-                            //Use txtPassword.text
-
-                            /*if (success) {
-                                setState(() {
-                                  errorFlag = false;
-                                  errorMessage = "";
-                                });
-                                Navigator.of(context).pop();
-                              } else {
-                                setState(() {
-                                  errorFlag = true;
-                                  errorMessage = message;
-                                });
-                              }*/
+                            ///////////////////////////////// BACKEND SECTION /////////////////////////////////
+                            Map<String, dynamic> result = await changePassword(id!);
+                            bool success = result['success'];
+                            String message = result['message'];
+                            print(success);
+                            print(message);
+                            ///////////////////////////////////////////////////////////////////////////////////
+                            if (success) {
+                              // add success indicator 
+                              setState(() {
+                                errorFlag = false;
+                                errorMessage = "";
+                              });
+                              Navigator.of(context).pop();
+                            } else {
+                              setState(() {
+                                errorFlag = true;
+                                errorMessage = message;
+                              });
+                            }
                           }
                         }),
                   ),
