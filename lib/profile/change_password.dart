@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
@@ -48,9 +50,9 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> changePassword(int id) async {
-    final String url = '${SharedPreferencesService.url}change-password?id=$id'; 
-      try {
-        final response = await http.put(
+    final String url = '${SharedPreferencesService.url}change-password?id=$id';
+    try {
+      final response = await http.put(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +67,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
       } else {
         return {'success': false, 'message': response.body};
       }
-    } catch(error) {
+    } catch (error) {
       return {'success': false, 'message': '$error'};
     }
   }
@@ -128,8 +130,8 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                       hintText: "* * * * * *",
                       obscureText: true,
                       controller: txtOldPassword,
-                       validator: (value) =>
-                    value!.isEmpty ? "Couldn't be empty" : null,
+                      validator: (value) =>
+                          value!.isEmpty ? "Couldn't be empty" : null,
                     ),
                   ),
                   Padding(
@@ -173,18 +175,25 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                         onPressed: () async {
                           if (formState.currentState!.validate()) {
                             ///////////////////////////////// BACKEND SECTION /////////////////////////////////
-                            Map<String, dynamic> result = await changePassword(id!);
+                            Map<String, dynamic> result =
+                                await changePassword(id!);
                             bool success = result['success'];
                             String message = result['message'];
                             print(success);
                             print(message);
                             ///////////////////////////////////////////////////////////////////////////////////
                             if (success) {
-                              // add success indicator 
+                              // add success indicator
                               setState(() {
                                 errorFlag = false;
                                 errorMessage = "";
                               });
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                text: 'Password Changed Successfully!',
+                                confirmBtnColor: TColor.primary,
+                              );
                               Navigator.of(context).pop();
                             } else {
                               setState(() {

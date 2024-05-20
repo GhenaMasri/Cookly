@@ -43,6 +43,34 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   Map<String, dynamic>? kitchenData;
   int? category_id;
 
+  late String? initialName;
+  late String? initialNumber;
+  late String? initialLocation;
+  late String? initialStreet;
+  late String? initialDescription;
+  late String? initialCategory;
+  late String? initialOrderingSystem;
+  late String? initialSpecialOrders;
+  late String? initialImage;
+
+  bool isDataChanged = false;
+
+   void _checkDataChanged() {
+    bool dataChanged = txtName.text != initialName ||
+        txtDescription.text != initialDescription ||
+        txtStreet.text != initialStreet ||
+        txtNumber.text != initialNumber ||
+        category != initialCategory ||
+        specialOrders != initialSpecialOrders ||
+        orderingSystem != initialOrderingSystem ||
+        location != initialLocation ||
+        imageUrl != initialImage;
+
+    setState(() {
+      isDataChanged = dataChanged;
+    });
+  }
+
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<Map<String, dynamic>>> getKitchenCategories() async {
     final response = await http
@@ -86,10 +114,11 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
     });
   }
 
-  Future<Map<String, dynamic>> editKitchen(int id, Map<String, dynamic> updates) async {
-    final String url = '${SharedPreferencesService.url}edit-chef?id=$id'; 
-      try {
-        final response = await http.put(
+  Future<Map<String, dynamic>> editKitchen(
+      int id, Map<String, dynamic> updates) async {
+    final String url = '${SharedPreferencesService.url}edit-chef?id=$id';
+    try {
+      final response = await http.put(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +130,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
       } else {
         return {'success': false, 'message': response.body};
       }
-    } catch(error) {
+    } catch (error) {
       return {'success': false, 'message': '$error'};
     }
   }
@@ -111,6 +140,10 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   void initState() {
     super.initState();
     _initDataFuture = _initData();
+    txtName.addListener(_checkDataChanged);
+    txtNumber.addListener(_checkDataChanged);
+    txtDescription.addListener(_checkDataChanged);
+    txtStreet.addListener(_checkDataChanged);
   }
 
   Future<void> _initData() async {
@@ -121,15 +154,23 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
         setState(() {
           kitchenData = result['kitchen'] ?? " ";
           imageUrl = kitchenData!['logo'] ?? " ";
-          txtName.text =  kitchenData!['name'] ?? " ";
-          location = kitchenData!['city'] ?? " "; 
-          txtStreet.text = kitchenData!['street'] ?? " "; 
-          txtNumber.text = kitchenData!['contact'] ?? " "; 
-          txtDescription.text = kitchenData!['description'] ?? " "; 
-          category_id = kitchenData!['category_id'] ?? 1; 
-          OrdersDb = kitchenData!['order_system'] ?? 0; 
-          orderingSystem = OrdersDb == 1 ? 'Order the day before' : 'Order in the same day';
-          specialOrders = kitchenData!['special_orders'] ?? "yes"; 
+          initialImage = imageUrl;
+          txtName.text = kitchenData!['name'] ?? " ";
+          initialName = txtName.text;
+          location = kitchenData!['city'] ?? " ";
+          initialLocation = location;
+          txtStreet.text = kitchenData!['street'] ?? " ";
+          initialStreet = txtStreet.text;
+          txtNumber.text = kitchenData!['contact'] ?? " ";
+          initialNumber = txtNumber.text;
+          txtDescription.text = kitchenData!['description'] ?? " ";
+          initialDescription = txtDescription.text;
+          category_id = kitchenData!['category_id'] ?? 1;
+          OrdersDb = kitchenData!['order_system'] ?? 0;
+          orderingSystem =
+              OrdersDb == 1 ? 'Order the day before' : 'Order in the same day';
+          initialOrderingSystem = orderingSystem;
+          specialOrders = kitchenData!['special_orders'] ?? "yes";
         });
       } else {
         print('Failed to fetch kitchen data: ${result?['message']}');
@@ -142,6 +183,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
     } else {
       specialOrders = "No";
     }
+    initialSpecialOrders = specialOrders;
     try {
       var fetchedCategories = await getKitchenCategories();
       setState(() {
@@ -149,6 +191,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
         for (var element in categories) {
           if (element['id'] == category_id) {
             category = element['category'];
+            initialCategory = category;
           }
           if (element.containsKey('category')) {
             categoriesList.add(element['category']);
@@ -226,6 +269,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                 await referenceImageToUpload.putFile(File(pickedFile!.path));
                 //Success: get the download URL
                 imageUrl = await referenceImageToUpload.getDownloadURL();
+                _checkDataChanged();
               } catch (error) {
                 //Some error occurred
               }
@@ -261,6 +305,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                 onChanged: (String? value) {
                   setState(() {
                     location = value;
+                    _checkDataChanged();
                   });
                 }),
           ),
@@ -304,12 +349,13 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                 onChanged: (String? value) {
                   setState(() {
                     category = value;
-                    /*if (value != null) {
+                    if (value != null) {
                       var selectedItem = categories.firstWhere(
                           (element) => element['category'] == value,
                           orElse: () => {});
                       selectedCategory = selectedItem['id'];
-                    }*/
+                    }
+                    _checkDataChanged();
                   });
                 }),
           ),
@@ -329,6 +375,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                     } else {
                       OrdersDb = 1;
                     }
+                    _checkDataChanged();
                   });
                 }),
           ),
@@ -347,7 +394,8 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                         groupValue: specialOrders,
                         onChanged: (value) {
                           setState(() {
-                            specialOrders = value.toString();
+                            specialOrders = value;
+                            _checkDataChanged();
                           });
                         },
                       ),
@@ -364,7 +412,8 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                         groupValue: specialOrders,
                         onChanged: (value) {
                           setState(() {
-                            specialOrders = value.toString();
+                            specialOrders = value;
+                            _checkDataChanged();
                           });
                         },
                       ),
@@ -382,11 +431,35 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: RoundButton(
                 title: "Save",
-                onPressed: () {
-                  if (formState.currentState!.validate()) {
-                    //save edits to db
-                  }
-                }),
+              isEnabled: isDataChanged,
+              onPressed: isDataChanged
+                  ? () {
+                      if (formState.currentState!.validate()) {
+                        Map<String, dynamic> updates = {};
+
+                        if (txtName.text != initialName)
+                          updates['name'] = txtName.text;
+                        if (txtStreet.text != initialStreet)
+                          updates['street'] = txtStreet.text;
+                        if (txtNumber.text != initialNumber)
+                          updates['contact'] = txtNumber.text;
+                        if(txtDescription.text != initialDescription)
+                         updates['description'] = txtDescription.text;
+                        if(imageUrl != initialImage)
+                         updates['logo'] = imageUrl;
+                        if(location != initialLocation)
+                         updates['city'] = location;
+                         if(category != initialCategory)
+                          updates['category_id'] = selectedCategory;
+                        if(orderingSystem != initialOrderingSystem)
+                        updates['order_system'] = OrdersDb;
+                        if(specialOrders != initialSpecialOrders)
+                         updates['special_orders'] = specialOrders!.toLowerCase();  
+                                            
+                        //Call the edit function
+                      }
+                    }
+                  : null,),
           ),
           const SizedBox(
             height: 20,

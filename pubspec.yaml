@@ -42,6 +42,7 @@ dependencies:
   shared_preferences: ^2.2.3
   firebase_storage: ^11.7.4
   firebase_app_check: ^0.2.2+4
+  quickalert: ^1.1.0
 
 dev_dependencies:
   flutter_test:
