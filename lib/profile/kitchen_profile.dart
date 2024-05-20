@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/dropdownfield.dart';
 import 'package:untitled/common_widget/round_button.dart';
@@ -24,6 +25,8 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   XFile? pickedFile;
   String? imageUrl;
   File? _image;
+  String errorMessage = '';
+  bool errorFlag = false;
 
   TextEditingController txtName = TextEditingController();
   String? location;
@@ -55,7 +58,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
 
   bool isDataChanged = false;
 
-   void _checkDataChanged() {
+  void _checkDataChanged() {
     bool dataChanged = txtName.text != initialName ||
         txtDescription.text != initialDescription ||
         txtStreet.text != initialStreet ||
@@ -126,6 +129,12 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
         body: jsonEncode(updates),
       );
       if (response.statusCode == 200) {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          text: 'Profile Edited Successfully!',
+          confirmBtnColor: TColor.primary,
+        );
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -427,10 +436,19 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
           const SizedBox(
             height: 20,
           ),
+          Visibility(
+            visible: errorFlag,
+            child: Text(errorMessage,
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 230, 81, 0),
+                  fontSize: 16,
+                )),
+          ),
+          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: RoundButton(
-                title: "Save",
+              title: "Save",
               isEnabled: isDataChanged,
               onPressed: isDataChanged
                   ? () {
@@ -443,23 +461,40 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                           updates['street'] = txtStreet.text;
                         if (txtNumber.text != initialNumber)
                           updates['contact'] = txtNumber.text;
-                        if(txtDescription.text != initialDescription)
-                         updates['description'] = txtDescription.text;
-                        if(imageUrl != initialImage)
-                         updates['logo'] = imageUrl;
-                        if(location != initialLocation)
-                         updates['city'] = location;
-                         if(category != initialCategory)
+                        if (txtDescription.text != initialDescription)
+                          updates['description'] = txtDescription.text;
+                        if (imageUrl != initialImage)
+                          updates['logo'] = imageUrl;
+                        if (location != initialLocation)
+                          updates['city'] = location;
+                        if (category != initialCategory)
                           updates['category_id'] = selectedCategory;
-                        if(orderingSystem != initialOrderingSystem)
-                        updates['order_system'] = OrdersDb;
-                        if(specialOrders != initialSpecialOrders)
-                         updates['special_orders'] = specialOrders!.toLowerCase();  
-                                            
+                        if (orderingSystem != initialOrderingSystem)
+                          updates['order_system'] = OrdersDb;
+                        if (specialOrders != initialSpecialOrders)
+                          updates['special_orders'] =
+                              specialOrders!.toLowerCase();
+
+                        /* if (success) {
+                              // add success indicator
+                              setState(() {
+                                errorFlag = false;
+                                errorMessage = "";
+                              });
+                    
+                              Navigator.of(context).pop();
+                            } else {
+                              setState(() {
+                                errorFlag = true;
+                                errorMessage = message;
+                              });
+                            } */
+
                         //Call the edit function
                       }
                     }
-                  : null,),
+                  : null,
+            ),
           ),
           const SizedBox(
             height: 20,

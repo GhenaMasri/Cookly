@@ -3,14 +3,13 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:untitled/common/MenuItem.dart';
 import 'package:untitled/common/globs.dart';
-import 'package:untitled/common_widget/dropdownfield.dart';
-import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:untitled/common_widget/dropdownfield.dart';
+import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/home/chef_home_view.dart';
 
 import 'package:untitled/common/color_extension.dart';
