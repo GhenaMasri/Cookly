@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/MenuItem.dart';
 import 'package:untitled/common/color_extension.dart';
@@ -21,7 +22,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   TextEditingController txtSearch = TextEditingController();
   int? kitchenId;
   late Future<void> _initDataFuture;
-   List<Map<String, dynamic>> categories = [];
+  List<Map<String, dynamic>> categories = [];
 
   late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
@@ -82,7 +83,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
- Future<List<Map<String, dynamic>>> getFoodCategories() async {
+  Future<List<Map<String, dynamic>>> getFoodCategories() async {
     final response = await http
         .get(Uri.parse('${SharedPreferencesService.url}food-categories'));
     if (response.statusCode == 200) {
@@ -163,14 +164,14 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
-  
+
   String getCategoryName(int categoryId) {
-  final category = categories.firstWhere(
-    (cat) => cat['id'] == categoryId,
-    orElse: () => {'id': categoryId, 'category': 'Unknown'},
-  );
-  return category['category'];
-}
+    final category = categories.firstWhere(
+      (cat) => cat['id'] == categoryId,
+      orElse: () => {'id': categoryId, 'category': 'Unknown'},
+    );
+    return category['category'];
+  }
 
   @override
   void initState() {
@@ -312,13 +313,32 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                           children: [
                             const SizedBox(width: 3),
                             ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: menuItem.image!,
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  width: 70,
+                                  height: 70,
+                                  color: Colors.grey[300],
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
+                            ),
+
+                            /* ClipOval(
                               child: Image.network(
                                 menuItem.image!,
                                 width: 70,
                                 height: 70,
                                 fit: BoxFit.cover,
                               ),
-                            ),
+                            ),*/
                             const SizedBox(width: 15),
                             Expanded(
                               child: Column(
