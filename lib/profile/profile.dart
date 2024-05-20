@@ -20,7 +20,7 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   final ImagePicker picker = ImagePicker();
   XFile? image;
- late Future<void> _initDataFuture;
+  late Future<void> _initDataFuture;
   TextEditingController txtFirstName = TextEditingController();
   TextEditingController txtLastName = TextEditingController();
   TextEditingController txtEmail = TextEditingController();
@@ -28,14 +28,33 @@ class _ProfileViewState extends State<ProfileView> {
   GlobalKey<FormState> formState = GlobalKey();
   String? username;
 
+  late String? initialFirstName;
+  late String? initialLastName;
+  late String? initialMobileNum;
+
+  bool isDataChanged = false;
+
+  void _checkDataChanged() {
+    bool dataChanged = txtFirstName.text != initialFirstName ||
+        txtLastName.text != initialLastName ||
+        txtMobile.text != initialMobileNum;
+
+    setState(() {
+      isDataChanged = dataChanged;
+    });
+  }
+
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> _loadUserData() async {
     List<String?> data = await SharedPreferencesService.getUserProfile();
     setState(() {
       txtFirstName.text = data[0] ?? "First Name";
+      initialFirstName = txtFirstName.text;
       txtLastName.text = data[1] ?? "Last Name";
+      initialLastName = txtLastName.text;
       txtEmail.text = data[2] ?? "Email";
       txtMobile.text = data[3] ?? "Phone";
+      initialMobileNum = txtMobile.text;
     });
   }
 
@@ -46,10 +65,11 @@ class _ProfileViewState extends State<ProfileView> {
     });
   }
 
-  Future<Map<String, dynamic>> editUser(int id, Map<String, dynamic> updates) async {
-    final String url = '${SharedPreferencesService.url}edit-user?id=$id'; 
-      try {
-        final response = await http.put(
+  Future<Map<String, dynamic>> editUser(
+      int id, Map<String, dynamic> updates) async {
+    final String url = '${SharedPreferencesService.url}edit-user?id=$id';
+    try {
+      final response = await http.put(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +81,7 @@ class _ProfileViewState extends State<ProfileView> {
       } else {
         return {'success': false, 'message': response.body};
       }
-    } catch(error) {
+    } catch (error) {
       return {'success': false, 'message': '$error'};
     }
   }
@@ -72,6 +92,9 @@ class _ProfileViewState extends State<ProfileView> {
     super.initState();
     _initDataFuture = _loadUserData();
     _loadUserName();
+    txtFirstName.addListener(_checkDataChanged);
+    txtLastName.addListener(_checkDataChanged);
+    txtMobile.addListener(_checkDataChanged);
   }
 
   String? _validatePhoneNumber(String? value) {
@@ -89,7 +112,7 @@ class _ProfileViewState extends State<ProfileView> {
     return null;
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
       future: _initDataFuture,
@@ -114,7 +137,9 @@ class _ProfileViewState extends State<ProfileView> {
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           Text(
-            username != null ? "Welcome to your profile $username!" : "Welcome to your profile!",
+            username != null
+                ? "Welcome to your profile $username!"
+                : "Welcome to your profile!",
             style: TextStyle(
                 color: TColor.primaryText,
                 fontSize: 16,
@@ -181,10 +206,8 @@ class _ProfileViewState extends State<ProfileView> {
                 title: "Change Password",
                 type: RoundButtonType.textPrimary,
                 onPressed: () {
-                   Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ChangePasswordView()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ChangePasswordView()));
                 }),
           ),
           const SizedBox(
@@ -193,10 +216,25 @@ class _ProfileViewState extends State<ProfileView> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: RoundButton(
-                title: "Save",
-                onPressed: () {
-                  if (formState.currentState!.validate()) {}
-                }),
+              title: "Save",
+              isEnabled: isDataChanged,
+              onPressed: isDataChanged
+                  ? () {
+                      if (formState.currentState!.validate()) {
+                        Map<String, dynamic> updates = {};
+
+                        if (txtFirstName.text != initialFirstName)
+                          updates['first_name'] = txtFirstName.text;
+                        if (txtLastName.text != initialLastName)
+                          updates['last_name'] = txtLastName.text;
+                        if (txtMobile.text != initialMobileNum)
+                          updates['phone'] = txtMobile.text;
+                      
+                        //Call the edit function
+                      }
+                    }
+                  : null,
+            ),
           ),
           const SizedBox(
             height: 20,
