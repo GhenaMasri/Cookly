@@ -44,6 +44,7 @@ dependencies:
   firebase_storage: ^11.7.4
   firebase_app_check: ^0.2.2+4
   quickalert: ^1.1.0
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:
