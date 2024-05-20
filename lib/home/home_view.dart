@@ -3,6 +3,7 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/menu/user_kitchens_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -267,14 +268,14 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             IconButton(
                               onPressed: () {
-                                /*Navigator.push(
+                                Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => MenuItemsView(
+                                      builder: (context) => UserKitchensView(
                                         mObj: mObj,
                                       ),
                                     ),
-                                  );*/
+                                  );
                               },
                               icon: Container(
                                 width: 35,
