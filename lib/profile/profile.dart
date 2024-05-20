@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:quickalert/quickalert.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common_widget/round_button.dart';
@@ -33,6 +34,9 @@ class _ProfileViewState extends State<ProfileView> {
   late String? initialMobileNum;
 
   bool isDataChanged = false;
+
+  String errorMessage = '';
+  bool errorFlag = false;
 
   void _checkDataChanged() {
     bool dataChanged = txtFirstName.text != initialFirstName ||
@@ -77,6 +81,12 @@ class _ProfileViewState extends State<ProfileView> {
         body: jsonEncode(updates),
       );
       if (response.statusCode == 200) {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          text: 'Profile Edited Successfully!',
+          confirmBtnColor: TColor.primary,
+        );
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -213,6 +223,15 @@ class _ProfileViewState extends State<ProfileView> {
           const SizedBox(
             height: 20,
           ),
+          Visibility(
+            visible: errorFlag,
+            child: Text(errorMessage,
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 230, 81, 0),
+                  fontSize: 16,
+                )),
+          ),
+          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: RoundButton(
@@ -229,7 +248,21 @@ class _ProfileViewState extends State<ProfileView> {
                           updates['last_name'] = txtLastName.text;
                         if (txtMobile.text != initialMobileNum)
                           updates['phone'] = txtMobile.text;
-                      
+
+                        /* if (success) {
+                              // add success indicator
+                              setState(() {
+                                errorFlag = false;
+                                errorMessage = "";
+                              });
+                              Navigator.of(context).pop();
+                            } else {
+                              setState(() {
+                                errorFlag = true;
+                                errorMessage = message;
+                              });
+                            } */
+
                         //Call the edit function
                       }
                     }
