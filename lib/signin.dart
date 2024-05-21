@@ -76,6 +76,10 @@ class _Signin extends State<Signin> {
       throw Exception('Failed to load kitchen name');
     }
   }
+
+  Future<void> _saveDataToSharedPreferences(int id, String firstName, String lastName, String email, String phone, String type) async {
+    await SharedPreferencesService.saveDataAfterSignin(id, firstName, lastName, email, phone, type);
+  }
   //////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -283,13 +287,8 @@ class _Signin extends State<Signin> {
                                 if (success) {
                                   SharedPreferences prefs = await SharedPreferences.getInstance();
                                   Map<String, dynamic> userData = result['user'];
-                                  await prefs.setInt('id', userData['id']);
-                                  await prefs.setString('first_name', userData['first_name']);
-                                  await prefs.setString('last_name', userData['last_name']);
-                                  await prefs.setString('email', userData['email']);
-                                  await prefs.setString('phone', userData['phone']);
-                                  await prefs.setString('type', userData['type']);
                                   await prefs.setBool('isSet', true);
+                                  _saveDataToSharedPreferences(userData['id'], userData['first_name'], userData['last_name'], userData['email'], userData['phone'], userData['type']);
                                   if (userData['type'] == "chef") {
                                     //store kitchen id in shared preferences 
                                     int chefId = await getChefId(userData['email']);

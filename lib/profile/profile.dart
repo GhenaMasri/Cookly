@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_textfield.dart';
 import 'dart:convert';
+import 'package:untitled/common/globs.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -28,10 +29,11 @@ class _ProfileViewState extends State<ProfileView> {
   TextEditingController txtMobile = TextEditingController();
   GlobalKey<FormState> formState = GlobalKey();
   String? username;
+  int? id;
 
-  late String? initialFirstName;
-  late String? initialLastName;
-  late String? initialMobileNum;
+  String? initialFirstName;
+  String? initialLastName;
+  String? initialMobileNum;
 
   bool isDataChanged = false;
 
@@ -69,6 +71,17 @@ class _ProfileViewState extends State<ProfileView> {
     });
   }
 
+  Future<void> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    setState(() {
+      this.id = id;
+    });
+  }
+
+  Future<void> _saveDataToSharedPreferences() async {
+    await SharedPreferencesService.saveDataToSharedPreferences(txtFirstName.text, txtLastName.text, txtMobile.text);
+  }
+
   Future<Map<String, dynamic>> editUser(
       int id, Map<String, dynamic> updates) async {
     final String url = '${SharedPreferencesService.url}edit-user?id=$id';
@@ -102,6 +115,7 @@ class _ProfileViewState extends State<ProfileView> {
     super.initState();
     _initDataFuture = _loadUserData();
     _loadUserName();
+    _loadUserId();
     txtFirstName.addListener(_checkDataChanged);
     txtLastName.addListener(_checkDataChanged);
     txtMobile.addListener(_checkDataChanged);
@@ -238,7 +252,7 @@ class _ProfileViewState extends State<ProfileView> {
               title: "Save",
               isEnabled: isDataChanged,
               onPressed: isDataChanged
-                  ? () {
+                  ? () async {
                       if (formState.currentState!.validate()) {
                         Map<String, dynamic> updates = {};
 
@@ -249,21 +263,25 @@ class _ProfileViewState extends State<ProfileView> {
                         if (txtMobile.text != initialMobileNum)
                           updates['phone'] = txtMobile.text;
 
-                        /* if (success) {
-                              // add success indicator
-                              setState(() {
-                                errorFlag = false;
-                                errorMessage = "";
-                              });
-                              Navigator.of(context).pop();
-                            } else {
-                              setState(() {
-                                errorFlag = true;
-                                errorMessage = message;
-                              });
-                            } */
-
-                        //Call the edit function
+                        Map<String, dynamic> result = await editUser(id!, updates);
+                        bool success = result['success'];
+                        String message = result['message'];
+                        print(message);                     
+                        if (success) {
+                          // save new user data to shared preferences
+                          _saveDataToSharedPreferences();
+                          // add success indicator
+                          setState(() {
+                            errorFlag = false;
+                            errorMessage = "";
+                          });
+                          Navigator.of(context).pop();
+                        } else {
+                          setState(() {
+                            errorFlag = true;
+                            errorMessage = message;
+                          });
+                        } 
                       }
                     }
                   : null,

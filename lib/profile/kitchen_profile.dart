@@ -46,15 +46,15 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   Map<String, dynamic>? kitchenData;
   int? category_id;
 
-  late String? initialName;
-  late String? initialNumber;
-  late String? initialLocation;
-  late String? initialStreet;
-  late String? initialDescription;
-  late String? initialCategory;
-  late String? initialOrderingSystem;
-  late String? initialSpecialOrders;
-  late String? initialImage;
+  String? initialName;
+  String? initialNumber;
+  String? initialLocation;
+  String? initialStreet;
+  String? initialDescription;
+  String? initialCategory;
+  String? initialOrderingSystem;
+  String? initialSpecialOrders;
+  String? initialImage;
 
   bool isDataChanged = false;
 
@@ -115,6 +115,10 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
     setState(() {
       kitchenId = kitchenid;
     });
+  }
+
+  Future<void> _saveKitchenNameToSharedPreferences() async {
+    await SharedPreferencesService.saveKitchenName(txtName.text);
   }
 
   Future<Map<String, dynamic>> editKitchen(
@@ -451,7 +455,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
               title: "Save",
               isEnabled: isDataChanged,
               onPressed: isDataChanged
-                  ? () {
+                  ? () async {
                       if (formState.currentState!.validate()) {
                         Map<String, dynamic> updates = {};
 
@@ -474,23 +478,27 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                         if (specialOrders != initialSpecialOrders)
                           updates['special_orders'] =
                               specialOrders!.toLowerCase();
-
-                        /* if (success) {
-                              // add success indicator
-                              setState(() {
-                                errorFlag = false;
-                                errorMessage = "";
-                              });
+                        
+                        Map<String, dynamic> result = await editKitchen(kitchenId!, updates);
+                        bool success = result['success'];
+                        String message = result['message'];
+                        print(message);
+                        if (success) {
+                          // save kitchen name to shared preferences
+                          _saveKitchenNameToSharedPreferences();
+                          // add success indicator
+                          setState(() {
+                            errorFlag = false;
+                            errorMessage = "";
+                          });
                     
-                              Navigator.of(context).pop();
-                            } else {
-                              setState(() {
-                                errorFlag = true;
-                                errorMessage = message;
-                              });
-                            } */
-
-                        //Call the edit function
+                          Navigator.of(context).pop();
+                        } else {
+                          setState(() {
+                            errorFlag = true;
+                            errorMessage = message;
+                          });
+                        } 
                       }
                     }
                   : null,

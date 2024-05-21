@@ -37,6 +37,29 @@ class SharedPreferencesService {
     return [firstName, lastName, email, phone];
   }
 
+  static Future<void> saveDataToSharedPreferences(String firstName, String lastName, String phone) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('first_name', firstName);
+    await prefs.setString('last_name', lastName);
+    await prefs.setString('phone', phone);
+  }
+
+  static Future<void> saveDataAfterSignin(int id, String firstName, String lastName, String email, String phone, String type) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('id', id);
+    await prefs.setString('first_name', firstName);
+    await prefs.setString('last_name', lastName);
+    await prefs.setString('email', email);
+    await prefs.setString('phone', phone);
+    await prefs.setString('type', type);
+    await prefs.setBool('isSet', true);
+  }
+
+  static Future<void> saveKitchenName(String kitchenName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('kitchen_name', kitchenName);
+  }
+
   static Future<void> clearSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove("isSet");
