@@ -28,7 +28,6 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   void addItemToList(MenuItem item) {
     setState(() {
       menuArr.add(item);
-      //Also Add to DB
     });
   }
 
@@ -165,7 +164,11 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
   //////////////////////////////////////////////////////////////////////////////////
 
-  String getCategoryName(int categoryId) {
+  String getCategoryName(int? categoryId) {
+    if (categoryId == null) {
+      return 'Unknown';
+    } 
+
     final category = categories.firstWhere(
       (cat) => cat['id'] == categoryId,
       orElse: () => {'id': categoryId, 'category': 'Unknown'},
@@ -356,7 +359,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    "Category: ${getCategoryName(menuItem.category!)}",
+                                    "Category: ${getCategoryName(menuItem.category)}",
                                     style: TextStyle(
                                       color: TColor.secondaryText,
                                       fontSize: 12,

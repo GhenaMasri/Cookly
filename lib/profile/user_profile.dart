@@ -31,6 +31,7 @@ class _UserProfileViewState extends State<UserProfileView> {
   TextEditingController txtMobile = TextEditingController();
   GlobalKey<FormState> formState = GlobalKey();
   String? username;
+  int? id;
 
   late String initialFirstName;
   late String? initialLastName;
@@ -67,6 +68,17 @@ class _UserProfileViewState extends State<UserProfileView> {
     setState(() {
       username = name;
     });
+  }
+
+  Future<void> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    setState(() {
+      this.id = id;
+    });
+  }
+
+  Future<void> _saveDataToSharedPreferences() async {
+    await SharedPreferencesService.saveDataToSharedPreferences(txtFirstName.text, txtLastName.text, txtMobile.text);
   }
 
   Future<Map<String, dynamic>> editUser(
@@ -267,7 +279,7 @@ class _UserProfileViewState extends State<UserProfileView> {
               title: "Save",
               isEnabled: isDataChanged,
               onPressed: isDataChanged
-                  ? () {
+                  ? () async {
                       if (formState.currentState!.validate()) {
                         Map<String, dynamic> updates = {};
 
@@ -278,22 +290,25 @@ class _UserProfileViewState extends State<UserProfileView> {
                         if (txtMobile.text != initialMobileNum)
                           updates['phone'] = txtMobile.text;
 
-                        /*   if (success) {
-                              // add success indicator
-                              setState(() {
-                                errorFlag = false;
-                                errorMessage = "";
-                              });
-                        
-                              Navigator.of(context).pop();
-                            } else {
-                              setState(() {
-                                errorFlag = true;
-                                errorMessage = message;
-                              });
-                            } */
-
-                        //Call the edit function
+                        Map<String, dynamic> result = await editUser(id!, updates);
+                        bool success = result['success'];
+                        String message = result['message'];
+                        print(message);                     
+                        if (success) {
+                          // save new user data to shared preferences
+                          _saveDataToSharedPreferences();
+                          // add success indicator
+                          setState(() {
+                            errorFlag = false;
+                            errorMessage = "";
+                          });
+                          Navigator.of(context).pop();
+                        } else {
+                          setState(() {
+                            errorFlag = true;
+                            errorMessage = message;
+                          });
+                        }
                       }
                     }
                   : null,

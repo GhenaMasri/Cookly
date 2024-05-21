@@ -69,7 +69,12 @@ class _MenuItemViewState extends State<MenuItemView> {
         }),
       );
       if (response.statusCode == 200) {
-        return {'success': true, 'message': response.body};
+        final responseBody = jsonDecode(response.body);
+        return {
+          'success': true,
+          'message': responseBody['message'],
+          'menuItem': responseBody['menuItem']
+        };
       } else {
         return {'success': false, 'message': response.body};
       }
@@ -385,26 +390,30 @@ class _MenuItemViewState extends State<MenuItemView> {
                               errorFlag = false;
                               errorMessage = "";
                             });
-                            menuItem = MenuItem(
-                                kitchenId: kitchenId,
-                                itemId: 0,
-                                image: imageUrl,
-                                name: txtName.text,
-                                notes: txtNotes.text,
-                                quantity: selectedQuantity,
-                                category: selectedCategory,
-                                price: dbPrice,
-                                time: txtTime.text);
-
-                            widget.addItemToList(menuItem!);
-                            Navigator.pop(context);
+                            
                           }
                           /////////////////////// BACKEND SECTION /////////////////////////
                           Map<String, dynamic> result = await addMenuItem();
                           bool success = result['success'];
                           String message = result['message'];
+                          final newItem = result['menuItem'];
                           print(success);
                           print(message);
+                          
+                          if (success) {
+                            widget.addItemToList(MenuItem(
+                              kitchenId: newItem['kitchen_id'],
+                              itemId: newItem['id'],
+                              image: newItem['image'],
+                              name: newItem['name'],
+                              notes: newItem['notes'],
+                              quantity: newItem['quantity_id'],
+                              category: newItem['category_id'],
+                              price: newItem['price'].toDouble(),
+                              time: newItem['time'],
+                            ));
+                            Navigator.pop(context);
+                          }
                           ////////////////////////////////////////////////////////////////
                         }),
                   ),

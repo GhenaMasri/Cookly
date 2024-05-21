@@ -78,6 +78,12 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
     });
   }
   /////////////////////////////////////////////////////////////////////////////////
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -174,8 +180,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                         onPressed: () async {
                           if (formState.currentState!.validate()) {
                             ///////////////////////////////// BACKEND SECTION /////////////////////////////////
-                            Map<String, dynamic> result =
-                                await changePassword(id!);
+                            Map<String, dynamic> result = await changePassword(id!);
                             bool success = result['success'];
                             String message = result['message'];
                             print(success);
