@@ -32,6 +32,7 @@ class _HomeViewState extends State<HomeView> {
       username = name;
     });
   }
+
 //////////////////////////////////////////////////////////////////////////
   List menuArr = [
     {
@@ -122,6 +123,19 @@ class _HomeViewState extends State<HomeView> {
                         color: TColor.primaryText,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        /* Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Notifications()));*/
+                      },
+                      icon: Image.asset(
+                        "assets/img/shopping_cart.png",
+                        width: 25,
+                        height: 25,
                       ),
                     ),
                     IconButton(
@@ -269,13 +283,13 @@ class _HomeViewState extends State<HomeView> {
                             IconButton(
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UserKitchensView(
-                                        mObj: mObj,
-                                      ),
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserKitchensView(
+                                      mObj: mObj,
                                     ),
-                                  );
+                                  ),
+                                );
                               },
                               icon: Container(
                                 width: 35,

@@ -486,11 +486,12 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                         offset: Offset(0, 2))
                                                   ]),
                                               alignment: Alignment.center,
-                                              child: Image.asset(
+                                              child: IconButton(
+                                              icon: Image.asset(
                                                   "assets/img/shopping_cart.png",
                                                   width: 20,
                                                   height: 20,
-                                                  color: TColor.primary),
+                                                  color: TColor.primary), onPressed: () {  },)
                                             ),
                                           ),
                                         ],
