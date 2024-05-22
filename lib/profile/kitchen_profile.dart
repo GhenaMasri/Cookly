@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
@@ -133,12 +134,6 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
         body: jsonEncode(updates),
       );
       if (response.statusCode == 200) {
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          text: 'Profile Edited Successfully!',
-          confirmBtnColor: TColor.primary,
-        );
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -181,7 +176,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
           category_id = kitchenData!['category_id'] ?? 1;
           OrdersDb = kitchenData!['order_system'] ?? 0;
           orderingSystem =
-              OrdersDb == 1 ? 'Order the day before' : 'Order in the same day';
+              OrdersDb == 0 ? 'Order the day before' : 'Order in the same day';
           initialOrderingSystem = orderingSystem;
           specialOrders = kitchenData!['special_orders'] ?? "yes";
         });
@@ -241,25 +236,31 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: TColor.placeholder,
-              borderRadius: BorderRadius.circular(50),
-            ),
-            alignment: Alignment.center,
-            child: imageUrl != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(50),
-                    child: Image.network(imageUrl!,
-                        width: 100, height: 100, fit: BoxFit.cover),
-                  )
-                : Icon(
-                    Icons.person,
-                    size: 65,
-                    color: TColor.secondaryText,
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: TColor.placeholder,
+                borderRadius: BorderRadius.circular(50),
+              ),
+              alignment: Alignment.center,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl!,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey[300],
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
-          ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              )),
           TextButton.icon(
             onPressed: () async {
               pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -440,15 +441,6 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
           const SizedBox(
             height: 20,
           ),
-          Visibility(
-            visible: errorFlag,
-            child: Text(errorMessage,
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 230, 81, 0),
-                  fontSize: 16,
-                )),
-          ),
-          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: RoundButton(
@@ -478,8 +470,9 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                         if (specialOrders != initialSpecialOrders)
                           updates['special_orders'] =
                               specialOrders!.toLowerCase();
-                        
-                        Map<String, dynamic> result = await editKitchen(kitchenId!, updates);
+
+                        Map<String, dynamic> result =
+                            await editKitchen(kitchenId!, updates);
                         bool success = result['success'];
                         String message = result['message'];
                         print(message);
@@ -491,14 +484,18 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                             errorFlag = false;
                             errorMessage = "";
                           });
-                    
-                          Navigator.of(context).pop();
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            text: 'Profile Edited Successfully!',
+                            confirmBtnColor: TColor.primary,
+                          );
                         } else {
                           setState(() {
                             errorFlag = true;
                             errorMessage = message;
                           });
-                        } 
+                        }
                       }
                     }
                   : null,
@@ -507,6 +504,15 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
           const SizedBox(
             height: 20,
           ),
+          Visibility(
+            visible: errorFlag,
+            child: Text(errorMessage,
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 230, 81, 0),
+                  fontSize: 16,
+                )),
+          ),
+          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
         ]),
       ),
     )));

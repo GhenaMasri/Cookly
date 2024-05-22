@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
@@ -189,6 +190,8 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
     txtPrice.text = widget.item.price?.toString() ?? '';
     txtTime.text = widget.item.time ?? '';
     imageUrl = widget.item.image ?? '';
+    selectedCategory = widget.item.category!;
+    selectedQuantity = widget.item.quantity!;
 
     initialName = txtName.text;
     initialNotes = txtNotes.text;
@@ -296,31 +299,34 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                     height: 20,
                   ),
                   Container(
-                    width: 300, // Increase the width
-                    height:
-                        200, // Make it a square by setting height equal to width
-                    decoration: BoxDecoration(
-                      color: TColor.placeholder,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    alignment: Alignment.center,
-                    child: widget.item.image != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                20), // Half of the width (or height)
-                            child: Image.network(
-                              widget.item.image!,
-                              width: 300,
-                              height: 200,
-                              fit: BoxFit.fill,
+                      width: 300, // Increase the width
+                      height:
+                          200, // Make it a square by setting height equal to width
+                      decoration: BoxDecoration(
+                        color: TColor.placeholder,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      alignment: Alignment.center,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            20), // Half of the width (or height)
+                        child: CachedNetworkImage(
+                          imageUrl: widget.item.image!,
+                          width: 300,
+                          height: 200,
+                          fit: BoxFit.fill,
+                          placeholder: (context, url) => Container(
+                            width: 300,
+                            height: 200,
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: CircularProgressIndicator(),
                             ),
-                          )
-                        : Icon(
-                            Icons.image,
-                            size: 75,
-                            color: TColor.secondaryText,
                           ),
-                  ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      )),
                   TextButton.icon(
                     onPressed: () async {
                       pickedFile =
@@ -460,7 +466,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                       type: RoundButtonType.textPrimary,
                       isEnabled: isDataChanged,
                       onPressed: isDataChanged
-                          ? () {
+                          ? () async{
                               Map<String, dynamic> updates = {};
 
                               if (txtName.text != initialName)
@@ -478,7 +484,8 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                               if (imageUrl != initialImageUrl)
                                 updates['image'] = imageUrl;
 
-                              editMenuItem(widget.item.itemId!, updates);
+                             await editMenuItem(widget.item.itemId!, updates);
+                              setState(() {});
                             }
                           : null,
                     ),
@@ -493,11 +500,12 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                         onPressed: () {
                           QuickAlert.show(
                             context: context,
-                            type: QuickAlertType.confirm,
+                            type: QuickAlertType.error,
                             text: 'You want to delete this item?',
+                            showCancelBtn: true,
                             confirmBtnText: 'Delete',
                             cancelBtnText: 'Cancel',
-                            confirmBtnColor: TColor.primary,
+                            confirmBtnColor: Colors.red,
                             onConfirmBtnTap: () async {
                               ////////////////////////// BACKEND SECTION ///////////////////////////
                               print(widget.item.itemId);

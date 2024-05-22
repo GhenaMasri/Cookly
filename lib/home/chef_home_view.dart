@@ -44,7 +44,6 @@ class _ChefHomeViewState extends State<ChefHomeView> {
           menuArr.indexWhere((item) => item.itemId == updatedItem.itemId);
       if (index != -1) {
         menuArr[index] = updatedItem;
-        //Also update in DB
       }
     });
   }

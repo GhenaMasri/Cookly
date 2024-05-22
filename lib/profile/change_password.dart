@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/common_widget/password_field.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/welcome_page.dart';
 
 class ChangePasswordView extends StatefulWidget {
   const ChangePasswordView({super.key});
@@ -41,7 +43,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
   String? _validateConfirmPassword(String? value) {
     String? password = txtPassword.text;
 
-    if (password == null || value == null || password != value) {
+    if (password.isEmpty || value == null || password != value) {
       return 'Passwords do not match';
     }
     return null;
@@ -130,7 +132,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    child: RoundTitleTextfield(
+                    child: PassRoundTitleTextfield(
                       title: "Old Password",
                       hintText: "* * * * * *",
                       obscureText: true,
@@ -142,8 +144,8 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    child: RoundTitleTextfield(
-                      title: "Password",
+                    child: PassRoundTitleTextfield(
+                      title: "New Password",
                       hintText: "* * * * * *",
                       obscureText: true,
                       controller: txtPassword,
@@ -153,7 +155,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    child: RoundTitleTextfield(
+                    child: PassRoundTitleTextfield(
                       title: "Confirm Password",
                       hintText: "* * * * * *",
                       obscureText: true,
@@ -164,21 +166,13 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Visibility(
-                    visible: errorFlag,
-                    child: Text(errorMessage,
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 230, 81, 0),
-                          fontSize: 16,
-                        )),
-                  ),
-                  Visibility(visible: errorFlag, child: SizedBox(height: 8)),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: RoundButton(
                         title: "Save",
                         onPressed: () async {
                           if (formState.currentState!.validate()) {
+
                             ///////////////////////////////// BACKEND SECTION /////////////////////////////////
                             Map<String, dynamic> result = await changePassword(id!);
                             bool success = result['success'];
@@ -187,17 +181,23 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                             print(message);
                             ///////////////////////////////////////////////////////////////////////////////////
                             if (success) {
-                              // add success indicator
                               setState(() {
                                 errorFlag = false;
                                 errorMessage = "";
                               });
-                              QuickAlert.show(
+                          
+                             QuickAlert.show(
                                 context: context,
                                 type: QuickAlertType.success,
                                 text: 'Password Changed Successfully!',
-                                confirmBtnColor: TColor.primary,
+                                showConfirmBtn: true,
+                                confirmBtnColor: Colors.green,
+                                onConfirmBtnTap: () {
+                                       Navigator.of(context).pop();
+                                       Navigator.of(context).pop();
+                                },
                               );
+                              Future.delayed(const Duration(seconds: 2));
                               Navigator.of(context).pop();
                             } else {
                               setState(() {
@@ -211,6 +211,15 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                   const SizedBox(
                     height: 20,
                   ),
+                                    Visibility(
+                    visible: errorFlag,
+                    child: Text(errorMessage,
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 230, 81, 0),
+                          fontSize: 16,
+                        )),
+                  ),
+                 
                 ],
               ),
             )),
