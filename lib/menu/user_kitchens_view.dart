@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 
-
 import '../../common_widget/menu_item_row.dart';
-
 
 class UserKitchensView extends StatefulWidget {
   final Map mObj;
-  const UserKitchensView({super.key,required this.mObj});
+  const UserKitchensView({super.key, required this.mObj});
 
   @override
   State<UserKitchensView> createState() => _UserKitchensViewState();
@@ -110,12 +108,25 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                       width: 8,
                     ),
                     Expanded(
-                      child: Text( 
-                        widget.mObj["name"].toString(),
+                      child: Text(
+                       widget.mObj["name"].toString(),
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
                             fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        /* Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Notifications()));*/
+                      },
+                      icon: Image.asset(
+                        "assets/img/shopping_cart.png",
+                        width: 25,
+                        height: 25,
                       ),
                     ),
                     IconButton(
@@ -166,11 +177,8 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                   return MenuItemRow(
                     mObj: mObj,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Container())
-                      );
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Container()));
                     },
                   );
                 }),
