@@ -254,7 +254,7 @@ class _HomeViewState extends State<HomeView> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          "${mObj["items_count"].toString()} items",
+                                          "${mObj["items_count"].toString()} Kitchens",
                                           style: TextStyle(
                                             color: TColor.secondaryText,
                                             fontSize: 11,

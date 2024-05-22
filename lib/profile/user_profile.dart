@@ -78,7 +78,8 @@ class _UserProfileViewState extends State<UserProfileView> {
   }
 
   Future<void> _saveDataToSharedPreferences() async {
-    await SharedPreferencesService.saveDataToSharedPreferences(txtFirstName.text, txtLastName.text, txtMobile.text);
+    await SharedPreferencesService.saveDataToSharedPreferences(
+        txtFirstName.text, txtLastName.text, txtMobile.text);
   }
 
   Future<Map<String, dynamic>> editUser(
@@ -93,12 +94,6 @@ class _UserProfileViewState extends State<UserProfileView> {
         body: jsonEncode(updates),
       );
       if (response.statusCode == 200) {
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          text: 'Profile Edited Successfully!',
-          confirmBtnColor: TColor.primary,
-        );
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -264,15 +259,6 @@ class _UserProfileViewState extends State<UserProfileView> {
           const SizedBox(
             height: 20,
           ),
-          Visibility(
-            visible: errorFlag,
-            child: Text(errorMessage,
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 230, 81, 0),
-                  fontSize: 16,
-                )),
-          ),
-          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: RoundButton(
@@ -290,10 +276,11 @@ class _UserProfileViewState extends State<UserProfileView> {
                         if (txtMobile.text != initialMobileNum)
                           updates['phone'] = txtMobile.text;
 
-                        Map<String, dynamic> result = await editUser(id!, updates);
+                        Map<String, dynamic> result =
+                            await editUser(id!, updates);
                         bool success = result['success'];
                         String message = result['message'];
-                        print(message);                     
+                        print(message);
                         if (success) {
                           // save new user data to shared preferences
                           _saveDataToSharedPreferences();
@@ -302,7 +289,12 @@ class _UserProfileViewState extends State<UserProfileView> {
                             errorFlag = false;
                             errorMessage = "";
                           });
-                          Navigator.of(context).pop();
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            text: 'Profile Edited Successfully!',
+                            confirmBtnColor: Colors.green,
+                          );
                         } else {
                           setState(() {
                             errorFlag = true;
@@ -317,6 +309,15 @@ class _UserProfileViewState extends State<UserProfileView> {
           const SizedBox(
             height: 20,
           ),
+          Visibility(
+            visible: errorFlag,
+            child: Text(errorMessage,
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 230, 81, 0),
+                  fontSize: 16,
+                )),
+          ),
+          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
         ]),
       ),
     )));
