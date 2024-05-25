@@ -102,6 +102,14 @@ class _UserProfileViewState extends State<UserProfileView> {
       return {'success': false, 'message': '$error'};
     }
   }
+
+  Future<void> signOut(BuildContext context) async {
+    await SharedPreferencesService.clearSharedPreferences();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => WelcomeView()),
+      (Route<dynamic> route) => false,
+    );
+  }
   /////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -206,9 +214,7 @@ class _UserProfileViewState extends State<UserProfileView> {
           ),
           TextButton(
             onPressed: () {
-              //Set shared prefernces to false.
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => WelcomeView()));
+              signOut(context);
             },
             child: Text(
               "Sign Out",

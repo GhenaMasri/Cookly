@@ -10,7 +10,6 @@ import 'package:http/http.dart' as http;
 import '../../common/color_extension.dart';
 import '../../common_widget/round_textfield.dart';
 import 'dart:convert';
-import 'package:untitled/common/globs.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -103,6 +102,14 @@ class _ProfileViewState extends State<ProfileView> {
       return {'success': false, 'message': '$error'};
     }
   }
+
+  Future<void> signOut(BuildContext context) async {
+    await SharedPreferencesService.clearSharedPreferences();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => WelcomeView()),
+      (Route<dynamic> route) => false,
+    );
+  }
   /////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -165,10 +172,8 @@ class _ProfileViewState extends State<ProfileView> {
                 fontWeight: FontWeight.w700),
           ),
           TextButton(
-            onPressed: () {
-              //Set shared prefernces to false.
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => WelcomeView()));
+            onPressed: () async {
+              signOut(context);
             },
             child: Text(
               "Sign Out",
@@ -266,7 +271,7 @@ class _ProfileViewState extends State<ProfileView> {
                             context: context,
                             type: QuickAlertType.success,
                             text: 'Profile Edited Successfully!',
-                            confirmBtnColor: TColor.primary,
+                            confirmBtnColor: Colors.green,
                           );
                         } else {
                           setState(() {

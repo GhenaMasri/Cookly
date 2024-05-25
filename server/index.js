@@ -66,6 +66,9 @@ app.use('/edit-user', editUserRoute);
 const changePasswordRoute = require('./routes/user/change_password');
 app.use('/change-password', changePasswordRoute);
 
+const kitchensByCategoriesCount = require('./routes/user/kitchens_by_categories');
+app.use('/home-page', kitchensByCategoriesCount);
+
 const port = 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

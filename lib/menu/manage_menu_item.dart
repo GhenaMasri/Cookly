@@ -148,7 +148,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
           context: context,
           type: QuickAlertType.success,
           text: 'Item Edited Successfully!',
-          confirmBtnColor: TColor.primary,
+          confirmBtnColor: Colors.green,
         );
         return {'success': true, 'message': response.body};
       } else {

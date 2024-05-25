@@ -80,6 +80,10 @@ class _Signin extends State<Signin> {
   Future<void> _saveDataToSharedPreferences(int id, String firstName, String lastName, String email, String phone, String type) async {
     await SharedPreferencesService.saveDataAfterSignin(id, firstName, lastName, email, phone, type);
   }
+
+  Future<void> _clearSharedPreferences() async {
+    await SharedPreferencesService.clearSharedPreferences();
+  }
   //////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -285,6 +289,7 @@ class _Signin extends State<Signin> {
                                 print(success);
                                 print(message);
                                 if (success) {
+                                  _clearSharedPreferences();
                                   SharedPreferences prefs = await SharedPreferences.getInstance();
                                   Map<String, dynamic> userData = result['user'];
                                   await prefs.setBool('isSet', true);

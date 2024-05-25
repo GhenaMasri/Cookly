@@ -19,8 +19,8 @@ class _StarupViewState extends State<SplashView> {
 
   void goWelcomePage() async {
       await Future.delayed( const Duration(seconds: 3) );
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const WelcomeView()));
-      //welcomePage();
+      //Navigator.push(context, MaterialPageRoute(builder: (context) => const WelcomeView()));
+      welcomePage();
   }
 
   void welcomePage() async{
