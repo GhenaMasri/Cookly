@@ -80,7 +80,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
     });
   }
   /////////////////////////////////////////////////////////////////////////////////
-  
+
   @override
   void initState() {
     super.initState();
@@ -172,9 +172,9 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                         title: "Save",
                         onPressed: () async {
                           if (formState.currentState!.validate()) {
-
                             ///////////////////////////////// BACKEND SECTION /////////////////////////////////
-                            Map<String, dynamic> result = await changePassword(id!);
+                            Map<String, dynamic> result =
+                                await changePassword(id!);
                             bool success = result['success'];
                             String message = result['message'];
                             print(success);
@@ -185,19 +185,17 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                                 errorFlag = false;
                                 errorMessage = "";
                               });
-                          
-                             QuickAlert.show(
+                              QuickAlert.show(
                                 context: context,
                                 type: QuickAlertType.success,
                                 text: 'Password Changed Successfully!',
                                 showConfirmBtn: true,
                                 confirmBtnColor: Colors.green,
                                 onConfirmBtnTap: () {
-                                       Navigator.of(context).pop();
-                                       Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
                                 },
-                              );
-                              Future.delayed(const Duration(seconds: 2));
+                              );                              Future.delayed(const Duration(seconds: 2));
                               Navigator.of(context).pop();
                             } else {
                               setState(() {
@@ -211,7 +209,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                   const SizedBox(
                     height: 20,
                   ),
-                                    Visibility(
+                  Visibility(
                     visible: errorFlag,
                     child: Text(errorMessage,
                         style: TextStyle(
@@ -219,7 +217,6 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                           fontSize: 16,
                         )),
                   ),
-                 
                 ],
               ),
             )),

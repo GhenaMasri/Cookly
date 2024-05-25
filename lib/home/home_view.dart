@@ -4,6 +4,8 @@ import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/menu/user_kitchens_view.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -18,13 +20,6 @@ class _HomeViewState extends State<HomeView> {
   late Future<void> _initDataFuture;
   String? username;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserName();
-    _initDataFuture; //_initDataFuture = load user home page API
-  }
-
 //////////////////////////////// BACKEND SECTION ///////////////////////////
   Future<void> _loadUserName() async {
     String? name = await SharedPreferencesService.getUserName();
@@ -33,7 +28,28 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-//////////////////////////////////////////////////////////////////////////
+  Future<List<Map<String, dynamic>>> kitchensByCategories() async {
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}home-page'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> kitchensCount = data['kitchensCount'];
+      final List<Map<String, dynamic>> result = kitchensCount.map((category) {
+        return {'id': category['id'] ,'category': category['category'], 'count': category['kitchen_count']};
+      }).toList();
+      return result;
+    } else {
+      throw Exception('Failed to load categories count');
+    }
+  }
+////////////////////////////////////////////////////////////////////////////
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+    _initDataFuture =  kitchensByCategories(); 
+  }
+
   List menuArr = [
     {
       "name": "Food",

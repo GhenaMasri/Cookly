@@ -488,7 +488,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                             context: context,
                             type: QuickAlertType.success,
                             text: 'Profile Edited Successfully!',
-                            confirmBtnColor: TColor.primary,
+                            confirmBtnColor: Colors.green,
                           );
                         } else {
                           setState(() {

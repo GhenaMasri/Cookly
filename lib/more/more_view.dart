@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:untitled/common/globs.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/more/payment_details_view.dart';
+import 'package:untitled/welcome_page.dart';
 
 class MoreView extends StatefulWidget {
   const MoreView({super.key});
@@ -43,6 +44,16 @@ class _MoreViewState extends State<MoreView> {
       "base": 0
     },
   ];
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> signOut(BuildContext context) async {
+    await SharedPreferencesService.clearSharedPreferences();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => WelcomeView()),
+      (Route<dynamic> route) => false,
+    );
+  }
+  /////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +131,7 @@ class _MoreViewState extends State<MoreView> {
                                 MaterialPageRoute(
                                     builder: (context) => Container()));
                           case "5":
-                          //ServiceCall.logout();
+                            signOut(context);
 
                           default:
                         }
