@@ -33,9 +33,9 @@ class _UserProfileViewState extends State<UserProfileView> {
   String? username;
   int? id;
 
-  late String initialFirstName;
-  late String? initialLastName;
-  late String? initialMobileNum;
+  String? initialFirstName;
+  String? initialLastName;
+  String? initialMobileNum;
 
   bool isDataChanged = false;
 
