@@ -167,21 +167,19 @@ class _UserProfileViewState extends State<UserProfileView> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Profile",
-                  style: TextStyle(
-                      color: TColor.primaryText,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800),
+                Expanded(
+                  child: Text(
+                    "Profile",
+                    style: TextStyle(
+                        color: TColor.primaryText,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800),
+                  ),
                 ),
                 IconButton(
                   onPressed: () {
-                    /* Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Notifications()));*/
+                    // Add functionality here
                   },
                   icon: Image.asset(
                     "assets/img/shopping_cart.png",
@@ -191,8 +189,12 @@ class _UserProfileViewState extends State<UserProfileView> {
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Container()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Container(),
+                      ),
+                    );
                   },
                   icon: Image.asset(
                     "assets/img/notification.png",
@@ -313,6 +315,15 @@ class _UserProfileViewState extends State<UserProfileView> {
                             type: QuickAlertType.success,
                             text: 'Profile Edited Successfully!',
                             confirmBtnColor: Colors.green,
+                            onConfirmBtnTap: () {
+                              FocusScope.of(context).unfocus();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => UserProfileView()),
+                              );
+                            },
                           );
                         } else {
                           setState(() {

@@ -272,6 +272,15 @@ class _ProfileViewState extends State<ProfileView> {
                             type: QuickAlertType.success,
                             text: 'Profile Edited Successfully!',
                             confirmBtnColor: Colors.green,
+                            onConfirmBtnTap: () {
+                              FocusScope.of(context).unfocus();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => ProfileView()),
+                              );
+                            },
                           );
                         } else {
                           setState(() {

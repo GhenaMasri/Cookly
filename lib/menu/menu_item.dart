@@ -326,6 +326,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                       child: RoundDropdown(
                           value: category, // Initial value
                           hintText: 'Select Category',
+                          header: 'Category',
                           items: categoriesList,
                           onChanged: (String? value) {
                             setState(() {
@@ -344,6 +345,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                       child: RoundDropdown(
                           value: quantity, // Initial value
                           hintText: 'Select Quantity',
+                          header: 'Quantity',
                           items: quantityList,
                           onChanged: (String? value) {
                             setState(() {

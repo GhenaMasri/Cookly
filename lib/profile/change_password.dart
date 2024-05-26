@@ -13,10 +13,10 @@ class ChangePasswordView extends StatefulWidget {
   const ChangePasswordView({super.key});
 
   @override
-  State<ChangePasswordView> createState() => _MenuItemsViewState();
+  State<ChangePasswordView> createState() => _ChangePasswordViewState();
 }
 
-class _MenuItemsViewState extends State<ChangePasswordView> {
+class _ChangePasswordViewState extends State<ChangePasswordView> {
   TextEditingController txtPassword = TextEditingController();
   TextEditingController txtConfirmPassword = TextEditingController();
   TextEditingController txtOldPassword = TextEditingController();
@@ -195,8 +195,7 @@ class _MenuItemsViewState extends State<ChangePasswordView> {
                                   Navigator.of(context).pop();
                                   Navigator.of(context).pop();
                                 },
-                              );                              Future.delayed(const Duration(seconds: 2));
-                              Navigator.of(context).pop();
+                              );
                             } else {
                               setState(() {
                                 errorFlag = true;

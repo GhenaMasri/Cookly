@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/dropdown.dart';
@@ -19,6 +20,7 @@ class _HomeViewState extends State<HomeView> {
   TextEditingController txtSearch = TextEditingController();
   late Future<void> _initDataFuture;
   String? username;
+ List<Map<String, dynamic>> menuArr = [];
 
 //////////////////////////////// BACKEND SECTION ///////////////////////////
   Future<void> _loadUserName() async {
@@ -29,14 +31,20 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<List<Map<String, dynamic>>> kitchensByCategories() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}home-page'));
+    final response =
+        await http.get(Uri.parse('${SharedPreferencesService.url}home-page'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> kitchensCount = data['kitchensCount'];
-      final List<Map<String, dynamic>> result = kitchensCount.map((category) {
-        return {'id': category['id'] ,'category': category['category'], 'count': category['kitchen_count']};
+       menuArr = kitchensCount.map((category) {
+        return {
+          'id': category['id'],
+          'category': category['category'],
+          'count': category['kitchen_count']
+          //I need image url here in car 'image'
+        };
       }).toList();
-      return result;
+      return menuArr;
     } else {
       throw Exception('Failed to load categories count');
     }
@@ -47,46 +55,9 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     _loadUserName();
-    _initDataFuture =  kitchensByCategories(); 
+   _initDataFuture = kitchensByCategories();
   }
 
-  List menuArr = [
-    {
-      "name": "Food",
-      "image": "assets/img/menu_1.png",
-      "items_count": "120",
-    },
-    {
-      "name": "Food",
-      "image": "assets/img/menu_1.png",
-      "items_count": "120",
-    },
-    {
-      "name": "Food",
-      "image": "assets/img/menu_1.png",
-      "items_count": "120",
-    },
-    {
-      "name": "Food",
-      "image": "assets/img/menu_1.png",
-      "items_count": "120",
-    },
-    {
-      "name": "Beverages",
-      "image": "assets/img/menu_2.png",
-      "items_count": "220",
-    },
-    {
-      "name": "Desserts",
-      "image": "assets/img/menu_3.png",
-      "items_count": "155",
-    },
-    {
-      "name": "Promotions",
-      "image": "assets/img/menu_4.png",
-      "items_count": "25",
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +74,6 @@ class _HomeViewState extends State<HomeView> {
       },
     );
   }
-
   Widget buildContent() {
     var media = MediaQuery.of(context).size;
     return Scaffold(
@@ -131,22 +101,20 @@ class _HomeViewState extends State<HomeView> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      username != null ? "Hello $username!" : "Hello!",
-                      style: TextStyle(
-                        color: TColor.primaryText,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
+                    Expanded(
+                      child: Text(
+                        username != null ? "Hello $username!" : "Hello!",
+                        style: TextStyle(
+                          color: TColor.primaryText,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                     IconButton(
                       onPressed: () {
-                        /* Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Notifications()));*/
+                        // Add functionality here
                       },
                       icon: Image.asset(
                         "assets/img/shopping_cart.png",
@@ -156,10 +124,12 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     IconButton(
                       onPressed: () {
-                        /* Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Notifications()));*/
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Container(),
+                          ),
+                        );
                       },
                       icon: Image.asset(
                         "assets/img/notification.png",
@@ -261,12 +231,23 @@ class _HomeViewState extends State<HomeView> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   ClipOval(
-                                      child: Image.asset(
-                                    mObj["image"].toString(),
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                  )),
+                                    child: CachedNetworkImage(
+                                      imageUrl: mObj["image"],
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        width: 80,
+                                        height: 80,
+                                        color: Colors.grey[300],
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                    ),
+                                  ),
                                   const SizedBox(width: 15),
                                   Expanded(
                                     child: Column(
@@ -275,7 +256,7 @@ class _HomeViewState extends State<HomeView> {
                                       children: [
                                         const SizedBox(height: 12),
                                         Text(
-                                          mObj["name"].toString(),
+                                          mObj["category"].toString(),
                                           style: TextStyle(
                                             color: TColor.primaryText,
                                             fontSize: 22,
@@ -284,7 +265,7 @@ class _HomeViewState extends State<HomeView> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          "${mObj["items_count"].toString()} Kitchens",
+                                          "${mObj["count"].toString()} Kitchens",
                                           style: TextStyle(
                                             color: TColor.secondaryText,
                                             fontSize: 11,
