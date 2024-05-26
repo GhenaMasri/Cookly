@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
-import 'package:untitled/common_widget/custom_list_tile.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:untitled/menu/rating_page.dart';
+import 'package:untitled/order/item_details_view.dart';
 
 import '../../common_widget/menu_item_row.dart';
 
-class UserKitchensView extends StatefulWidget {
-final Map mObj;
-  const UserKitchensView({super.key, required this.mObj});
+class KitchenMenuView extends StatefulWidget {
+  //final Map mObj; //Kitchen
+  const KitchenMenuView({
+    super.key,
+    /* required this.mObj */
+  });
 
   @override
-  State<UserKitchensView> createState() => _UserKitchensViewState();
+  State<KitchenMenuView> createState() => _KitchenMenuViewState();
 }
 
-class _UserKitchensViewState extends State<UserKitchensView> {
+class _KitchenMenuViewState extends State<KitchenMenuView> {
   TextEditingController txtSearch = TextEditingController();
 
   List menuItemsArr = [
     {
-      "image": "assets/img/app_cookly.png",
+      "image": "assets/img/dess_1.png",
       "name": "French Apple Pie",
       "rate": "4.9",
       "rating": "124",
@@ -109,8 +113,9 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                       width: 8,
                     ),
                     Expanded(
-                      child: Text("Category",
-                      /*  widget.mObj["name"].toString(), */
+                      child: Text(
+                        'Kitchen Name',
+                        /*  widget.mObj["name"].toString(), */
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -152,7 +157,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: RoundTextfield(
-                  hintText: "Search Kitchen",
+                  hintText: "Search Food",
                   controller: txtSearch,
                   left: Container(
                     alignment: Alignment.center,
@@ -175,11 +180,14 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                 itemCount: menuItemsArr.length,
                 itemBuilder: ((context, index) {
                   var mObj = menuItemsArr[index] as Map? ?? {};
-                  return CustomListTile(
+                  return MenuItemRow(
                     mObj: mObj,
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Container()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ItemDetailsView()),
+                      );
                     },
                   );
                 }),
@@ -187,6 +195,23 @@ class _UserKitchensViewState extends State<UserKitchensView> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        onPressed: () {
+          showModalBottomSheet(
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              context: context,
+              builder: (context) {
+                return const RateItemView();
+              });
+        },
+        child: Icon(
+          Icons.star,
+          color: TColor.white,
+        ),
+        backgroundColor: TColor.primary,
       ),
     );
   }
