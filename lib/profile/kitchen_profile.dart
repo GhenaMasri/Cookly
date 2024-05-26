@@ -313,6 +313,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
             child: RoundDropdown(
                 value: location, // Initial value
                 hintText: 'Select City',
+                header: 'City',
                 items: ['Nablus', 'Jenin', 'Ramallah', 'Tulkarm'],
                 validator: (value) =>
                     value!.isEmpty ? "Couldn't be empty" : null,
@@ -357,6 +358,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
             child: RoundDropdown(
                 value: category, // Initial value
                 hintText: 'Select Category',
+                header: 'Category',
                 items: categoriesList, //this should be categoriesList
                 validator: (value) =>
                     value!.isEmpty ? "Couldn't be empty" : null,
@@ -377,6 +379,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
             child: RoundDropdown(
                 value: orderingSystem, // Initial value
+                header: 'Ordering System',
                 hintText: 'Ordering System',
                 validator: (value) =>
                     value!.isEmpty ? "Couldn't be empty" : null,
@@ -489,6 +492,15 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                             type: QuickAlertType.success,
                             text: 'Profile Edited Successfully!',
                             confirmBtnColor: Colors.green,
+                            onConfirmBtnTap: () {
+                              FocusScope.of(context).unfocus();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => KitchenProfileView()),
+                              );
+                            },
                           );
                         } else {
                           setState(() {

@@ -416,6 +416,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                           value: category, // Initial value
                           hintText: 'Select Category',
                           items: categoriesList,
+                          header: 'Category',
                           onChanged: (String? value) {
                             setState(() {
                               category = value;
@@ -434,6 +435,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                       child: RoundDropdown(
                           value: quantity, // Initial value
                           hintText: 'Select Quantity',
+                          header: 'Quantity',
                           items: quantityList,
                           onChanged: (String? value) {
                             setState(() {
@@ -466,7 +468,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                       type: RoundButtonType.textPrimary,
                       isEnabled: isDataChanged,
                       onPressed: isDataChanged
-                          ? () async{
+                          ? () async {
                               Map<String, dynamic> updates = {};
 
                               if (txtName.text != initialName)
@@ -484,8 +486,10 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                               if (imageUrl != initialImageUrl)
                                 updates['image'] = imageUrl;
 
-                             await editMenuItem(widget.item.itemId!, updates);
-                              setState(() {});
+                              await editMenuItem(widget.item.itemId!, updates);
+                              setState(() {
+                                FocusScope.of(context).unfocus();
+                              });
                             }
                           : null,
                     ),
@@ -505,7 +509,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                             showCancelBtn: true,
                             confirmBtnText: 'Delete',
                             cancelBtnText: 'Cancel',
-                            confirmBtnColor: Colors.red,
+                            confirmBtnColor: Color.fromARGB(255, 222, 0, 56),
                             onConfirmBtnTap: () async {
                               ////////////////////////// BACKEND SECTION ///////////////////////////
                               print(widget.item.itemId);

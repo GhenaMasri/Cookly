@@ -112,8 +112,8 @@ class _PassRoundTitleTextfieldState extends State<PassRoundTitleTextfield> {
                         ? IconButton(
                             icon: Icon(
                               _obscureText
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                             ),
                             onPressed: () {
                               setState(() {
