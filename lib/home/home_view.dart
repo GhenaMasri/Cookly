@@ -42,8 +42,8 @@ class _HomeViewState extends State<HomeView> {
         return {
           'id': category['id'],
           'category': category['category'],
-          'count': category['kitchen_count']
-          //I need image url here in car 'image'
+          'count': category['kitchen_count'],
+          'image': category['image']
         };
       }).toList();
       return menuArr;
