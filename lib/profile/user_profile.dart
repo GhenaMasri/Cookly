@@ -4,6 +4,7 @@ import 'package:untitled/common/globs.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:untitled/order/cart.dart';
 import 'package:untitled/profile/change_password.dart';
 import 'package:untitled/welcome_page.dart';
 import 'dart:convert';
@@ -179,7 +180,12 @@ class _UserProfileViewState extends State<UserProfileView> {
                 ),
                 IconButton(
                   onPressed: () {
-                    // Add functionality here
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CartPage(),
+                      ),
+                    );
                   },
                   icon: Image.asset(
                     "assets/img/shopping_cart.png",
