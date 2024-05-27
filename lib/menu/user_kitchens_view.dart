@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/custom_list_tile.dart';
+import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 
 import '../../common_widget/menu_item_row.dart';
@@ -15,6 +16,7 @@ final Map mObj;
 
 class _UserKitchensViewState extends State<UserKitchensView> {
   TextEditingController txtSearch = TextEditingController();
+   String? selectedLocation;
 
   List menuItemsArr = [
     {
@@ -149,6 +151,32 @@ class _UserKitchensViewState extends State<UserKitchensView> {
               const SizedBox(
                 height: 20,
               ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Delivering to",
+                      style: TextStyle(
+                        color: TColor.secondaryText,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    MyDropdownMenu(
+                      value: selectedLocation,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedLocation = newValue;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: RoundTextfield(
