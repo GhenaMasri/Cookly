@@ -8,6 +8,8 @@ import 'package:untitled/menu/user_kitchens_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:untitled/order/cart.dart';
+
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
 
@@ -114,7 +116,12 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     IconButton(
                       onPressed: () {
-                        // Add functionality here
+                        Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CartPage(),
+                      ),
+                    );
                       },
                       icon: Image.asset(
                         "assets/img/shopping_cart.png",

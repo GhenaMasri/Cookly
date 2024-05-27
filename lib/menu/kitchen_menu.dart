@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/menu/rating_page.dart';
+import 'package:untitled/order/cart.dart';
 import 'package:untitled/order/item_details_view.dart';
 
 import '../../common_widget/menu_item_row.dart';
@@ -124,10 +125,12 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     IconButton(
                       onPressed: () {
-                        /* Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Notifications()));*/
+                   Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CartPage(),
+                      ),
+                    );
                       },
                       icon: Image.asset(
                         "assets/img/shopping_cart.png",
