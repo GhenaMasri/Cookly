@@ -3,14 +3,21 @@ const router = express.Router();
 const pool = require("../../db");
 
 router.get("/", async (req, res) => {
-  const { kitchenId } = req.query;
+  const { kitchenId, name } = req.query;
 
   if (!kitchenId) {
     return res.status(400).send("KitchenId parameter is required");
   }
 
-  const query = "SELECT * FROM menu_item WHERE kitchen_id = ?";
-  pool.execute(query, [kitchenId], async (error, results, fields) => {
+  let query = "SELECT * FROM menu_item WHERE kitchen_id = ?";
+  const queryParams = [kitchenId];
+
+  if (name) {
+    query += " AND name LIKE ?";
+    queryParams.push(`%${name}%`);
+  }
+
+  pool.execute(query, queryParams, async (error, results, fields) => {
     if (error) {
       console.error("Error executing query:", error);
       res.status(500).send("Internal server error");

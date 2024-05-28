@@ -4,13 +4,16 @@ import 'package:untitled/common_widget/custom_list_tile.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/order/cart.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../common_widget/menu_item_row.dart';
+import 'package:untitled/common/globs.dart';
 
 class UserKitchensView extends StatefulWidget {
-final Map mObj;
-final String? location;
-  const UserKitchensView({super.key, required this.mObj, required this.location});
+  final Map mObj;
+  final String? location;
+  const UserKitchensView(
+      {super.key, required this.mObj, required this.location});
 
   @override
   State<UserKitchensView> createState() => _UserKitchensViewState();
@@ -18,74 +21,58 @@ final String? location;
 
 class _UserKitchensViewState extends State<UserKitchensView> {
   TextEditingController txtSearch = TextEditingController();
-   String? selectedLocation;
+  String? selectedLocation;
+  List<Map<String, dynamic>> kitchens = [];
 
-  List menuItemsArr = [
-    {
-      "image": "assets/img/app_cookly.png",
-      "name": "French Apple Pie",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_2.png",
-      "name": "Dark Chocolate Cake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Cakes by Tella",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_3.png",
-      "name": "Street Shake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Café Racer",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_4.png",
-      "name": "Fudgy Chewy Brownies",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_1.png",
-      "name": "French Apple Pie",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_2.png",
-      "name": "Dark Chocolate Cake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Cakes by Tella",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_3.png",
-      "name": "Street Shake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Café Racer",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_4.png",
-      "name": "Fudgy Chewy Brownies",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-  ];
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<List<Map<String, dynamic>>> kitchensPerCategory({required int categoryId, String? city, String? name}) async {
+    final Uri uri = Uri.parse('${SharedPreferencesService.url}kitchens')
+        .replace(queryParameters: {
+      'category_id': categoryId,
+      if (city != null) 'city': city,
+      if (name != null) 'name': name
+    });
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> kitchensPerCategory = data['kitchens'];
+      setState(() {
+        kitchens = kitchensPerCategory.map((kitchen) {
+          return {
+            'id': kitchen['id'],
+            'kitchen_name': kitchen['kitchen_name'],
+            'logo': kitchen['logo'],
+            'category_name': kitchen['category_name'],
+            'rates_num': kitchen['rates_num'],
+            'rate': kitchen['rate']
+          };
+        }).toList();
+      });
+      return kitchens;
+    } else {
+      throw Exception('Failed to load kitchens');
+    }
+  }
+
+  Future<void> _updateKitchensArr() async {
+    try {
+      List<Map<String, dynamic>> result = [];
+      int categoryId = widget.mObj["id"];
+      String? city = selectedLocation;
+      String? name = txtSearch.text.isNotEmpty ? txtSearch.text : null;
+
+      result = await kitchensPerCategory(categoryId: categoryId, city: city, name: name);
+      
+      setState(() {
+        kitchens = result;
+      });
+    } catch (error) {
+      print('Error loading menu items: $error');
+    }
+  }
+  /////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -113,8 +100,9 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                       width: 8,
                     ),
                     Expanded(
-                      child: Text("Category",
-                      /*  widget.mObj["name"].toString(), */
+                      child: Text(
+                        "Category",
+                        /*  widget.mObj["name"].toString(), */
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -123,12 +111,12 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                     ),
                     IconButton(
                       onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CartPage(),
-                      ),
-                    );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CartPage(),
+                          ),
+                        );
                       },
                       icon: Image.asset(
                         "assets/img/shopping_cart.png",
@@ -174,6 +162,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                       onChanged: (newValue) {
                         setState(() {
                           selectedLocation = newValue;
+                          _updateKitchensArr();
                         });
                       },
                     ),
@@ -184,7 +173,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: RoundTextfield(
-                  hintText: "Search Kitchen",
+                  hintText: "Search by kitchen name",
                   controller: txtSearch,
                   left: Container(
                     alignment: Alignment.center,
@@ -204,9 +193,9 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
-                itemCount: menuItemsArr.length,
+                itemCount: kitchens.length,
                 itemBuilder: ((context, index) {
-                  var mObj = menuItemsArr[index] as Map? ?? {};
+                  var mObj = kitchens[index] as Map? ?? {};
                   return CustomListTile(
                     mObj: mObj,
                     onTap: () {
