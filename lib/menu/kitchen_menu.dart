@@ -8,10 +8,10 @@ import 'package:untitled/order/item_details_view.dart';
 import '../../common_widget/menu_item_row.dart';
 
 class KitchenMenuView extends StatefulWidget {
-  //final Map mObj; //Kitchen
+  final Map mObj; 
   const KitchenMenuView({
     super.key,
-    /* required this.mObj */
+    required this.mObj,
   });
 
   @override
@@ -115,8 +115,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     Expanded(
                       child: Text(
-                        'Kitchen Name',
-                        /*  widget.mObj["name"].toString(), */
+                         widget.mObj["name"].toString(),
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -182,9 +181,9 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                 padding: EdgeInsets.zero,
                 itemCount: menuItemsArr.length,
                 itemBuilder: ((context, index) {
-                  var mObj = menuItemsArr[index] as Map? ?? {};
+                  var mObj1 = menuItemsArr[index] as Map? ?? {};
                   return MenuItemRow(
-                    mObj: mObj,
+                    mObj: mObj1,
                     onTap: () {
                       Navigator.push(
                         context,

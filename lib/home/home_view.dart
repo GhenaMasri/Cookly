@@ -291,6 +291,7 @@ class _HomeViewState extends State<HomeView> {
                                   MaterialPageRoute(
                                     builder: (context) => UserKitchensView(
                                       mObj: mObj,
+                                      location: txtSearch.text
                                     ),
                                   ),
                                 );
