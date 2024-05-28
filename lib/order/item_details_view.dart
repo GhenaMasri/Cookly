@@ -6,6 +6,7 @@ import '../../common/color_extension.dart';
 
 
 class ItemDetailsView extends StatefulWidget {
+
   const ItemDetailsView({super.key});
 
   @override

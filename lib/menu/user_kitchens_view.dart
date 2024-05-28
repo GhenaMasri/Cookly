@@ -9,7 +9,8 @@ import '../../common_widget/menu_item_row.dart';
 
 class UserKitchensView extends StatefulWidget {
 final Map mObj;
-  const UserKitchensView({super.key, required this.mObj});
+final String? location;
+  const UserKitchensView({super.key, required this.mObj, required this.location});
 
   @override
   State<UserKitchensView> createState() => _UserKitchensViewState();
