@@ -24,14 +24,16 @@ class RoundDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       // Header text
-      Text(
-        header!,
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+       if (header != null) ...[
+        Text(
+          header!,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-      SizedBox(height: 8), // Spacing between header and dropdownContainer(
+        SizedBox(height: 8), // Spacing between header and dropdown
+      ],
       Container(
         height: 50, // Set the height to match other fields
         decoration: BoxDecoration(

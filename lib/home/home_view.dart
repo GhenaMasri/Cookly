@@ -22,7 +22,7 @@ class _HomeViewState extends State<HomeView> {
   TextEditingController txtSearch = TextEditingController();
   late Future<void> _initDataFuture;
   String? username;
- List<Map<String, dynamic>> menuArr = [];
+  List<Map<String, dynamic>> menuArr = [];
 
 //////////////////////////////// BACKEND SECTION ///////////////////////////
   Future<void> _loadUserName() async {
@@ -33,12 +33,13 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<List<Map<String, dynamic>>> kitchensByCategories() async {
+    _loadUserName();
     final response =
         await http.get(Uri.parse('${SharedPreferencesService.url}home-page'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> kitchensCount = data['kitchensCount'];
-       menuArr = kitchensCount.map((category) {
+      menuArr = kitchensCount.map((category) {
         return {
           'id': category['id'],
           'category': category['category'],
@@ -56,10 +57,8 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _loadUserName();
-   _initDataFuture = kitchensByCategories();
+    _initDataFuture = kitchensByCategories();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +75,7 @@ class _HomeViewState extends State<HomeView> {
       },
     );
   }
+
   Widget buildContent() {
     var media = MediaQuery.of(context).size;
     return Scaffold(
@@ -117,11 +117,11 @@ class _HomeViewState extends State<HomeView> {
                     IconButton(
                       onPressed: () {
                         Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CartPage(),
-                      ),
-                    );
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CartPage(),
+                          ),
+                        );
                       },
                       icon: Image.asset(
                         "assets/img/shopping_cart.png",
@@ -237,6 +237,7 @@ class _HomeViewState extends State<HomeView> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  const SizedBox(width: 4),
                                   ClipOval(
                                     child: CachedNetworkImage(
                                       imageUrl: mObj["image"],
@@ -290,9 +291,7 @@ class _HomeViewState extends State<HomeView> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => UserKitchensView(
-                                      mObj: mObj,
-                                      location: txtSearch.text
-                                    ),
+                                        mObj: mObj, location: txtSearch.text),
                                   ),
                                 );
                               },

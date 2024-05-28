@@ -495,11 +495,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                             onConfirmBtnTap: () {
                               FocusScope.of(context).unfocus();
                               Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => KitchenProfileView()),
-                              );
+                              //Navigator.of(context).pop();
                             },
                           );
                         } else {

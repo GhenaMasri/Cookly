@@ -69,7 +69,7 @@ app.use('/change-password', changePasswordRoute);
 const kitchensByCategoriesCount = require('./routes/user/kitchens_by_categories');
 app.use('/home-page', kitchensByCategoriesCount);
 
-const port = 3000;
+const port = 7000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

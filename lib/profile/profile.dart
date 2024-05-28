@@ -4,6 +4,7 @@ import 'package:untitled/common/globs.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:untitled/main_page.dart';
 import 'package:untitled/profile/change_password.dart';
 import 'package:untitled/welcome_page.dart';
 import 'package:http/http.dart' as http;
@@ -275,11 +276,7 @@ class _ProfileViewState extends State<ProfileView> {
                             onConfirmBtnTap: () {
                               FocusScope.of(context).unfocus();
                               Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => ProfileView()),
-                              );
+                              //Navigator.of(context).pop();
                             },
                           );
                         } else {
