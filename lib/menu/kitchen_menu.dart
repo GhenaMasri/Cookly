@@ -4,11 +4,14 @@ import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/menu/rating_page.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:untitled/order/item_details_view.dart';
-
+import 'package:untitled/common/globs.dart';
 import '../../common_widget/menu_item_row.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:untitled/common/MenuItem.dart';
 
 class KitchenMenuView extends StatefulWidget {
-  final Map mObj; 
+  final Map mObj;
   const KitchenMenuView({
     super.key,
     required this.mObj,
@@ -20,6 +23,59 @@ class KitchenMenuView extends StatefulWidget {
 
 class _KitchenMenuViewState extends State<KitchenMenuView> {
   TextEditingController txtSearch = TextEditingController();
+  List<MenuItem> menuArr = [];
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<List<MenuItem>> getMenuItems({required int kitchenId, String? name}) async {
+    final Uri uri = Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
+      queryParameters: {
+        'kitchenId': kitchenId,
+        if (name != null) 'name': name,
+      },
+    );
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      final List<dynamic> items = data['items'];
+      setState(() {
+        menuArr = items.map((item) {
+          return MenuItem(
+            kitchenId: item['kitchen_id'],
+            itemId: item['id'],
+            image: item['image'],
+            name: item['name'],
+            notes: item['notes'],
+            quantity: item['quantity_id'],
+            category: item['category_id'],
+            price: item['price'].toDouble(),
+            time: item['time'],
+          );
+        }).toList();
+      });
+      return menuArr;
+    } else {
+      throw Exception('Failed to load menu items');
+    }
+  }
+
+  Future<void> _updateMenuArr() async {
+    try {
+      List<MenuItem> result = [];
+      int kitchenId = widget.mObj["id"];
+      String? name = txtSearch.text.isNotEmpty? txtSearch.text : null;
+
+      result = await getMenuItems(kitchenId: kitchenId, name: name);
+      
+      setState(() {
+        menuArr = result;
+      });
+    } catch (error) {
+      print('Error loading menu items: $error');
+    }
+  }
+  /////////////////////////////////////////////////////////////////////////////////
 
   List menuItemsArr = [
     {
@@ -115,7 +171,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     Expanded(
                       child: Text(
-                         widget.mObj["name"].toString(),
+                        widget.mObj["name"].toString(),
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -124,12 +180,12 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     IconButton(
                       onPressed: () {
-                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CartPage(),
-                      ),
-                    );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CartPage(),
+                          ),
+                        );
                       },
                       icon: Image.asset(
                         "assets/img/shopping_cart.png",
