@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 
@@ -38,19 +39,26 @@ class CustomListTile extends StatelessWidget {
               child: ListTile(
                 contentPadding: EdgeInsets.all(0),
                 leading: ClipOval(
-                  child: Container(
+                  child: CachedNetworkImage(
+                    imageUrl: mObj["logo"],
                     width: 70,
                     height: 70,
-                    child: Image.asset(
-                      mObj["image"],
-                      fit: BoxFit.cover,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      width: 70,
+                      height: 70,
+                      color: Colors.grey[300],
+                      child: Center(
+                        child: CircularProgressIndicator(color: TColor.primary,),
+                      ),
                     ),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
                 ),
                 title: Padding(
                   padding: const EdgeInsets.only(bottom: 4.0),
                   child: Text(
-                    mObj["name"],
+                    mObj["kitchen_name"],
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -60,7 +68,7 @@ class CustomListTile extends StatelessWidget {
                 subtitle: Padding(
                   padding: const EdgeInsets.only(bottom: 4.0),
                   child: Text(
-                    mObj["type"],
+                    mObj["category_name"],
                     style: TextStyle(
                       fontSize: 16,
                     ),
@@ -76,7 +84,7 @@ class CustomListTile extends StatelessWidget {
                         Icon(Icons.star, color: TColor.primary),
                         SizedBox(width: 4),
                         Text(
-                          mObj["rate"],
+                          mObj["rate"].toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -85,7 +93,7 @@ class CustomListTile extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      '${mObj["rating"]} ratings',
+                      mObj["rates_num"].toString() + ' ratings',
                       style: TextStyle(
                         fontSize: 12,
                       ),

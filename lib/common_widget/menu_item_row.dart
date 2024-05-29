@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../common/color_extension.dart';
@@ -16,11 +17,16 @@ class MenuItemRow extends StatelessWidget {
         child: Stack(
           alignment: Alignment.bottomLeft,
           children: [
-            Image.asset(
-              mObj["image"].toString(),
+            CachedNetworkImage(
+              imageUrl: mObj["image"].toString(),
               width: double.maxFinite,
               height: 200,
               fit: BoxFit.cover,
+              placeholder: (context, url) => Center(
+                  child: CircularProgressIndicator(
+                color: TColor.primary,
+              )),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
             Container(
               width: double.maxFinite,
@@ -54,7 +60,7 @@ class MenuItemRow extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Image.asset(
+                          /* Image.asset(
                             "assets/img/rate.png",
                             width: 10,
                             height: 10,
@@ -62,8 +68,8 @@ class MenuItemRow extends StatelessWidget {
                           ),
                           const SizedBox(
                             width: 4,
-                          ),
-                          Text(
+                          ), */
+                          /* Text(
                             mObj["rate"],
                             textAlign: TextAlign.center,
                             style:
@@ -71,9 +77,9 @@ class MenuItemRow extends StatelessWidget {
                           ),
                           const SizedBox(
                             width: 8,
-                          ),
+                          ), */
                           Text(
-                            mObj["type"],
+                            mObj["category"],
                             textAlign: TextAlign.center,
                             style: TextStyle(color: TColor.white, fontSize: 11),
                           ),
@@ -83,11 +89,11 @@ class MenuItemRow extends StatelessWidget {
                             style:
                                 TextStyle(color: TColor.primary, fontSize: 11),
                           ),
-                          Text(
+                          /* Text(
                             mObj["food_type"],
                             textAlign: TextAlign.center,
                             style: TextStyle(color: TColor.white, fontSize: 12),
-                          ),
+                          ), */
                         ],
                       ),
                     ],

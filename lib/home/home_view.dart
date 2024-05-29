@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/common_widget/cart_drop_down.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
@@ -21,7 +22,7 @@ class _HomeViewState extends State<HomeView> {
   TextEditingController txtSearch = TextEditingController();
   late Future<void> _initDataFuture;
   String? username;
-   int? selectedCategoryId;
+  int? selectedCategoryId;
   List<Map<String, dynamic>> menuArr = [];
 
 //////////////////////////////// BACKEND SECTION ///////////////////////////
@@ -34,7 +35,6 @@ class _HomeViewState extends State<HomeView> {
 
   Future<List<Map<String, dynamic>>> kitchensByCategories(
       {String? city, int? category}) async {
-    _loadUserName();
     final Uri uri = Uri.parse('${SharedPreferencesService.url}home-page')
         .replace(queryParameters: {
       if (city != null) 'city': city,
@@ -69,7 +69,7 @@ class _HomeViewState extends State<HomeView> {
       int? category = selectedCategoryId;
 
       result = await kitchensByCategories(city: city, category: category);
-      
+
       setState(() {
         menuArr = result;
       });
@@ -93,13 +93,35 @@ class _HomeViewState extends State<HomeView> {
       throw Exception('Failed to load kitchen categories');
     }
   }
+
+  List<Map<String, dynamic>> categories = [];
+  List<String> categoriesList = [];
+  String? category;
+  Future<void> _initData() async {
+    _loadUserName();
+    kitchensByCategories();
+    try {
+      var fetchedCategories = await getKitchenCategories();
+
+      setState(() {
+        categories = fetchedCategories;
+
+        for (var element in categories) {
+          if (element.containsKey('category')) {
+            categoriesList.add(element['category']);
+          }
+        }
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
 ////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
-    _initDataFuture = kitchensByCategories();
+    _initDataFuture = _initData();
   }
 
   @override
@@ -108,7 +130,7 @@ class _HomeViewState extends State<HomeView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(color: TColor.primary));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -125,7 +147,7 @@ class _HomeViewState extends State<HomeView> {
         children: [
           Positioned(
             left: 0,
-            top: 250,
+            top: 200,
             child: Container(
               width: media.width * 0.27,
               height: media.height,
@@ -191,46 +213,70 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "Delivering to",
-                      style: TextStyle(
-                        color: TColor.secondaryText,
-                        fontSize: 12,
+                    // Location Dropdown
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Delivering to",
+                            style: TextStyle(
+                              color: TColor.secondaryText,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          MyDropdownMenu(
+                            value: selectedLocation,
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedLocation = newValue;
+                                _updateMenuArr();
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    MyDropdownMenu(
-                      value: selectedLocation,
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedLocation = newValue;
-                          _updateMenuArr();
-                        });
-                      },
+                    // Category Dropdown
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Category",
+                            style: TextStyle(
+                              color: TColor.secondaryText,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          CartDropdownMenu(
+                            items: categoriesList,
+                            hint: 'Choose Category',
+                            value: category,
+                            onChanged: (newValue) {
+                              setState(() {
+                                category = newValue;
+                                var selectedItem = categories.firstWhere(
+                                  (element) => element['category'] == newValue,
+                                  orElse: () => {},
+                                );
+                                selectedCategoryId = selectedItem['id'];
+                                _updateMenuArr();
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: RoundTextfield(
-                  hintText: "Search Kitchen Category",
-                  controller: txtSearch,
-                  left: Container(
-                    alignment: Alignment.center,
-                    width: 30,
-                    child: Image.asset(
-                      "assets/img/search.png",
-                      width: 20,
-                      height: 20,
-                      color: TColor.primary,
-                    ),
-                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -292,7 +338,7 @@ class _HomeViewState extends State<HomeView> {
                                         height: 80,
                                         color: Colors.grey[300],
                                         child: Center(
-                                          child: CircularProgressIndicator(),
+                                          child: CircularProgressIndicator(color: TColor.primary),
                                         ),
                                       ),
                                       errorWidget: (context, url, error) =>
@@ -334,7 +380,7 @@ class _HomeViewState extends State<HomeView> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => UserKitchensView(
-                                        mObj: mObj, location: txtSearch.text),
+                                        mObj: mObj, location:selectedLocation),
                                   ),
                                 );
                               },
