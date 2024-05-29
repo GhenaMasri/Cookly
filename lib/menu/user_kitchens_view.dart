@@ -3,6 +3,7 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/custom_list_tile.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:untitled/menu/kitchen_menu.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -22,10 +23,12 @@ class UserKitchensView extends StatefulWidget {
 class _UserKitchensViewState extends State<UserKitchensView> {
   TextEditingController txtSearch = TextEditingController();
   String? selectedLocation;
+  late Future<void> _initDataFuture;
   List<Map<String, dynamic>> kitchens = [];
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<List<Map<String, dynamic>>> kitchensPerCategory({required int categoryId, String? city, String? name}) async {
+  Future<List<Map<String, dynamic>>> kitchensPerCategory(
+      {required int categoryId, String? city, String? name}) async {
     final Uri uri = Uri.parse('${SharedPreferencesService.url}kitchens')
         .replace(queryParameters: {
       'category_id': categoryId,
@@ -63,8 +66,9 @@ class _UserKitchensViewState extends State<UserKitchensView> {
       String? city = selectedLocation;
       String? name = txtSearch.text.isNotEmpty ? txtSearch.text : null;
 
-      result = await kitchensPerCategory(categoryId: categoryId, city: city, name: name);
-      
+      result = await kitchensPerCategory(
+          categoryId: categoryId, city: city, name: name);
+
       setState(() {
         kitchens = result;
       });
@@ -72,10 +76,48 @@ class _UserKitchensViewState extends State<UserKitchensView> {
       print('Error loading menu items: $error');
     }
   }
+
   /////////////////////////////////////////////////////////////////////////////////
+  @override
+  void initState() {
+    super.initState();
+    if (widget.location != null) selectedLocation = widget.location;
+    txtSearch.addListener(_updateKitchensArr);
+    _initDataFuture = _initData();
+  }
+
+  @override
+  void dispose() {
+    txtSearch.removeListener(_updateKitchensArr);
+    txtSearch.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initData() async {
+    kitchensPerCategory(
+        categoryId: widget.mObj['id'],
+        city: widget.location,
+        name: txtSearch.text.isNotEmpty ? txtSearch.text : null);
+  }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -101,8 +143,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                     ),
                     Expanded(
                       child: Text(
-                        "Category",
-                        /*  widget.mObj["name"].toString(), */
+                        widget.mObj["category"].toString(),
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -199,8 +240,11 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                   return CustomListTile(
                     mObj: mObj,
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Container()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  KitchenMenuView(mObj: mObj)));
                     },
                   );
                 }),

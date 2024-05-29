@@ -217,7 +217,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(color: TColor.primary));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -255,7 +255,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                     height: 100,
                     color: Colors.grey[300],
                     child: Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(color: TColor.primary),
                     ),
                   ),
                   errorWidget: (context, url, error) => Icon(Icons.error),
@@ -495,11 +495,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                             onConfirmBtnTap: () {
                               FocusScope.of(context).unfocus();
                               Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => KitchenProfileView()),
-                              );
+                              //Navigator.of(context).pop();
                             },
                           );
                         } else {

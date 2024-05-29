@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/main_page.dart';
@@ -77,8 +76,10 @@ class _Signin extends State<Signin> {
     }
   }
 
-  Future<void> _saveDataToSharedPreferences(int id, String firstName, String lastName, String email, String phone, String type) async {
-    await SharedPreferencesService.saveDataAfterSignin(id, firstName, lastName, email, phone, type);
+  Future<void> _saveDataToSharedPreferences(int id, String firstName,
+      String lastName, String email, String phone, String type) async {
+    await SharedPreferencesService.saveDataAfterSignin(
+        id, firstName, lastName, email, phone, type);
   }
 
   Future<void> _clearSharedPreferences() async {
@@ -88,6 +89,8 @@ class _Signin extends State<Signin> {
 
   @override
   Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+
     return MaterialApp(
         home: Scaffold(
       body: Container(
@@ -128,7 +131,8 @@ class _Signin extends State<Signin> {
               height: 20,
             ),
             Container(
-                width: double.infinity,
+                width: media.width,
+                height: media.height,
                 decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -290,17 +294,28 @@ class _Signin extends State<Signin> {
                                 print(message);
                                 if (success) {
                                   _clearSharedPreferences();
-                                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                                  Map<String, dynamic> userData = result['user'];
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  Map<String, dynamic> userData =
+                                      result['user'];
                                   await prefs.setBool('isSet', true);
-                                  _saveDataToSharedPreferences(userData['id'], userData['first_name'], userData['last_name'], userData['email'], userData['phone'], userData['type']);
+                                  _saveDataToSharedPreferences(
+                                      userData['id'],
+                                      userData['first_name'],
+                                      userData['last_name'],
+                                      userData['email'],
+                                      userData['phone'],
+                                      userData['type']);
                                   if (userData['type'] == "chef") {
-                                    //store kitchen id in shared preferences 
-                                    int chefId = await getChefId(userData['email']);
+                                    //store kitchen id in shared preferences
+                                    int chefId =
+                                        await getChefId(userData['email']);
                                     await prefs.setInt('kitchen_id', chefId);
                                     //store kitchen name in shared preferences
-                                    String kitchenName = await getKitchenName(chefId);
-                                    await prefs.setString('kitchen_name', kitchenName);
+                                    String kitchenName =
+                                        await getKitchenName(chefId);
+                                    await prefs.setString(
+                                        'kitchen_name', kitchenName);
                                   }
                                   ////////////////////////////////////////////////////////////////////////
                                   setState(() {

@@ -118,7 +118,7 @@ class _UserProfileViewState extends State<UserProfileView> {
     super.initState();
     _initDataFuture = _loadUserData();
     _loadUserName();
-     _loadUserId();
+    _loadUserId();
     txtFirstName.addListener(_checkDataChanged);
     txtLastName.addListener(_checkDataChanged);
     txtMobile.addListener(_checkDataChanged);
@@ -145,7 +145,7 @@ class _UserProfileViewState extends State<UserProfileView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(color: TColor.primary));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -304,7 +304,8 @@ class _UserProfileViewState extends State<UserProfileView> {
                         if (txtMobile.text != initialMobileNum)
                           updates['phone'] = txtMobile.text;
 
-                        Map<String, dynamic> result = await editUser(id!, updates);
+                        Map<String, dynamic> result =
+                            await editUser(id!, updates);
                         bool success = result['success'];
                         String message = result['message'];
                         print(message);
@@ -324,11 +325,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                             onConfirmBtnTap: () {
                               FocusScope.of(context).unfocus();
                               Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => UserProfileView()),
-                              );
+                              //Navigator.of(context).pop();
                             },
                           );
                         } else {

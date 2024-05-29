@@ -504,8 +504,9 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                         onPressed: () {
                           QuickAlert.show(
                             context: context,
+                            title: 'Delete',
                             type: QuickAlertType.error,
-                            text: 'You want to delete this item?',
+                            text: 'Are you sure you want to delete this item?',
                             showCancelBtn: true,
                             confirmBtnText: 'Delete',
                             cancelBtnText: 'Cancel',

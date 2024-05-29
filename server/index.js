@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express();
 const pool = require("./db");
+const cors = require('cors');
+
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
-
+app.use(cors());
 //chef routes
 const chefSignupdRoute = require('./routes/chef/chef_signup');
 app.use('/chef-signup', chefSignupdRoute);
@@ -72,7 +74,7 @@ app.use('/home-page', kitchensByCategoriesCountRoute);
 const kitchensPerCategoryRoute = require('./routes/user/kitchens_per_category');
 app.use('/kitchens', kitchensPerCategoryRoute);
 
-const port = 3000;
+const port =  3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

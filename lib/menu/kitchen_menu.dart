@@ -24,10 +24,13 @@ class KitchenMenuView extends StatefulWidget {
 class _KitchenMenuViewState extends State<KitchenMenuView> {
   TextEditingController txtSearch = TextEditingController();
   List<MenuItem> menuArr = [];
+  late Future<void> _initDataFuture;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<List<MenuItem>> getMenuItems({required int kitchenId, String? name}) async {
-    final Uri uri = Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
+  Future<List<MenuItem>> getMenuItems(
+      {required int kitchenId, String? name}) async {
+    final Uri uri =
+        Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
       queryParameters: {
         'kitchenId': kitchenId,
         if (name != null) 'name': name,
@@ -48,7 +51,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
             name: item['name'],
             notes: item['notes'],
             quantity: item['quantity_id'],
-            category: item['category_id'],
+            category: item['category_id'], // category: item['category_name]
             price: item['price'].toDouble(),
             time: item['time'],
           );
@@ -64,10 +67,10 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
     try {
       List<MenuItem> result = [];
       int kitchenId = widget.mObj["id"];
-      String? name = txtSearch.text.isNotEmpty? txtSearch.text : null;
+      String? name = txtSearch.text.isNotEmpty ? txtSearch.text : null;
 
       result = await getMenuItems(kitchenId: kitchenId, name: name);
-      
+
       setState(() {
         menuArr = result;
       });
@@ -77,75 +80,37 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
   }
   /////////////////////////////////////////////////////////////////////////////////
 
-  List menuItemsArr = [
-    {
-      "image": "assets/img/dess_1.png",
-      "name": "French Apple Pie",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_2.png",
-      "name": "Dark Chocolate Cake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Cakes by Tella",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_3.png",
-      "name": "Street Shake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Café Racer",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_4.png",
-      "name": "Fudgy Chewy Brownies",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_1.png",
-      "name": "French Apple Pie",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_2.png",
-      "name": "Dark Chocolate Cake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Cakes by Tella",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_3.png",
-      "name": "Street Shake",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Café Racer",
-      "food_type": "Desserts"
-    },
-    {
-      "image": "assets/img/dess_4.png",
-      "name": "Fudgy Chewy Brownies",
-      "rate": "4.9",
-      "rating": "124",
-      "type": "Minute by tuk tuk",
-      "food_type": "Desserts"
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    txtSearch.addListener(_updateMenuArr);
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    int kitchenId = widget.mObj["id"];
+    String? name = txtSearch.text.isNotEmpty ? txtSearch.text : null;
+    getMenuItems(kitchenId: kitchenId, name: name);
+  }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -171,7 +136,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     Expanded(
                       child: Text(
-                        widget.mObj["name"].toString(),
+                        widget.mObj["kitchen_name"].toString(),
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -235,9 +200,9 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
-                itemCount: menuItemsArr.length,
+                itemCount: menuArr.length,
                 itemBuilder: ((context, index) {
-                  var mObj1 = menuItemsArr[index] as Map? ?? {};
+                  var mObj1 = menuArr[index] as Map? ?? {};
                   return MenuItemRow(
                     mObj: mObj1,
                     onTap: () {
