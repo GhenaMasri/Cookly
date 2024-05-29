@@ -31,7 +31,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
       {required int categoryId, String? city, String? name}) async {
     final Uri uri = Uri.parse('${SharedPreferencesService.url}kitchens')
         .replace(queryParameters: {
-      'category_id': categoryId,
+      'category_id': categoryId.toString(),
       if (city != null) 'city': city,
       if (name != null) 'name': name
     });

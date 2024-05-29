@@ -32,7 +32,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
     final Uri uri =
         Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
       queryParameters: {
-        'kitchenId': kitchenId,
+        'kitchenId': kitchenId.toString(),
         if (name != null) 'name': name,
       },
     );

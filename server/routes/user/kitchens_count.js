@@ -20,7 +20,7 @@ router.get("/", (req, res) => {
   }
 
   if (category) {
-    conditions.push("k.id = ?");
+    conditions.push("k.category_id = ?");
     queryParams.push(category);
   }
 

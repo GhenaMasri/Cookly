@@ -19,7 +19,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   String? selectedLocation;
-  TextEditingController txtSearch = TextEditingController();
   late Future<void> _initDataFuture;
   String? username;
   int? selectedCategoryId;
@@ -38,7 +37,7 @@ class _HomeViewState extends State<HomeView> {
     final Uri uri = Uri.parse('${SharedPreferencesService.url}home-page')
         .replace(queryParameters: {
       if (city != null) 'city': city,
-      if (category != null) 'category': category,
+      if (category != null) 'category': category.toString(),
     });
 
     final response = await http.get(uri);
@@ -93,12 +92,13 @@ class _HomeViewState extends State<HomeView> {
       throw Exception('Failed to load kitchen categories');
     }
   }
+////////////////////////////////////////////////////////////////////////////
 
   List<Map<String, dynamic>> categories = [];
   List<String> categoriesList = [];
   String? category;
   Future<void> _initData() async {
-    _loadUserName();
+    await _loadUserName();
     kitchensByCategories();
     try {
       var fetchedCategories = await getKitchenCategories();
@@ -116,7 +116,6 @@ class _HomeViewState extends State<HomeView> {
       print(error);
     }
   }
-////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
