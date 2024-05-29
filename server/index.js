@@ -66,8 +66,11 @@ app.use('/edit-user', editUserRoute);
 const changePasswordRoute = require('./routes/user/change_password');
 app.use('/change-password', changePasswordRoute);
 
-const kitchensByCategoriesCount = require('./routes/user/kitchens_by_categories');
-app.use('/home-page', kitchensByCategoriesCount);
+const kitchensByCategoriesCountRoute = require('./routes/user/kitchens_count');
+app.use('/home-page', kitchensByCategoriesCountRoute);
+
+const kitchensPerCategoryRoute = require('./routes/user/kitchens_per_category');
+app.use('/kitchens', kitchensPerCategoryRoute);
 
 const port = 7000;
 app.listen(port, () => {

@@ -7,7 +7,6 @@ import 'package:untitled/common/globs.dart';
 import 'package:untitled/menu/user_kitchens_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:untitled/order/cart.dart';
 
 class HomeView extends StatefulWidget {
@@ -22,6 +21,7 @@ class _HomeViewState extends State<HomeView> {
   TextEditingController txtSearch = TextEditingController();
   late Future<void> _initDataFuture;
   String? username;
+   int? selectedCategoryId;
   List<Map<String, dynamic>> menuArr = [];
 
 //////////////////////////////// BACKEND SECTION ///////////////////////////
@@ -32,24 +32,65 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future<List<Map<String, dynamic>>> kitchensByCategories() async {
+  Future<List<Map<String, dynamic>>> kitchensByCategories(
+      {String? city, int? category}) async {
     _loadUserName();
-    final response =
-        await http.get(Uri.parse('${SharedPreferencesService.url}home-page'));
+    final Uri uri = Uri.parse('${SharedPreferencesService.url}home-page')
+        .replace(queryParameters: {
+      if (city != null) 'city': city,
+      if (category != null) 'category': category,
+    });
+
+    final response = await http.get(uri);
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> kitchensCount = data['kitchensCount'];
-      menuArr = kitchensCount.map((category) {
-        return {
-          'id': category['id'],
-          'category': category['category'],
-          'count': category['kitchen_count'],
-          'image': category['image']
-        };
-      }).toList();
+      setState(() {
+        menuArr = kitchensCount.map((category) {
+          return {
+            'id': category['id'],
+            'category': category['category'],
+            'count': category['kitchen_count'],
+            'image': category['image']
+          };
+        }).toList();
+      });
       return menuArr;
     } else {
       throw Exception('Failed to load categories count');
+    }
+  }
+
+  Future<void> _updateMenuArr() async {
+    try {
+      List<Map<String, dynamic>> result = [];
+      String? city = selectedLocation;
+      int? category = selectedCategoryId;
+
+      result = await kitchensByCategories(city: city, category: category);
+      
+      setState(() {
+        menuArr = result;
+      });
+    } catch (error) {
+      print('Error loading menu items: $error');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getKitchenCategories() async {
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> categoryList = data['categories'];
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
+        return {'id': category['id'], 'category': category['category']};
+      }).toList();
+      return categories;
+    } else {
+      throw Exception('Failed to load kitchen categories');
     }
   }
 ////////////////////////////////////////////////////////////////////////////
@@ -57,6 +98,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+    _loadUserName();
     _initDataFuture = kitchensByCategories();
   }
 
@@ -166,6 +208,7 @@ class _HomeViewState extends State<HomeView> {
                       onChanged: (newValue) {
                         setState(() {
                           selectedLocation = newValue;
+                          _updateMenuArr();
                         });
                       },
                     ),
@@ -176,7 +219,7 @@ class _HomeViewState extends State<HomeView> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: RoundTextfield(
-                  hintText: "Search Food",
+                  hintText: "Search Kitchen Category",
                   controller: txtSearch,
                   left: Container(
                     alignment: Alignment.center,
