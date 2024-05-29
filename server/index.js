@@ -72,7 +72,7 @@ app.use('/home-page', kitchensByCategoriesCountRoute);
 const kitchensPerCategoryRoute = require('./routes/user/kitchens_per_category');
 app.use('/kitchens', kitchensPerCategoryRoute);
 
-const port = 7000;
+const port = 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
