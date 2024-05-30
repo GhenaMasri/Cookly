@@ -3,6 +3,7 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/custom_list_tile.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/menu/kitchen_menu.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:http/http.dart' as http;
@@ -81,9 +82,9 @@ class _UserKitchensViewState extends State<UserKitchensView> {
   @override
   void initState() {
     super.initState();
+    _initDataFuture = _initData();
     if (widget.location != null) selectedLocation = widget.location;
     txtSearch.addListener(_updateKitchensArr);
-    _initDataFuture = _initData();
   }
 
   @override
@@ -94,7 +95,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
   }
 
   Future<void> _initData() async {
-    kitchensPerCategory(
+    await kitchensPerCategory(
         categoryId: widget.mObj['id'],
         city: widget.location,
         name: txtSearch.text.isNotEmpty ? txtSearch.text : null);
@@ -143,7 +144,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                     ),
                     Expanded(
                       child: Text(
-                        widget.mObj["category"].toString(),
+                        "Category: " + widget.mObj["category"].toString(),
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -230,25 +231,56 @@ class _UserKitchensViewState extends State<UserKitchensView> {
               const SizedBox(
                 height: 15,
               ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                itemCount: kitchens.length,
-                itemBuilder: ((context, index) {
-                  var mObj = kitchens[index] as Map? ?? {};
-                  return CustomListTile(
-                    mObj: mObj,
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  KitchenMenuView(mObj: mObj)));
-                    },
-                  );
-                }),
-              ),
+              if (kitchens.isEmpty)
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.4),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Center(
+                      child: Text(
+                        "There is no kitchen\n with this name",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: kitchens.length,
+                  itemBuilder: ((context, index) {
+                    var mObj = kitchens[index] as Map? ?? {};
+                    return CustomListTile(
+                      mObj: mObj,
+                      onTap: () {
+                        pushReplacementWithAnimation(context, KitchenMenuView(mObj: mObj));
+                       /*  Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    KitchenMenuView(mObj: mObj))); */
+                      },
+                    );
+                  }),
+                ),
             ],
           ),
         ),

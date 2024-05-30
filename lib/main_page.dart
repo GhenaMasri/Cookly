@@ -47,10 +47,9 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageStorage(bucket: storageBucket, child: selectPageView),
-      backgroundColor: const Color(0xfff5f5f5),
+      backgroundColor: TColor.white,
       bottomNavigationBar: BottomAppBar(
-        surfaceTintColor: TColor.white,
-        shadowColor: Colors.black,
+        color: TColor.white, 
         elevation: 1,
         height: 64,
         child: SafeArea(
@@ -103,7 +102,6 @@ class _MainViewState extends State<MainView> {
                       } else {
                         selectPageView = UserProfileView();
                       }
-                      
                     }
                     if (mounted) {
                       setState(() {});

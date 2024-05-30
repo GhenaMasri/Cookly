@@ -27,6 +27,8 @@ class _MyDropdownMenuState extends State<MyDropdownMenu> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DropdownButton<String>(
+          isExpanded:
+              true, // Ensures the dropdown button expands to fill available width
           value: selectedOption,
           onChanged: (String? newValue) {
             setState(() {

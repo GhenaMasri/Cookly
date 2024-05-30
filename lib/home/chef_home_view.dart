@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/MenuItem.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/dropdown.dart';
+import 'package:untitled/common_widget/fade_animation.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/common_widget/scale_animation.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/menu/manage_menu_item.dart';
 import 'package:untitled/menu/menu_item.dart';
 import 'package:http/http.dart' as http;
@@ -26,26 +29,32 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
   late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
-    setState(() {
-      menuArr.add(item);
-    });
+    if (mounted) {
+      setState(() {
+        menuArr.add(item);
+      });
+    }
   }
 
   void RemoveItemFromList(MenuItem item) {
-    setState(() {
-      menuArr.remove(item);
-      //Also remove from DB
-    });
+    if (mounted) {
+      setState(() {
+        menuArr.remove(item);
+        //Also remove from DB
+      });
+    }
   }
 
   void updateMenuItem(MenuItem updatedItem) {
-    setState(() {
-      final index =
-          menuArr.indexWhere((item) => item.itemId == updatedItem.itemId);
-      if (index != -1) {
-        menuArr[index] = updatedItem;
-      }
-    });
+    if (mounted) {
+      setState(() {
+        final index =
+            menuArr.indexWhere((item) => item.itemId == updatedItem.itemId);
+        if (index != -1) {
+          menuArr[index] = updatedItem;
+        }
+      });
+    }
   }
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
@@ -134,9 +143,11 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
   Future<void> _loadKitchenId() async {
     int? kitchenid = await SharedPreferencesService.getKitchenId();
-    setState(() {
-      kitchenId = kitchenid;
-    });
+    if (mounted) {
+      setState(() {
+        kitchenId = kitchenid;
+      });
+    }
     try {
       await _updateMenuArr();
     } catch (error) {
@@ -153,10 +164,11 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       } else {
         items = await chefMenuItems();
       }
-      setState(() {
-        menuArr = items;
-        categories = fetchedCategories;
-      });
+      if (mounted)
+        setState(() {
+          menuArr = items;
+          categories = fetchedCategories;
+        });
     } catch (error) {
       print('Error loading menu items: $error');
     }
@@ -166,7 +178,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   String getCategoryName(int? categoryId) {
     if (categoryId == null) {
       return 'Unknown';
-    } 
+    }
 
     final category = categories.firstWhere(
       (cat) => cat['id'] == categoryId,
@@ -195,7 +207,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: TColor.primary));
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -325,7 +338,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                                   height: 70,
                                   color: Colors.grey[300],
                                   child: Center(
-                                    child: CircularProgressIndicator(color: TColor.primary),
+                                    child: CircularProgressIndicator(
+                                        color: TColor.primary),
                                   ),
                                 ),
                                 errorWidget: (context, url, error) =>
@@ -370,7 +384,14 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                             ),
                             IconButton(
                               onPressed: () {
-                                Navigator.push(
+                                pushReplacementWithAnimation(
+                                    context,
+                                    ManageMenuItemView(
+                                      RemoveItemFromList: RemoveItemFromList,
+                                      updateMenuItem: updateMenuItem,
+                                      item: menuItem,
+                                    ));
+                                /* Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ManageMenuItemView(
@@ -379,7 +400,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                                       item: menuItem,
                                     ),
                                   ),
-                                );
+                                ); */
                               },
                               icon: Container(
                                 width: 35,
@@ -415,13 +436,15 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
+          pushReplacementWithScaleAnimation(context,
+              MenuItemView(menu: menuArr, addItemToList: addItemToList));
+          /*  Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) =>
                   MenuItemView(menu: menuArr, addItemToList: addItemToList),
             ),
-          );
+          ); */
         },
         shape: const CircleBorder(),
         backgroundColor: TColor.primary,

@@ -12,8 +12,7 @@ class OrderDetailsPage extends StatelessWidget {
     double subtotal = order['items'].fold(0, (sum, item) => sum + item['price']);
     double deliveryCost = 2.0; // example delivery cost
     double total = subtotal + deliveryCost;
-    double paid = order['paid'];
-
+   
     return Scaffold(
       backgroundColor: TColor.white,
       appBar: AppBar(
@@ -53,6 +52,14 @@ class OrderDetailsPage extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           'Order Time: ${order['orderTime']}',
+                          style: TextStyle(
+                            color: TColor.secondaryText,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Contact Number: ${order['ContactNumber']}',
                           style: TextStyle(
                             color: TColor.secondaryText,
                             fontSize: 12,
@@ -118,7 +125,7 @@ class OrderDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Delivery Instructions',
+                'Any Notes',
                 style: TextStyle(
                   color: TColor.primaryText,
                   fontSize: 13,
@@ -201,28 +208,6 @@ class OrderDetailsPage extends StatelessWidget {
                   ),
                   Text(
                     "\$${total.toStringAsFixed(2)}",
-                    style: TextStyle(
-                      color: TColor.primary,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Paid',
-                    style: TextStyle(
-                      color: TColor.primaryText,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(
-                    "\$${paid.toStringAsFixed(2)}",
                     style: TextStyle(
                       color: TColor.primary,
                       fontSize: 22,
