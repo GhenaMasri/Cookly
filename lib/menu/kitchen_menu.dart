@@ -51,7 +51,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
             name: item['name'],
             notes: item['notes'],
             quantity: item['quantity_id'],
-            category: item['category_id'], // category: item['category_name]
+            category: item['category_id'], 
+            cName: item['category_name'],
             price: item['price'].toDouble(),
             time: item['time'],
           );
@@ -136,7 +137,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     Expanded(
                       child: Text(
-                        widget.mObj["kitchen_name"].toString(),
+                        "Kitchen: ${widget.mObj["kitchen_name"].toString()}",
                         style: TextStyle(
                             color: TColor.primaryText,
                             fontSize: 20,
@@ -180,7 +181,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: RoundTextfield(
-                  hintText: "Search Food",
+                  hintText: "Search for item",
                   controller: txtSearch,
                   left: Container(
                     alignment: Alignment.center,

@@ -25,6 +25,6 @@ class MenuItem {
     this.category,
     this.price,
     this.time,
-    cName = "",
+    this.cName = "",
   });
 }

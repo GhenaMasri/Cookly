@@ -50,7 +50,8 @@ class _UserKitchensViewState extends State<UserKitchensView> {
             'logo': kitchen['logo'],
             'category_name': kitchen['category_name'],
             'rates_num': kitchen['rates_num'],
-            'rate': kitchen['rate']
+            'rate': kitchen['rate'],
+            'order_system': kitchen['order_system']
           };
         }).toList();
       });
@@ -250,7 +251,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Center(
                       child: Text(
-                        "There is no kitchen\n with this name",
+                        "There is no kitchens with this\n name or in this location",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

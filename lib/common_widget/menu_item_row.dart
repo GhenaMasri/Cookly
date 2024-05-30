@@ -52,7 +52,7 @@ class MenuItemRow extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: TColor.white,
-                            fontSize: 18,
+                            fontSize: 25,
                             fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(
@@ -80,17 +80,17 @@ class MenuItemRow extends StatelessWidget {
                             width: 8,
                           ), */
                           Text(
-                            mObj.category.toString(),
+                            mObj.cName!,
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: TColor.white, fontSize: 11),
+                            style: TextStyle(color: TColor.white, fontSize: 15),
                           ),
-                          Text(
+                          /*Text(
                             " . ",
                             textAlign: TextAlign.center,
                             style:
-                                TextStyle(color: TColor.primary, fontSize: 11),
+                                TextStyle(color: TColor.primary, fontSize: 18),
                           ),
-                          /* Text(
+                           Text(
                             mObj["food_type"],
                             textAlign: TextAlign.center,
                             style: TextStyle(color: TColor.white, fontSize: 12),
