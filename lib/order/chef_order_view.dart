@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/chef_order_details.dart';
 
 class OrdersPage extends StatelessWidget {
@@ -16,7 +17,7 @@ class OrdersPage extends StatelessWidget {
         {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
         {"name": "French Fries Large", "qty": "1", "price": 6.0}
       ],
-      "paid": 20.0
+      "ContactNumber": "0597280457"
     },
     {
       "customerName": "John Doe",
@@ -30,7 +31,7 @@ class OrdersPage extends StatelessWidget {
         {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
         {"name": "French Fries Large", "qty": "1", "price": 6.0}
       ],
-      "paid": 20.0
+       "ContactNumber": "0597280457"
     },
     {
       "customerName": "John Doe",
@@ -44,7 +45,7 @@ class OrdersPage extends StatelessWidget {
         {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
         {"name": "French Fries Large", "qty": "1", "price": 6.0}
       ],
-      "paid": 20.0
+       "ContactNumber": "0597280457"
     },
     {
       "customerName": "John Doe",
@@ -58,7 +59,7 @@ class OrdersPage extends StatelessWidget {
         {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
         {"name": "French Fries Large", "qty": "1", "price": 6.0}
       ],
-      "paid": 20.0
+       "ContactNumber": "0597280457"
     },
     // Add more orders here
   ];
@@ -153,12 +154,13 @@ class OrdersPage extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      Navigator.push(
+                      pushReplacementWithAnimation(context, OrderDetailsPage(order: order));
+                      /* Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => OrderDetailsPage(order: order),
                         ),
-                      );
+                      ); */
                     },
                     icon: Container(
                       width: 35,

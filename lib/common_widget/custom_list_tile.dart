@@ -15,7 +15,7 @@ class CustomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(
@@ -26,10 +26,7 @@ class CustomListTile extends StatelessWidget {
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                   color: Colors.white,
                 ),
               ),
@@ -49,7 +46,9 @@ class CustomListTile extends StatelessWidget {
                       height: 70,
                       color: Colors.grey[300],
                       child: Center(
-                        child: CircularProgressIndicator(color: TColor.primary,),
+                        child: CircularProgressIndicator(
+                          color: TColor.primary,
+                        ),
                       ),
                     ),
                     errorWidget: (context, url, error) => Icon(Icons.error),

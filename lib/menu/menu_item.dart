@@ -162,7 +162,7 @@ class _MenuItemViewState extends State<MenuItemView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(color: TColor.primary,));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {

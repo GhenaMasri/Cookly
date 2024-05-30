@@ -5,6 +5,7 @@ import 'package:untitled/common_widget/cart_drop_down.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/menu/user_kitchens_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -129,7 +130,8 @@ class _HomeViewState extends State<HomeView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: TColor.primary));
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -212,11 +214,8 @@ class _HomeViewState extends State<HomeView> {
               ),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Location Dropdown
                     Expanded(
@@ -243,6 +242,8 @@ class _HomeViewState extends State<HomeView> {
                         ],
                       ),
                     ),
+                    const SizedBox(
+                        width: 10), // Add some space between the dropdowns
                     // Category Dropdown
                     Expanded(
                       child: Column(
@@ -279,16 +280,46 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
               const SizedBox(height: 10),
-              Expanded(
-                child: ListView.builder(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-                  itemCount: menuArr.length,
-                  itemBuilder: ((context, index) {
-                    var mObj = menuArr[index] as Map? ?? {};
-                    return GestureDetector(
-                      onTap: () {
-                        /*Navigator.push(
+              if (menuArr.isEmpty)
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.4),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Center(
+                      child: Text(
+                        "There are no kitchens in this\n location and/or category",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 30, horizontal: 20),
+                    itemCount: menuArr.length,
+                    itemBuilder: ((context, index) {
+                      var mObj = menuArr[index] as Map? ?? {};
+                      return GestureDetector(
+                        onTap: () {
+                          /*Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => MenuItemsView(
@@ -296,122 +327,128 @@ class _HomeViewState extends State<HomeView> {
                               ),
                             ),
                           );*/
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Stack(
-                          alignment: Alignment.centerRight,
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: 90,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(25),
-                                  bottomLeft: Radius.circular(25),
-                                  topRight: Radius.circular(25),
-                                  bottomRight: Radius.circular(25),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const SizedBox(width: 4),
-                                  ClipOval(
-                                    child: CachedNetworkImage(
-                                      imageUrl: mObj["image"],
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) => Container(
-                                        width: 80,
-                                        height: 80,
-                                        color: Colors.grey[300],
-                                        child: Center(
-                                          child: CircularProgressIndicator(color: TColor.primary),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 15),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 12),
-                                        Text(
-                                          mObj["category"].toString(),
-                                          style: TextStyle(
-                                            color: TColor.primaryText,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "${mObj["count"].toString()} Kitchens",
-                                          style: TextStyle(
-                                            color: TColor.secondaryText,
-                                            fontSize: 11,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UserKitchensView(
-                                        mObj: mObj, location:selectedLocation),
-                                  ),
-                                );
-                              },
-                              icon: Container(
-                                width: 35,
-                                height: 35,
-                                decoration: BoxDecoration(
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Stack(
+                            alignment: Alignment.centerRight,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 90,
+                                decoration: const BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(17.5),
-                                  boxShadow: const [
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(25),
+                                    bottomLeft: Radius.circular(25),
+                                    topRight: Radius.circular(25),
+                                    bottomRight: Radius.circular(25),
+                                  ),
+                                  boxShadow: [
                                     BoxShadow(
                                       color: Colors.black12,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
+                                      blurRadius: 7,
+                                      offset: Offset(0, 4),
                                     ),
                                   ],
                                 ),
-                                alignment: Alignment.center,
-                                child: Image.asset(
-                                  "assets/img/btn_next.png",
-                                  width: 15,
-                                  height: 15,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(width: 4),
+                                    ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: mObj["image"],
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) =>
+                                            Container(
+                                          width: 80,
+                                          height: 80,
+                                          color: Colors.grey[300],
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                                color: TColor.primary),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            mObj["category"].toString(),
+                                            style: TextStyle(
+                                              color: TColor.primaryText,
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "${mObj["count"].toString()} Kitchens",
+                                            style: TextStyle(
+                                              color: TColor.secondaryText,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ],
+                              IconButton(
+                                onPressed: () {
+                                  pushReplacementWithAnimation(context,UserKitchensView(
+                                          mObj: mObj,
+                                          location: selectedLocation));
+                                 /*  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UserKitchensView(
+                                          mObj: mObj,
+                                          location: selectedLocation),
+                                    ),
+                                  ); */
+                                },
+                                icon: Container(
+                                  width: 35,
+                                  height: 35,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(17.5),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Image.asset(
+                                    "assets/img/btn_next.png",
+                                    width: 15,
+                                    height: 15,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+                  ),
                 ),
-              ),
             ],
           ),
         ],
