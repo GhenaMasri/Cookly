@@ -202,7 +202,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                 padding: EdgeInsets.zero,
                 itemCount: menuArr.length,
                 itemBuilder: ((context, index) {
-                  var mObj1 = menuArr[index] as Map? ?? {};
+                  var mObj1 = menuArr[index];
                   return MenuItemRow(
                     mObj: mObj1,
                     onTap: () {
