@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/common/MenuItem.dart';
 
 import '../common/color_extension.dart';
 
 class MenuItemRow extends StatelessWidget {
-  final Map mObj;
+  final MenuItem mObj;
   final VoidCallback onTap;
   const MenuItemRow({super.key, required this.mObj, required this.onTap});
 
@@ -18,7 +19,7 @@ class MenuItemRow extends StatelessWidget {
           alignment: Alignment.bottomLeft,
           children: [
             CachedNetworkImage(
-              imageUrl: mObj["image"].toString(),
+              imageUrl: mObj.image.toString(),
               width: double.maxFinite,
               height: 200,
               fit: BoxFit.cover,
@@ -47,7 +48,7 @@ class MenuItemRow extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        mObj["name"],
+                        mObj.name!,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: TColor.white,
@@ -79,7 +80,7 @@ class MenuItemRow extends StatelessWidget {
                             width: 8,
                           ), */
                           Text(
-                            mObj["category"],
+                            mObj.category.toString(),
                             textAlign: TextAlign.center,
                             style: TextStyle(color: TColor.white, fontSize: 11),
                           ),

@@ -13,6 +13,7 @@ class MenuItem {
   int? category;
   double? price;
   String? time;
+  String? cName;
  
   MenuItem({
     this.kitchenId,
@@ -24,5 +25,6 @@ class MenuItem {
     this.category,
     this.price,
     this.time,
+    cName = "",
   });
 }
