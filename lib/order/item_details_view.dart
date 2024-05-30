@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:untitled/common_widget/round_icon_button.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 import '../../common/color_extension.dart';
+import 'dart:convert';
 
 
 class ItemDetailsView extends StatefulWidget {
@@ -17,6 +19,40 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
   double price = 15;
   int qty = 1;
   bool isFav = false;
+  int? userId;
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> addCartItem() async {
+    const url = '${SharedPreferencesService.url}signup';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'userId': userId,
+          'menuItemId': 1, //change it to the id come from the previous page 
+          'quantity': qty,
+          'price': price,
+          'notes': "" //change it to the text inside the notes text field 
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      }  else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    setState(() {
+      userId = id;
+    });
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {

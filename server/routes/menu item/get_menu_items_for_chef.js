@@ -9,11 +9,17 @@ router.get("/", async (req, res) => {
     return res.status(400).send("KitchenId parameter is required");
   }
 
-  let query = "SELECT * FROM menu_item WHERE kitchen_id = ?";
+  let query = `
+    SELECT mi.*, fc.category as category_name
+    FROM menu_item mi
+    JOIN food_category fc ON mi.category_id = fc.id
+    WHERE mi.kitchen_id = ?
+  `;
+
   const queryParams = [kitchenId];
 
   if (name) {
-    query += " AND name LIKE ?";
+    query += " AND mi.name LIKE ?";
     queryParams.push(`%${name}%`);
   }
 
