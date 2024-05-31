@@ -4,6 +4,9 @@ import 'package:untitled/common_widget/cart_drop_down.dart';
 import 'package:untitled/common_widget/food_list_tile.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/order/my_order_view.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class CartPage extends StatefulWidget {
   CartPage({Key? key}) : super(key: key);
@@ -14,8 +17,9 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   String? selectedKitchen;
+  int? userId;
   List<String> kitchens = ['Nosha', 'Enaba', 'Alf-lela'];
-  List<Map<String, dynamic>> foodItems = [
+  List<Map<String, dynamic>> cartItems = [
     {
       'imageUrl': 'assets/img/dess_2.png',
       'foodName': 'Pizza',
@@ -66,9 +70,54 @@ class _CartPageState extends State<CartPage> {
     },
   ];
 
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> getCartItems(int userId) async { //call it in future data
+    final url = Uri.parse('${SharedPreferencesService.url}get-cart-items?userId=$userId');
+    
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          cartItems = List<Map<String, dynamic>>.from(data['cartItems']);
+        });
+      } else {
+        print('Failed to load cart items');
+      }
+    } catch (error) {
+      print('Error fetching cart items: $error');
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteCartItem(int cartItemId) async { //call it when verify deletion 
+    final url ='${SharedPreferencesService.url}delete-cart-item?cartItemId=$cartItemId';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> _loadUserId() async { //call it in future data
+    int? id = await SharedPreferencesService.getId();
+    setState(() {
+      userId = id;
+    });
+  }
+/////////////////////////////////////////////////////////////////////////////////
+
   void removeItem(int index) {
     setState(() {
-      foodItems.removeAt(index);
+      cartItems.removeAt(index);
     });
   }
 
@@ -137,12 +186,12 @@ class _CartPageState extends State<CartPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  ...foodItems.map((item) => FoodItemTile(
+                  ...cartItems.map((item) => FoodItemTile(
                         imageUrl: item['imageUrl'],
                         foodName: item['foodName'],
                         quantity: item['quantity'],
                         price: item['price'],
-                        onRemove: () => removeItem(foodItems.indexOf(item)),
+                        onRemove: () => removeItem(cartItems.indexOf(item)),
                       )),
                 ],
               ),

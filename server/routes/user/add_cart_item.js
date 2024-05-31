@@ -3,10 +3,10 @@ const router = express.Router();
 const pool = require('../../db');
 
 router.post('/', async (req, res) => {
-  const { userId, menuItemId, quantity, price, notes } = req.body;
+  const { userId, menuItemId, quantity, price, notes, subQuantityId } = req.body;
 
-  if (!userId || !menuItemId || !quantity || !price) {
-    return res.status(400).send("userId, menuItemId, and quantity are required");
+  if (!userId || !menuItemId || !quantity || !price || !subQuantityId) {
+    return res.status(400).send("userId, menuItemId, quantity, price and subQuantityId are required");
   }
 
   try {
@@ -28,8 +28,8 @@ router.post('/', async (req, res) => {
     }
 
     await pool.promise().execute(
-      'INSERT INTO cart_item (cart_id, menu_item_id, quantity, price, notes) VALUES (?, ?, ?, ?, ?)',
-      [cartId, menuItemId, quantity, price, notes]
+      'INSERT INTO cart_item (cart_id, menu_item_id, quantity, price, notes, sub_quantity_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [cartId, menuItemId, quantity, price, notes, subQuantityId]
     );
 
     res.status(200).send("Menu item added to cart successfully");

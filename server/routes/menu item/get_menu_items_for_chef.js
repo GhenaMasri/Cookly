@@ -10,9 +10,10 @@ router.get("/", async (req, res) => {
   }
 
   let query = `
-    SELECT mi.*, fc.category as category_name
+    SELECT mi.*, fc.category as category_name, fq.quantity as quantity_name
     FROM menu_item mi
     JOIN food_category fc ON mi.category_id = fc.id
+    JOIN food_quantity fq ON mi.quantity_id = fq.id
     WHERE mi.kitchen_id = ?
   `;
 
