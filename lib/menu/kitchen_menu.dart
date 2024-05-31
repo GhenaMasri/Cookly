@@ -55,6 +55,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
             cName: item['category_name'],
             price: item['price'].toDouble(),
             time: item['time'],
+            qName: item['quantity_name']
           );
         }).toList();
       });

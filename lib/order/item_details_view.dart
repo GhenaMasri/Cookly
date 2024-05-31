@@ -20,10 +20,11 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
   int qty = 1;
   bool isFav = false;
   int? userId;
+  List<Map<String, dynamic>> subQuantities = [];
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<Map<String, dynamic>> addCartItem() async {
-    const url = '${SharedPreferencesService.url}signup';
+  Future<Map<String, dynamic>> addCartItem() async { //call it in add item to cart button
+    const url = '${SharedPreferencesService.url}add-cart-item';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -33,7 +34,8 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
           'menuItemId': 1, //change it to the id come from the previous page 
           'quantity': qty,
           'price': price,
-          'notes': "" //change it to the text inside the notes text field 
+          'notes': "", //change it to the text inside the notes text field 
+          'subQuantityId': 1 //change it to be the sub quantity id the user choose from subQuantities array
         }),
       );
       if (response.statusCode == 200) {
@@ -46,7 +48,26 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
     }
   }
 
-  Future<void> _loadUserId() async {
+  Future<void> fetchSubFoodQuantities(int quantityId) async { //call it in future data
+    final url = Uri.parse('${SharedPreferencesService.url}sub-food-quantities?quantityId=$quantityId');
+    
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          subQuantities = List<Map<String, dynamic>>.from(data['sub_quantities']);
+        });
+      } else {
+        print('Failed to load sub food quantities');
+      }
+    } catch (error) {
+      print('Error fetching sub food quantities: $error');
+    }
+  }
+
+  Future<void> _loadUserId() async { //call it in future data
     int? id = await SharedPreferencesService.getId();
     setState(() {
       userId = id;
