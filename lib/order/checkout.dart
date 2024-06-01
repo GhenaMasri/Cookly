@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:untitled/more/add_card_view.dart';
 import 'package:untitled/order/checkout_message_view.dart';
 
 class CheckoutView extends StatefulWidget {
-  const CheckoutView({super.key});
+  final double totalPrice;
+  final double deliveryCost;
+  const CheckoutView({super.key, required this.totalPrice, required this.deliveryCost});
 
   @override
   State<CheckoutView> createState() => _CheckoutViewState();
@@ -17,6 +20,17 @@ class _CheckoutViewState extends State<CheckoutView> {
     {"name": "**** **** **** 2187", "icon": "assets/img/visa_icon.png"},
     {"name": "test@gmail.com", "icon": "assets/img/paypal.png"},
   ];
+
+  double? discount = 5.0;
+  double? checkoutPrice = 0.0;
+
+  @override
+   void initState() {
+    super.initState();
+
+  checkoutPrice  = widget.deliveryCost+widget.totalPrice-discount!;
+  }
+ 
 
   int selectMethod = -1;
   TextEditingController txtStreet = TextEditingController();
@@ -78,7 +92,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 8, ),
+                        vertical: 8,
+                      ),
                       child: RoundTitleTextfield(
                         title: "Street",
                         hintText: "Street",
@@ -89,7 +104,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 8, ),
+                        vertical: 8,
+                      ),
                       child: RoundTitleTextfield(
                         title: "Contact Number",
                         hintText: "Enter Contact Number",
@@ -125,17 +141,6 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontSize: 13,
                               fontWeight: FontWeight.w500),
                         ),
-                        TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.add, color: TColor.primary),
-                          label: Text(
-                            "Add Card",
-                            style: TextStyle(
-                                color: TColor.primary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700),
-                          ),
-                        )
                       ],
                     ),
                     ListView.builder(
@@ -174,6 +179,15 @@ class _CheckoutViewState extends State<CheckoutView> {
                                   onTap: () {
                                     setState(() {
                                       selectMethod = index;
+                                      if (selectMethod == 1) {
+                                        showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            context: context,
+                                            builder: (context) {
+                                              return const AddCardView();
+                                            });
+                                      }
                                     });
                                   },
                                   child: Icon(
@@ -218,7 +232,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          "\$68",
+                          widget.totalPrice.toString()+"₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 13,
@@ -241,7 +255,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          "\$2",
+                          widget.deliveryCost.toString()+"₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 13,
@@ -264,7 +278,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          "-\$4",
+                          discount.toString()+"₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 13,
@@ -294,7 +308,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          "\$66",
+                          checkoutPrice.toString()+"₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 15,

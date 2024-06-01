@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 
@@ -35,8 +36,21 @@ class FoodItemTile extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(imageUrl,
-                  width: 60, height: 60, fit: BoxFit.cover),
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  width: 60,
+                  height: 60,
+                  color: Colors.grey[300],
+                  child: Center(
+                    child: CircularProgressIndicator(color: TColor.primary),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
             ),
             SizedBox(width: 10.0),
             Expanded(
@@ -55,7 +69,7 @@ class FoodItemTile extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('\$${price.toStringAsFixed(2)}',
+                Text('${price.toStringAsFixed(2)}₪',
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 IconButton(

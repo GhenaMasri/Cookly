@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -162,7 +161,10 @@ class _MenuItemViewState extends State<MenuItemView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: TColor.primary,));
+          return Center(
+              child: CircularProgressIndicator(
+            color: TColor.primary,
+          ));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -305,16 +307,6 @@ class _MenuItemViewState extends State<MenuItemView> {
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                     child: RoundTitleTextfield(
-                      title: "Price",
-                      hintText: "Enter Price",
-                      controller: txtPrice,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    child: RoundTitleTextfield(
                       title: "Estimated Preparation Time",
                       hintText: "Enter Time (day:hour:minutes)",
                       controller: txtTime,
@@ -358,6 +350,16 @@ class _MenuItemViewState extends State<MenuItemView> {
                               }
                             });
                           })),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Price",
+                      hintText: "Price For Selected Quantity",
+                      controller: txtPrice,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -392,7 +394,6 @@ class _MenuItemViewState extends State<MenuItemView> {
                               errorFlag = false;
                               errorMessage = "";
                             });
-                            
                           }
                           /////////////////////// BACKEND SECTION /////////////////////////
                           Map<String, dynamic> result = await addMenuItem();
@@ -401,7 +402,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                           final newItem = result['menuItem'];
                           print(success);
                           print(message);
-                          
+
                           if (success) {
                             widget.addItemToList(MenuItem(
                               kitchenId: newItem['kitchen_id'],

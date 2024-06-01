@@ -84,17 +84,19 @@ class MenuItemRow extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(color: TColor.white, fontSize: 15),
                           ),
-                          /*Text(
+                          Text(
                             " . ",
                             textAlign: TextAlign.center,
                             style:
-                                TextStyle(color: TColor.primary, fontSize: 18),
+                                TextStyle(color: TColor.primary, fontSize: 15),
                           ),
-                           Text(
-                            mObj["food_type"],
+                          Text(
+                            mObj.price.toString() +
+                                "₪ / " +
+                                mObj.qName.toString(),
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: TColor.white, fontSize: 12),
-                          ), */
+                            style: TextStyle(color: TColor.white, fontSize: 15),
+                          ),
                         ],
                       ),
                     ],

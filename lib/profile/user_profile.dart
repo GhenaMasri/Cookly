@@ -145,7 +145,8 @@ class _UserProfileViewState extends State<UserProfileView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: TColor.primary));
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -177,21 +178,6 @@ class _UserProfileViewState extends State<UserProfileView> {
                         color: TColor.primaryText,
                         fontSize: 20,
                         fontWeight: FontWeight.w800),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CartPage(),
-                      ),
-                    );
-                  },
-                  icon: Image.asset(
-                    "assets/img/shopping_cart.png",
-                    width: 25,
-                    height: 25,
                   ),
                 ),
                 IconButton(

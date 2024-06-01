@@ -1,79 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/cart_drop_down.dart';
 import 'package:untitled/common_widget/food_list_tile.dart';
 import 'package:untitled/common_widget/round_button.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/my_order_view.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:untitled/common/globs.dart';
 
 class CartPage extends StatefulWidget {
-  CartPage({Key? key}) : super(key: key);
+  final Map kitchen;
+  CartPage({Key? key, required this.kitchen}) : super(key: key);
 
   @override
   _CartPageState createState() => _CartPageState();
 }
 
 class _CartPageState extends State<CartPage> {
-  String? selectedKitchen;
   int? userId;
-  List<String> kitchens = ['Nosha', 'Enaba', 'Alf-lela'];
-  List<Map<String, dynamic>> cartItems = [
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Pizza',
-      'quantity': 2,
-      'price': 15.99,
-    },
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Burger',
-      'quantity': 1,
-      'price': 8.99,
-    },
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Pasta',
-      'quantity': 3,
-      'price': 12.49,
-    },
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Pasta',
-      'quantity': 3,
-      'price': 12.49,
-    },
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Pasta',
-      'quantity': 3,
-      'price': 12.49,
-    },
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Pasta',
-      'quantity': 3,
-      'price': 12.49,
-    },
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Pasta',
-      'quantity': 3,
-      'price': 12.49,
-    },
-    {
-      'imageUrl': 'assets/img/dess_2.png',
-      'foodName': 'Pasta',
-      'quantity': 3,
-      'price': 12.49,
-    },
-  ];
+  late Future<void> _initDataFuture;
+  List<Map<String, dynamic>> cartItems = [];
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<void> getCartItems(int userId) async { //call it in future data
-    final url = Uri.parse('${SharedPreferencesService.url}get-cart-items?userId=$userId');
-    
+  Future<void> getCartItems(int userId) async {
+    //call it in future data
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}get-cart-items?userId=$userId');
+
     try {
       final response = await http.get(url);
 
@@ -90,8 +46,10 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  Future<Map<String, dynamic>> deleteCartItem(int cartItemId) async { //call it when verify deletion 
-    final url ='${SharedPreferencesService.url}delete-cart-item?cartItemId=$cartItemId';
+  Future<Map<String, dynamic>> deleteCartItem(int cartItemId) async {
+    //call it when verify deletion
+    final url =
+        '${SharedPreferencesService.url}delete-cart-item?cartItemId=$cartItemId';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -107,7 +65,8 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  Future<void> _loadUserId() async { //call it in future data
+  Future<void> _loadUserId() async {
+    //call it in future data
     int? id = await SharedPreferencesService.getId();
     setState(() {
       userId = id;
@@ -122,7 +81,34 @@ class _CartPageState extends State<CartPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await _loadUserId();
+    await getCartItems(userId!);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -151,68 +137,71 @@ class _CartPageState extends State<CartPage> {
               height: 25,
             ),
           ),
+          SizedBox(
+            width: 10,
+          ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: cartItems.isEmpty
+          ? Center(
+              child: Text(
+                "There are no items added to cart",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  "Order From",
-                  style: TextStyle(
-                    color: TColor.secondaryText,
-                    fontSize: 12,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ...cartItems.map((item) => FoodItemTile(
+                            imageUrl: item['image'],
+                            foodName: item['name'],
+                            quantity: item['quantity'],
+                            price: item['price'].toDouble(),
+                            onRemove: () {
+                              QuickAlert.show(
+                                context: context,
+                                title: 'Delete',
+                                type: QuickAlertType.error,
+                                text:
+                                    'Are you sure you want to delete this item?',
+                                showCancelBtn: true,
+                                confirmBtnText: 'Delete',
+                                cancelBtnText: 'Cancel',
+                                confirmBtnColor:
+                                    Color.fromARGB(255, 222, 0, 56),
+                                onConfirmBtnTap: () async {
+                                  deleteCartItem(item['id']);
+                                  removeItem(cartItems.indexOf(item));
+                                  Navigator.of(context).pop();
+                                },
+                                onCancelBtnTap: () {
+                                  Navigator.of(context).pop();
+                                },
+                              );
+                            })),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 5),
-                CartDropdownMenu(
-                  items: kitchens,
-                  value: selectedKitchen,
-                  hint: 'Choose Kitchen',
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedKitchen = newValue;
-                    });
-                  },
-                ),
+                Visibility(
+                    visible: cartItems.isNotEmpty,
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: RoundButton(
+                        title: "Order Now",
+                        onPressed: () {
+                          pushReplacementWithAnimation(
+                              context, MyOrderView(items: cartItems, kitchen: widget.kitchen,));
+                        },
+                      ),
+                    )),
               ],
             ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ...cartItems.map((item) => FoodItemTile(
-                        imageUrl: item['imageUrl'],
-                        foodName: item['foodName'],
-                        quantity: item['quantity'],
-                        price: item['price'],
-                        onRemove: () => removeItem(cartItems.indexOf(item)),
-                      )),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(10),
-            child: RoundButton(
-              title: "Order Now",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyOrderView(),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/menu/rating_page.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:untitled/order/item_details_view.dart';
@@ -147,12 +148,13 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     IconButton(
                       onPressed: () {
-                        Navigator.push(
+                        pushReplacementWithAnimation(context,CartPage(kitchen:widget.mObj));
+                        /* Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CartPage(),
+                            builder: (context) => CartPage(kitchen:widget.mObj),
                           ),
-                        );
+                        ); */
                       },
                       icon: Image.asset(
                         "assets/img/shopping_cart.png",
@@ -208,11 +210,12 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                   return MenuItemRow(
                     mObj: mObj1,
                     onTap: () {
-                      Navigator.push(
+                      pushReplacementWithAnimation(context,ItemDetailsView(item: mObj1, kitchen: widget.mObj));
+                     /*  Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const ItemDetailsView()),
-                      );
+                      ); */
                     },
                   );
                 }),
