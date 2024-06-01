@@ -184,21 +184,6 @@ class _HomeViewState extends State<HomeView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CartPage(),
-                          ),
-                        );
-                      },
-                      icon: Image.asset(
-                        "assets/img/shopping_cart.png",
-                        width: 25,
-                        height: 25,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
                             builder: (context) => Container(),
                           ),
                         );
@@ -282,9 +267,9 @@ class _HomeViewState extends State<HomeView> {
               const SizedBox(height: 10),
               if (menuArr.isEmpty)
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(25),
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
@@ -408,10 +393,12 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  pushReplacementWithAnimation(context,UserKitchensView(
+                                  pushReplacementWithAnimation(
+                                      context,
+                                      UserKitchensView(
                                           mObj: mObj,
                                           location: selectedLocation));
-                                 /*  Navigator.push(
+                                  /*  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => UserKitchensView(

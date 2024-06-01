@@ -1,31 +1,38 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/checkout.dart';
 
 class MyOrderView extends StatefulWidget {
-  const MyOrderView({super.key});
+  final List<Map<String, dynamic>> items;
+  final Map kitchen;
+  const MyOrderView({super.key, required this.items, required this.kitchen});
 
   @override
   State<MyOrderView> createState() => _MyOrderViewState();
 }
 
 class _MyOrderViewState extends State<MyOrderView> {
-  List itemArr = [
-    {"name": "Beef Burger", "qty": "1", "price": 16.0},
-    {"name": "Classic Burger", "qty": "1", "price": 14.0},
-    {"name": "Cheese Chicken Burger", "qty": "1", "price": 17.0},
-    {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
-    {"name": "French Fires Large", "qty": "1", "price": 6.0}
-  ];
   TextEditingController txtNotes = TextEditingController();
   String? delivery;
+  double? totalPrice;
+  double deliveryCost = 10.0;
+  double? finalPrice;
+
+  double calculateTotalPrice() {
+    return widget.items.fold(0.0, (sum, item) {
+      return sum + (item['price'].toDouble());
+    });}
 
   @override
   void initState() {
     super.initState();
     delivery = "Yes";
+    totalPrice = calculateTotalPrice();
+    finalPrice  = deliveryCost+totalPrice!;
   }
 
   @override
@@ -74,11 +81,22 @@ class _MyOrderViewState extends State<MyOrderView> {
                   children: [
                     ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.asset(
-                          "assets/img/shop_logo.png",
+                        child: CachedNetworkImage(
+                          imageUrl: widget.kitchen['logo'],
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            width: 80,
+                            height: 80,
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                  color: TColor.primary),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         )),
                     const SizedBox(
                       width: 8,
@@ -88,7 +106,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "King Burgers",
+                            widget.kitchen['kitchen_name'],
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: TColor.primaryText,
@@ -111,19 +129,13 @@ class _MyOrderViewState extends State<MyOrderView> {
                                 width: 4,
                               ),
                               Text(
-                                "4.9",
+                                widget.kitchen['rate'].toString(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.primary, fontSize: 12),
                               ),
                               const SizedBox(
                                 width: 8,
-                              ),
-                              Text(
-                                "(124 Ratings)",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: TColor.secondaryText, fontSize: 12),
                               ),
                             ],
                           ),
@@ -134,19 +146,19 @@ class _MyOrderViewState extends State<MyOrderView> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                "Burger",
+                                "Category",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.secondaryText, fontSize: 12),
                               ),
                               Text(
-                                " . ",
+                                " : ",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.primary, fontSize: 12),
                               ),
                               Text(
-                                "Western Food",
+                                widget.kitchen['category_name'],
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.secondaryText, fontSize: 12),
@@ -170,7 +182,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                               ),
                               Expanded(
                                 child: Text(
-                                  "No 03, 4th Lane, Newyork",
+                                  widget.kitchen['street'],
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       color: TColor.secondaryText,
@@ -194,40 +206,70 @@ class _MyOrderViewState extends State<MyOrderView> {
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
-                  itemCount: itemArr.length,
+                  itemCount: widget.items.length,
                   separatorBuilder: ((context, index) => Divider(
                         indent: 25,
                         endIndent: 25,
-                        color: TColor.secondaryText.withOpacity(0.5),
+                        color: Colors.grey.withOpacity(0.5),
                         height: 1,
                       )),
                   itemBuilder: ((context, index) {
-                    var cObj = itemArr[index] as Map? ?? {};
-                    return Container(
+                    var cObj = widget.items[index] as Map? ?? {};
+                    return Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 25),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "${cObj["name"].toString()} x${cObj["qty"].toString()}",
+                          vertical: 5, horizontal: 15),
+                      child: ExpansionTile(
+                        title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                "${cObj["name"].toString()} x${cObj["quantity"].toString()}",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Text(
+                              "${cObj["price"].toString()}₪",
                               style: TextStyle(
-                                  color: TColor.primaryText,
+                                  color: Colors.black,
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w500),
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                left: 15, right: 15, bottom: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (cObj["notes"] != null)
+                                  Text(
+                                    "Notes: ${cObj["notes"]}",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                const SizedBox(height: 5),
+                                if (cObj["sub_quantity"] != null)
+                                  Text(
+                                    "Sub-Quantity: ${cObj["sub_quantity"]}",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
-                          const SizedBox(
-                            width: 15,
-                          ),
-                          Text(
-                            "\$${cObj["price"].toString()}",
-                            style: TextStyle(
-                                color: TColor.primaryText,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700),
-                          )
                         ],
                       ),
                     );
@@ -257,7 +299,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                         ),
                       ],
                     ),
-                       const SizedBox(
+                    const SizedBox(
                       height: 4,
                     ),
                     Divider(
@@ -286,6 +328,11 @@ class _MyOrderViewState extends State<MyOrderView> {
                                 onChanged: (value) {
                                   setState(() {
                                     delivery = value;
+                                    deliveryCost = 10.0;
+                                    finalPrice  = deliveryCost+totalPrice!;
+                                    setState(() {
+                                      
+                                    });
                                   });
                                 },
                               ),
@@ -308,6 +355,11 @@ class _MyOrderViewState extends State<MyOrderView> {
                                 onChanged: (value) {
                                   setState(() {
                                     delivery = value;
+                                    deliveryCost = 0.0;
+                                    finalPrice  = deliveryCost+totalPrice!;
+                                    setState(() {
+                                      
+                                    });
                                   });
                                 },
                               ),
@@ -334,7 +386,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          "\$68",
+                          totalPrice.toString(),
                           style: TextStyle(
                               color: TColor.primary,
                               fontSize: 13,
@@ -357,7 +409,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          "\$2",
+                          deliveryCost.toString()+"₪",
                           style: TextStyle(
                               color: TColor.primary,
                               fontSize: 13,
@@ -387,7 +439,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          "\$70",
+                          finalPrice.toString()+"₪",
                           style: TextStyle(
                               color: TColor.primary,
                               fontSize: 22,
@@ -401,12 +453,13 @@ class _MyOrderViewState extends State<MyOrderView> {
                     RoundButton(
                         title: "Checkout",
                         onPressed: () {
-                           Navigator.push(
+                          pushReplacementWithAnimation(context, CheckoutView(totalPrice:totalPrice!,deliveryCost:deliveryCost));
+                          /* Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const CheckoutView(),
+                              builder: (context) => CheckoutView(finalPrice:finalPrice!,deliveryCost:deliveryCost)
                             ),
-                          ); 
+                          ); */
                         }),
                     const SizedBox(
                       height: 20,

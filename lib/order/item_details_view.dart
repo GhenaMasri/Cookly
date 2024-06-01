@@ -1,15 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:untitled/common/MenuItem.dart';
 import 'package:untitled/common_widget/round_icon_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/order/cart.dart';
 import '../../common/color_extension.dart';
 import 'dart:convert';
 
-
 class ItemDetailsView extends StatefulWidget {
-
-  const ItemDetailsView({super.key});
+  final MenuItem item;
+  final Map kitchen;
+  const ItemDetailsView({super.key, required this.item, required this.kitchen});
 
   @override
   State<ItemDetailsView> createState() => _ItemDetailsViewState();
@@ -20,10 +25,21 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
   int qty = 1;
   bool isFav = false;
   int? userId;
+  int? quantityId;
+  String? selectedValue;
   List<Map<String, dynamic>> subQuantities = [];
+  List<String> listQuantities = [];
+  double discount = 0.0;
+  double genPrice = 0.0;
+  double discPrice = 0.0;
+  double finalPrice = 0.0;
+  int? quantity;
+  TextEditingController txtNotes = TextEditingController();
+  String? time;
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<Map<String, dynamic>> addCartItem() async { //call it in add item to cart button
+  Future<Map<String, dynamic>> addCartItem() async {
+    //call it in add item to cart button
     const url = '${SharedPreferencesService.url}add-cart-item';
     try {
       final response = await http.post(
@@ -31,16 +47,19 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'userId': userId,
-          'menuItemId': 1, //change it to the id come from the previous page 
+          'menuItemId': widget
+              .item.itemId, //change it to the id come from the previous page
           'quantity': qty,
-          'price': price,
-          'notes': "", //change it to the text inside the notes text field 
-          'subQuantityId': 1 //change it to be the sub quantity id the user choose from subQuantities array
+          'price': finalPrice,
+          'notes':
+              txtNotes.text, //change it to the text inside the notes text field
+          'subQuantityId':
+              quantityId //change it to be the sub quantity id the user choose from subQuantities array
         }),
       );
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
-      }  else {
+      } else {
         return {'success': false, 'message': response.body};
       }
     } catch (error) {
@@ -48,16 +67,19 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
     }
   }
 
-  Future<void> fetchSubFoodQuantities(int quantityId) async { //call it in future data
-    final url = Uri.parse('${SharedPreferencesService.url}sub-food-quantities?quantityId=$quantityId');
-    
+  Future<void> fetchSubFoodQuantities(int quantityId) async {
+    //call it in future data
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}sub-food-quantities?quantityId=$quantityId');
+
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          subQuantities = List<Map<String, dynamic>>.from(data['sub_quantities']);
+          subQuantities =
+              List<Map<String, dynamic>>.from(data['sub_quantities']);
         });
       } else {
         print('Failed to load sub food quantities');
@@ -67,27 +89,73 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
     }
   }
 
-  Future<void> _loadUserId() async { //call it in future data
+  Future<void> _loadUserId() async {
+    //call it in future data
     int? id = await SharedPreferencesService.getId();
     setState(() {
       userId = id;
     });
   }
+
 /////////////////////////////////////////////////////////////////////////////////
+  late Future<void> _initDataFuture;
+  @override
+  void initState() {
+    super.initState();
+    finalPrice = widget.item.price!;
+    time = widget.kitchen["order_system"] == 0 ? "Day before" : widget.item.time!.toString();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await _loadUserId();
+    await fetchSubFoodQuantities(widget.item.quantity!);
+    quantityId = subQuantities[0]['id'];
+    quantity = subQuantities[0]['quantity'];
+    selectedValue = subQuantities[0]['sub_quantity'];
+    for (var element in subQuantities) {
+      listQuantities.add(element['sub_quantity']);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: TColor.white,
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
-          Image.asset(
-            "assets/img/detail_top.png",
+          CachedNetworkImage(
+            imageUrl: widget.item.image!,
             width: media.width,
             height: media.width,
             fit: BoxFit.cover,
+            placeholder: (context, url) => Container(
+              width: media.width,
+              height: media.width,
+              color: Colors.grey[300],
+              child: Center(
+                child: CircularProgressIndicator(color: TColor.primary),
+              ),
+            ),
+            errorWidget: (context, url, error) => Icon(Icons.error),
           ),
           Container(
             width: media.width,
@@ -126,7 +194,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 25),
                                 child: Text(
-                                  "Tandoori Chicken Pizza",
+                                  widget.item.name!,
                                   style: TextStyle(
                                       color: TColor.primaryText,
                                       fontSize: 22,
@@ -148,35 +216,19 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        IgnorePointer(
-                                          ignoring: true,
-                                          child: RatingBar.builder(
-                                            initialRating: 4,
-                                            minRating: 1,
-                                            direction: Axis.horizontal,
-                                            allowHalfRating: true,
-                                            itemCount: 5,
-                                            itemSize: 20,
-                                            itemPadding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 1.0),
-                                            itemBuilder: (context, _) => Icon(
-                                              Icons.star,
-                                              color: TColor.primary,
-                                            ),
-                                            onRatingUpdate: (rating) {
-                                              print(rating);
-                                            },
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
                                         Text(
-                                          " 4 Star Ratings",
+                                          "Category: " + widget.item.cName!,
                                           style: TextStyle(
-                                              color: TColor.primary,
-                                              fontSize: 11,
+                                              color: TColor.secondaryText,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        SizedBox(height: 4,),
+                                        Text(
+                                          "Preparation Time: " + time!,
+                                          style: TextStyle(
+                                              color: TColor.secondaryText,
+                                              fontSize: 14,
                                               fontWeight: FontWeight.w500),
                                         ),
                                       ],
@@ -186,7 +238,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                           CrossAxisAlignment.end,
                                       children: [
                                         Text(
-                                          "\$${price.toStringAsFixed(2)}",
+                                          "${widget.item.price!.toStringAsFixed(2)}₪",
                                           style: TextStyle(
                                               color: TColor.primaryText,
                                               fontSize: 31,
@@ -196,7 +248,8 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                           height: 4,
                                         ),
                                         Text(
-                                          "/per Portion",
+                                          "/" +
+                                              subQuantities[0]['sub_quantity']!,
                                           style: TextStyle(
                                               color: TColor.primaryText,
                                               fontSize: 11,
@@ -228,7 +281,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 25),
                                 child: Text(
-                                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare leo non mollis id cursus. Eu euismod faucibus in leo malesuada",
+                                  widget.item.notes!,
                                   style: TextStyle(
                                       color: TColor.secondaryText,
                                       fontSize: 12),
@@ -274,7 +327,8 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton(
                                       isExpanded: true,
-                                      items: ["small", "Big"].map((e) {
+                                      value: selectedValue,
+                                      items: listQuantities.map((e) {
                                         return DropdownMenuItem(
                                           value: e,
                                           child: Text(
@@ -285,7 +339,29 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                           ),
                                         );
                                       }).toList(),
-                                      onChanged: (val) {},
+                                      onChanged: (val) {
+                                        setState(() {
+                                          selectedValue = val;
+                                          if (val != null) {
+                                            var selectedItem =
+                                                subQuantities.firstWhere(
+                                                    (element) =>
+                                                        element[
+                                                            'sub_quantity'] ==
+                                                        val,
+                                                    orElse: () => {});
+                                            quantityId = selectedItem['id'];
+                                            discount = selectedItem['discount'];
+                                            quantity = selectedItem['quantity'];
+                                            genPrice =
+                                                widget.item.price! * quantity!;
+                                            discPrice = genPrice -
+                                                (genPrice * discount);
+                                            finalPrice = discPrice * qty;
+                                            setState(() {});
+                                          }
+                                        });
+                                      },
                                       hint: Text(
                                         "- Select the size of portion -",
                                         textAlign: TextAlign.center,
@@ -294,6 +370,29 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                             fontSize: 14),
                                       ),
                                     ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 25,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 25),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: TColor.textfield,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Add Notes',
+                                      hintStyle:
+                                          TextStyle(color: TColor.placeholder),
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 12),
+                                    ),
+                                    maxLines: null,
                                   ),
                                 ),
                               ),
@@ -320,6 +419,11 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                         if (qty < 1) {
                                           qty = 1;
                                         }
+                                        genPrice =
+                                            widget.item.price! * quantity!;
+                                        discPrice =
+                                            genPrice - (genPrice * discount);
+                                        finalPrice = discPrice * qty;
                                         setState(() {});
                                       },
                                       child: Container(
@@ -368,6 +472,11 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                     InkWell(
                                       onTap: () {
                                         qty = qty + 1;
+                                        genPrice =
+                                            widget.item.price! * quantity!;
+                                        discPrice =
+                                            genPrice - (genPrice * discount);
+                                        finalPrice = discPrice * qty;
 
                                         setState(() {});
                                       },
@@ -460,7 +569,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                     height: 15,
                                                   ),
                                                   Text(
-                                                    "\$${(price * qty).toString()}",
+                                                    "\₪${finalPrice.toString()}",
                                                     style: TextStyle(
                                                         color:
                                                             TColor.primaryText,
@@ -479,40 +588,48 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                         icon:
                                                             "assets/img/shopping_add.png",
                                                         color: TColor.primary,
-                                                        onPressed: () {}),
+                                                        onPressed: () async {
+                                                          await addCartItem();
+                                                        }),
                                                   )
                                                 ],
                                               )),
                                           InkWell(
                                             onTap: () {
-                                              Navigator.push(
+                                              pushReplacementWithAnimation(
+                                                  context, CartPage(kitchen: widget.kitchen,));
+                                              /* Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          Container()));
+                                                          CartPage())); */
                                             },
                                             child: Container(
-                                              width: 45,
-                                              height: 45,
-                                              decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          22.5),
-                                                  boxShadow: const [
-                                                    BoxShadow(
-                                                        color: Colors.black12,
-                                                        blurRadius: 4,
-                                                        offset: Offset(0, 2))
-                                                  ]),
-                                              alignment: Alignment.center,
-                                              child: IconButton(
-                                              icon: Image.asset(
-                                                  "assets/img/shopping_cart.png",
-                                                  width: 20,
-                                                  height: 20,
-                                                  color: TColor.primary), onPressed: () {  },)
-                                            ),
+                                                width: 45,
+                                                height: 45,
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            22.5),
+                                                    boxShadow: const [
+                                                      BoxShadow(
+                                                          color: Colors.black12,
+                                                          blurRadius: 4,
+                                                          offset: Offset(0, 2))
+                                                    ]),
+                                                alignment: Alignment.center,
+                                                child: IconButton(
+                                                  icon: Image.asset(
+                                                      "assets/img/shopping_cart.png",
+                                                      width: 20,
+                                                      height: 20,
+                                                      color: TColor.primary),
+                                                  onPressed: () {
+                                                    pushReplacementWithAnimation(
+                                                        context, CartPage(kitchen: widget.kitchen,));
+                                                  },
+                                                )),
                                           ),
                                         ],
                                       ),
@@ -529,22 +646,6 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                         height: 20,
                       ),
                     ],
-                  ),
-                  Container(
-                    height: media.width - 20,
-                    alignment: Alignment.bottomRight,
-                    margin: const EdgeInsets.only(right: 4),
-                    child: InkWell(
-                        onTap: () {
-                          isFav = !isFav;
-                          setState(() {});
-                        },
-                        child: Image.asset(
-                            isFav
-                                ? "assets/img/favorites_btn.png"
-                                : "assets/img/favorites_btn_2.png",
-                            width: 70,
-                            height: 70)),
                   ),
                 ],
               ),
@@ -575,10 +676,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                       ),
                       IconButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Container()));
+                          pushReplacementWithAnimation(context, CartPage(kitchen:widget.kitchen));
                         },
                         icon: Image.asset(
                           "assets/img/shopping_cart.png",

@@ -390,16 +390,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                       maxLines: 2,
                     ),
                   ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    child: RoundTitleTextfield(
-                      title: "Price",
-                      hintText: "Enter Price",
-                      controller: txtPrice,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
+         
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
@@ -449,6 +440,16 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
                               }
                             });
                           })),
+                                   Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Price",
+                      hintText: "Price For Selected Quantity",
+                      controller: txtPrice,
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
