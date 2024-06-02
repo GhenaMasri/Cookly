@@ -25,16 +25,48 @@ class _HomeViewState extends State<HomeView> {
   int? selectedCategoryId;
   List<Map<String, dynamic>> menuArr = [];
 
-//////////////////////////////// BACKEND SECTION ///////////////////////////
-  Future<void> _loadUserName() async {
-    String? name = await SharedPreferencesService.getUserName();
-    setState(() {
-      username = name;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
   }
 
-  Future<List<Map<String, dynamic>>> kitchensByCategories(
-      {String? city, int? category}) async {
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> _initData() async {
+    await _loadUserName();
+    await _updateMenuArr();
+    try {
+      var fetchedCategories = await getKitchenCategories();
+      if (mounted) {
+        setState(() {
+          categories = fetchedCategories;
+
+          for (var element in categories) {
+            if (element.containsKey('category')) {
+              categoriesList.add(element['category']);
+            }
+          }
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<void> _loadUserName() async {
+    String? name = await SharedPreferencesService.getUserName();
+    if (mounted) {
+      setState(() {
+        username = name;
+      });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> kitchensByCategories({String? city, int? category}) async {
     final Uri uri = Uri.parse('${SharedPreferencesService.url}home-page')
         .replace(queryParameters: {
       if (city != null) 'city': city,
@@ -46,16 +78,18 @@ class _HomeViewState extends State<HomeView> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> kitchensCount = data['kitchensCount'];
-      setState(() {
-        menuArr = kitchensCount.map((category) {
-          return {
-            'id': category['id'],
-            'category': category['category'],
-            'count': category['kitchen_count'],
-            'image': category['image']
-          };
-        }).toList();
-      });
+      if (mounted) {
+        setState(() {
+          menuArr = kitchensCount.map((category) {
+            return {
+              'id': category['id'],
+              'category': category['category'],
+              'count': category['kitchen_count'],
+              'image': category['image']
+            };
+          }).toList();
+        });
+      }
       return menuArr;
     } else {
       throw Exception('Failed to load categories count');
@@ -70,9 +104,11 @@ class _HomeViewState extends State<HomeView> {
 
       result = await kitchensByCategories(city: city, category: category);
 
-      setState(() {
-        menuArr = result;
-      });
+      if (mounted) {
+        setState(() {
+          menuArr = result;
+        });
+      }
     } catch (error) {
       print('Error loading menu items: $error');
     }
@@ -93,36 +129,10 @@ class _HomeViewState extends State<HomeView> {
       throw Exception('Failed to load kitchen categories');
     }
   }
-////////////////////////////////////////////////////////////////////////////
 
   List<Map<String, dynamic>> categories = [];
   List<String> categoriesList = [];
   String? category;
-  Future<void> _initData() async {
-    await _loadUserName();
-    kitchensByCategories();
-    try {
-      var fetchedCategories = await getKitchenCategories();
-
-      setState(() {
-        categories = fetchedCategories;
-
-        for (var element in categories) {
-          if (element.containsKey('category')) {
-            categoriesList.add(element['category']);
-          }
-        }
-      });
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _initDataFuture = _initData();
-  }
 
   @override
   Widget build(BuildContext context) {
