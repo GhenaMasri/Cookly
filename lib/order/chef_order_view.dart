@@ -11,11 +11,41 @@ class OrdersPage extends StatelessWidget {
       "orderTime": "12:30 PM",
       "status": "waiting",
       "items": [
-        {"name": "Beef Burger", "qty": "1", "price": 16.0},
-        {"name": "Classic Burger", "qty": "1", "price": 14.0},
-        {"name": "Cheese Chicken Burger", "qty": "1", "price": 17.0},
-        {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
-        {"name": "French Fries Large", "qty": "1", "price": 6.0}
+        {
+          "name": "Beef Burger",
+          "qty": "1",
+          "price": 16.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Classic Burger",
+          "qty": "1",
+          "price": 14.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Cheese Chicken Burger",
+          "qty": "1",
+          "price": 17.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Chicken Legs Basket",
+          "qty": "1",
+          "price": 15.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "French Fries Large",
+          "qty": "1",
+          "price": 6.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        }
       ],
       "ContactNumber": "0597280457"
     },
@@ -25,13 +55,43 @@ class OrdersPage extends StatelessWidget {
       "orderTime": "12:30 PM",
       "status": "waiting",
       "items": [
-        {"name": "Beef Burger", "qty": "1", "price": 16.0},
-        {"name": "Classic Burger", "qty": "1", "price": 14.0},
-        {"name": "Cheese Chicken Burger", "qty": "1", "price": 17.0},
-        {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
-        {"name": "French Fries Large", "qty": "1", "price": 6.0}
+        {
+          "name": "Beef Burger",
+          "qty": "1",
+          "price": 16.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Classic Burger",
+          "qty": "1",
+          "price": 14.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Cheese Chicken Burger",
+          "qty": "1",
+          "price": 17.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Chicken Legs Basket",
+          "qty": "1",
+          "price": 15.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "French Fries Large",
+          "qty": "1",
+          "price": 6.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        }
       ],
-       "ContactNumber": "0597280457"
+      "ContactNumber": "0597280457"
     },
     {
       "customerName": "John Doe",
@@ -39,13 +99,43 @@ class OrdersPage extends StatelessWidget {
       "orderTime": "12:30 PM",
       "status": "waiting",
       "items": [
-        {"name": "Beef Burger", "qty": "1", "price": 16.0},
-        {"name": "Classic Burger", "qty": "1", "price": 14.0},
-        {"name": "Cheese Chicken Burger", "qty": "1", "price": 17.0},
-        {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
-        {"name": "French Fries Large", "qty": "1", "price": 6.0}
+        {
+          "name": "Beef Burger",
+          "qty": "1",
+          "price": 16.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Classic Burger",
+          "qty": "1",
+          "price": 14.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Cheese Chicken Burger",
+          "qty": "1",
+          "price": 17.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Chicken Legs Basket",
+          "qty": "1",
+          "price": 15.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "French Fries Large",
+          "qty": "1",
+          "price": 6.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        }
       ],
-       "ContactNumber": "0597280457"
+      "ContactNumber": "0597280457"
     },
     {
       "customerName": "John Doe",
@@ -53,22 +143,51 @@ class OrdersPage extends StatelessWidget {
       "orderTime": "12:30 PM",
       "status": "waiting",
       "items": [
-        {"name": "Beef Burger", "qty": "1", "price": 16.0},
-        {"name": "Classic Burger", "qty": "1", "price": 14.0},
-        {"name": "Cheese Chicken Burger", "qty": "1", "price": 17.0},
-        {"name": "Chicken Legs Basket", "qty": "1", "price": 15.0},
-        {"name": "French Fries Large", "qty": "1", "price": 6.0}
+        {
+          "name": "Beef Burger",
+          "qty": "1",
+          "price": 16.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Classic Burger",
+          "qty": "1",
+          "price": 14.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Cheese Chicken Burger",
+          "qty": "1",
+          "price": 17.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Chicken Legs Basket",
+          "qty": "1",
+          "price": 15.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "French Fries Large",
+          "qty": "1",
+          "price": 6.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        }
       ],
-       "ContactNumber": "0597280457"
+      "ContactNumber": "0597280457"
     },
     // Add more orders here
   ];
 
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: TColor.white,
-     
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView.builder(
@@ -114,7 +233,8 @@ class OrdersPage extends StatelessWidget {
                                 SizedBox(height: 8.0),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on, size: 20, color: TColor.primary),
+                                    Icon(Icons.location_on,
+                                        size: 20, color: TColor.primary),
                                     SizedBox(width: 5.0),
                                     Text(order['location']),
                                   ],
@@ -122,7 +242,8 @@ class OrdersPage extends StatelessWidget {
                                 SizedBox(height: 5.0),
                                 Row(
                                   children: [
-                                    Icon(Icons.access_time, size: 20, color: TColor.primary),
+                                    Icon(Icons.access_time,
+                                        size: 20, color: TColor.primary),
                                     SizedBox(width: 5.0),
                                     Text(order['orderTime']),
                                   ],
@@ -130,7 +251,8 @@ class OrdersPage extends StatelessWidget {
                                 SizedBox(height: 5.0),
                                 Row(
                                   children: [
-                                    Icon(Icons.assignment_turned_in, size: 20, color: TColor.primary),
+                                    Icon(Icons.assignment_turned_in,
+                                        size: 20, color: TColor.primary),
                                     SizedBox(width: 5.0),
                                     Text(
                                       order['status'].toUpperCase(),
@@ -154,7 +276,8 @@ class OrdersPage extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {
-                      pushReplacementWithAnimation(context, OrderDetailsPage(order: order));
+                      pushReplacementWithAnimation(
+                          context, OrderDetailsPage(order: order));
                       /* Navigator.push(
                         context,
                         MaterialPageRoute(

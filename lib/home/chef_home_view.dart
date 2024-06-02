@@ -40,7 +40,6 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     if (mounted) {
       setState(() {
         menuArr.remove(item);
-        //Also remove from DB
       });
     }
   }
@@ -148,11 +147,6 @@ class _ChefHomeViewState extends State<ChefHomeView> {
         kitchenId = kitchenid;
       });
     }
-    try {
-      await _updateMenuArr();
-    } catch (error) {
-      print('Error loading menu items: $error');
-    }
   }
 
   Future<void> _updateMenuArr() async {
@@ -187,10 +181,19 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     return category['category'];
   }
 
+  Future<void> _initData() async {
+    await _loadKitchenId();
+     try {
+      await _updateMenuArr();
+    } catch (error) {
+      print('Error loading menu items: $error');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _initDataFuture = _loadKitchenId();
+    _initDataFuture = _initData();
     txtSearch.addListener(_updateMenuArr);
   }
 
