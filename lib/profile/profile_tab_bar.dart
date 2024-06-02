@@ -13,7 +13,7 @@ class ProfileTabBar extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.white,
           title: Text(
             "Cookly",
             style: TextStyle(color: TColor.primary, fontSize: 30),

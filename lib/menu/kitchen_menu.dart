@@ -115,6 +115,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
 
   Widget buildContent() {
     return Scaffold(
+      backgroundColor: TColor.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),

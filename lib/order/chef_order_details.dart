@@ -2,14 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import '../common_widget/round_button.dart';
 
-class OrderDetailsPage extends StatelessWidget {
+class OrderDetailsPage extends StatefulWidget {
   final Map<String, dynamic> order;
 
   OrderDetailsPage({required this.order});
 
   @override
+  _OrderDetailsPageState createState() => _OrderDetailsPageState();
+}
+
+class _OrderDetailsPageState extends State<OrderDetailsPage> {
+  late String _currentStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentStatus = widget.order['status'];
+  }
+
+  @override
   Widget build(BuildContext context) {
-    double subtotal = order['items'].fold(0, (sum, item) => sum + item['price']);
+    double subtotal =
+        widget.order['items'].fold(0, (sum, item) => sum + item['price']);
     double deliveryCost = 2.0; // example delivery cost
     double total = subtotal + deliveryCost;
 
@@ -31,6 +45,8 @@ class OrderDetailsPage extends StatelessWidget {
             children: [
               _buildCustomerDetails(),
               const SizedBox(height: 20),
+              _buildStatusSegmentedControl(),
+              const SizedBox(height: 20),
               Text(
                 'Items:',
                 style: TextStyle(
@@ -46,8 +62,7 @@ class OrderDetailsPage extends StatelessWidget {
               const SizedBox(height: 15),
               _buildCostSummary(subtotal, deliveryCost, total),
               const SizedBox(height: 25),
-              _buildActionButtons(),
-              const SizedBox(height: 20),
+              
             ],
           ),
         ),
@@ -64,7 +79,7 @@ class OrderDetailsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                order['customerName'],
+                widget.order['customerName'],
                 style: TextStyle(
                   color: TColor.primaryText,
                   fontSize: 18,
@@ -73,7 +88,7 @@ class OrderDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Location: ${order['location']}',
+                'Location: ${widget.order['location']}',
                 style: TextStyle(
                   color: TColor.secondaryText,
                   fontSize: 12,
@@ -81,7 +96,7 @@ class OrderDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Order Time: ${order['orderTime']}',
+                'Order Time: ${widget.order['orderTime']}',
                 style: TextStyle(
                   color: TColor.secondaryText,
                   fontSize: 12,
@@ -89,7 +104,7 @@ class OrderDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Contact Number: ${order['ContactNumber']}',
+                'Contact Number: ${widget.order['ContactNumber']}',
                 style: TextStyle(
                   color: TColor.secondaryText,
                   fontSize: 12,
@@ -109,7 +124,7 @@ class OrderDetailsPage extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.zero,
-        itemCount: order['items'].length,
+        itemCount: widget.order['items'].length,
         separatorBuilder: (context, index) => Divider(
           indent: 25,
           endIndent: 25,
@@ -117,7 +132,7 @@ class OrderDetailsPage extends StatelessWidget {
           height: 1,
         ),
         itemBuilder: (context, index) {
-          var item = order['items'][index];
+          var item = widget.order['items'][index];
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
             child: ExpansionTile(
@@ -134,7 +149,7 @@ class OrderDetailsPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "\$${item['price']}",
+                    "${item['price']}₪",
                     style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 13,
@@ -145,7 +160,8 @@ class OrderDetailsPage extends StatelessWidget {
               ),
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
+                  padding:
+                      const EdgeInsets.only(left: 15, right: 15, bottom: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -230,7 +246,7 @@ class OrderDetailsPage extends StatelessWidget {
               ),
             ),
             Text(
-              "\$${total.toStringAsFixed(2)}",
+              "${total.toStringAsFixed(2)}₪",
               style: TextStyle(
                 color: TColor.primary,
                 fontSize: 22,
@@ -256,7 +272,7 @@ class OrderDetailsPage extends StatelessWidget {
           ),
         ),
         Text(
-          "\$${amount.toStringAsFixed(2)}",
+          "${amount.toStringAsFixed(2)}₪",
           style: TextStyle(
             color: TColor.primary,
             fontSize: 13,
@@ -267,24 +283,87 @@ class OrderDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
-    return Column(
-      children: [
-        RoundButton(
-          title: 'Accept',
-          onPressed: () {
-            // Implement accept functionality
-          },
+ Widget _buildStatusSegmentedControl() {
+  List<String> statusesOrder = ['Pending', 'In Progress', 'Delivered'];
+
+  // Find the index of the current status in the order
+  int currentStatusIndex = statusesOrder.indexOf(_currentStatus);
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(
+          'Order Status',
+          style: TextStyle(
+            color: TColor.primaryText,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
         ),
-        const SizedBox(height: 10),
-        RoundButton(
-          title: 'Decline',
-          type: RoundButtonType.textPrimary,
-          onPressed: () {
-            // Implement decline functionality
-          },
+      ),
+      Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ToggleButtons(
+            borderRadius: BorderRadius.circular(10),
+            children: <Widget>[
+              _buildStatusButton(
+                  'Pending', Colors.yellow, _currentStatus == 'Pending'),
+              _buildStatusButton('In Progress', Colors.orange,
+                  _currentStatus == 'In Progress'),
+              _buildStatusButton(
+                  'Delivered', Colors.green, _currentStatus == 'Delivered'),
+            ],
+            isSelected: [
+              _currentStatus == 'Pending',
+              _currentStatus == 'In Progress',
+              _currentStatus == 'Delivered',
+            ],
+            onPressed: (int index) {
+              int nextStatusIndex = currentStatusIndex + 1;
+
+              if (index == nextStatusIndex && nextStatusIndex < statusesOrder.length) {
+                setState(() {
+                  _currentStatus = statusesOrder[nextStatusIndex];
+                });
+              }
+            },
+            color: TColor.primaryText,
+            selectedColor: TColor.white,
+            fillColor: Colors.transparent,
+            selectedBorderColor: TColor.white,
+            //borderColor: TColor.primary,
+          ),
         ),
-      ],
+      ),
+    ],
+  );
+}
+
+
+  Widget _buildStatusButton(String text, Color color, bool isSelected) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            color.withOpacity(0.7),
+            color.withOpacity(0.9),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          color: isSelected ? TColor.white : TColor.primaryText,
+        ),
+      ),
     );
   }
 }

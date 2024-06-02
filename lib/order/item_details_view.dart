@@ -326,6 +326,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                       borderRadius: BorderRadius.circular(5)),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton(
+                                      dropdownColor: TColor.white,
                                       isExpanded: true,
                                       value: selectedValue,
                                       items: listQuantities.map((e) {
@@ -351,7 +352,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                         val,
                                                     orElse: () => {});
                                             quantityId = selectedItem['id'];
-                                            discount = selectedItem['discount'];
+                                            discount = selectedItem['discount'].toDouble();
                                             quantity = selectedItem['quantity'];
                                             genPrice =
                                                 widget.item.price! * quantity!;
@@ -384,6 +385,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: TextField(
+                                    controller: txtNotes,
                                     decoration: InputDecoration(
                                       hintText: 'Add Notes',
                                       hintStyle:

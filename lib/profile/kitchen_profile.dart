@@ -229,6 +229,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
 
   Widget buildContent() {
     return Scaffold(
+      backgroundColor: TColor.white,
         body: SingleChildScrollView(
             child: Form(
       key: formState,

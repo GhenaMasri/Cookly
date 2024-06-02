@@ -3,13 +3,18 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/chef_order_details.dart';
 
-class OrdersPage extends StatelessWidget {
+class ChefOrderDelievered extends StatefulWidget {
+  @override
+  _ChefOrderDelieveredState createState() => _ChefOrderDelieveredState();
+}
+
+class _ChefOrderDelieveredState extends State<ChefOrderDelievered> {
   final List<Map<String, dynamic>> orders = [
     {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "waiting",
+      "status": "Delivered",
       "items": [
         {
           "name": "Beef Burger",
@@ -53,7 +58,7 @@ class OrdersPage extends StatelessWidget {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "waiting",
+      "status": "Delivered",
       "items": [
         {
           "name": "Beef Burger",
@@ -97,7 +102,7 @@ class OrdersPage extends StatelessWidget {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "waiting",
+      "status": "Delivered",
       "items": [
         {
           "name": "Beef Burger",
@@ -141,7 +146,7 @@ class OrdersPage extends StatelessWidget {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "waiting",
+      "status": "Delivered",
       "items": [
         {
           "name": "Beef Burger",
@@ -184,7 +189,7 @@ class OrdersPage extends StatelessWidget {
     // Add more orders here
   ];
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: TColor.white,
@@ -197,7 +202,6 @@ class OrdersPage extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Stack(
-                alignment: Alignment.centerRight,
                 children: [
                   Container(
                     width: double.infinity,
@@ -251,19 +255,11 @@ class OrdersPage extends StatelessWidget {
                                 SizedBox(height: 5.0),
                                 Row(
                                   children: [
-                                    Icon(Icons.assignment_turned_in,
+                                    Icon(Icons.phone,
                                         size: 20, color: TColor.primary),
                                     SizedBox(width: 5.0),
                                     Text(
-                                      order['status'].toUpperCase(),
-                                      style: TextStyle(
-                                        color: order['status'] == 'accepted'
-                                            ? Colors.green
-                                            : order['status'] == 'declined'
-                                                ? Colors.red
-                                                : Colors.orange,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      order['ContactNumber'],
                                     ),
                                   ],
                                 ),
@@ -274,35 +270,100 @@ class OrdersPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      pushReplacementWithAnimation(
-                          context, OrderDetailsPage(order: order));
-                      /* Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailsPage(order: order),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              title: Text('Report User'),
+                              content: Text('Do you want to report this user?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'No',
+                                    style: TextStyle(color: TColor.primary),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text(
+                                    'Yes',
+                                    style: TextStyle(color: TColor.primary),
+                                  ),
+                                  onPressed: () {
+                                    // Report Logic
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(17.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ); */
-                    },
-                    icon: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(17.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.report,
+                          color: TColor.primary,
+                        ),
                       ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.arrow_forward,
-                        color: TColor.primary,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: IconButton(
+                      onPressed: () {
+                        pushReplacementWithAnimation(
+                            context, OrderDetailsPage(order: order));
+                        /* Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderDetailsPage(order: order),
+                          ),
+                        ); */
+                      },
+                      icon: Container(
+                        width: 35,
+                        height: 35,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(17.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: TColor.primary,
+                        ),
                       ),
                     ),
                   ),

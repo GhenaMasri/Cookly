@@ -259,6 +259,7 @@ class _ManageMenuItemViewState extends State<ManageMenuItemView> {
 
   Widget buildContent() {
     return Scaffold(
+      backgroundColor: TColor.white,
       body: SingleChildScrollView(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),

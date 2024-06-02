@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/more/more_view.dart';
-import 'package:untitled/order/chef_order_view.dart';
+import 'package:untitled/order/chef_order_pending.dart';
 import 'package:untitled/order/orders_tab_bar.dart';
+import 'package:untitled/order/user_orders.dart';
 import 'package:untitled/profile/profile_tab_bar.dart';
 import 'package:untitled/profile/user_profile.dart';
 import '../common_widget/tab_button.dart';
@@ -79,12 +80,11 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 1) {
                       selectTab = 1;
-                      selectPageView = OrdersTabBar();
-                      /*if (type == "chef") {
-                        selectPageView = Container();
+                      if (type == "chef") {
+                        selectPageView = OrdersTabBar();
                       } else {
-                        selectPageView = Container();
-                      }*/
+                        selectPageView = UserOrders();
+                      }
                     }
                     if (mounted) {
                       setState(() {});
