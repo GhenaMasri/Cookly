@@ -59,7 +59,9 @@ class _UserKitchensViewState extends State<UserKitchensView> {
             'rate': kitchen['rate'],
             'order_system': kitchen['order_system'],
             'status': 'open', // Replace this with actual status
-            'street': 'Rafidya', //Replace this with street
+            'street': kitchen['street'], 
+            'contact': kitchen['contact'],
+            'city': kitchen['city']
           };
         }).toList();
       });

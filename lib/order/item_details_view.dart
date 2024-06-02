@@ -39,7 +39,6 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> addCartItem() async {
-    //call it in add item to cart button
     const url = '${SharedPreferencesService.url}add-cart-item';
     try {
       final response = await http.post(
@@ -47,14 +46,11 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'userId': userId,
-          'menuItemId': widget
-              .item.itemId, //change it to the id come from the previous page
+          'menuItemId': widget.item.itemId, 
           'quantity': qty,
           'price': finalPrice,
-          'notes':
-              txtNotes.text, //change it to the text inside the notes text field
-          'subQuantityId':
-              quantityId //change it to be the sub quantity id the user choose from subQuantities array
+          'notes': txtNotes.text, 
+          'subQuantityId': quantityId 
         }),
       );
       if (response.statusCode == 200) {
@@ -68,7 +64,6 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
   }
 
   Future<void> fetchSubFoodQuantities(int quantityId) async {
-    //call it in future data
     final url = Uri.parse(
         '${SharedPreferencesService.url}sub-food-quantities?quantityId=$quantityId');
 
@@ -90,7 +85,6 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
   }
 
   Future<void> _loadUserId() async {
-    //call it in future data
     int? id = await SharedPreferencesService.getId();
     setState(() {
       userId = id;
@@ -225,7 +219,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                         ),
                                         SizedBox(height: 4,),
                                         Text(
-                                          "Preparation Time: " + time!,
+                                          time == "Day before" ? "Should order day before": "Preparation Time: ${time!}",
                                           style: TextStyle(
                                               color: TColor.secondaryText,
                                               fontSize: 14,
@@ -351,7 +345,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                         val,
                                                     orElse: () => {});
                                             quantityId = selectedItem['id'];
-                                            discount = selectedItem['discount'];
+                                            discount = selectedItem['discount'].toDouble();
                                             quantity = selectedItem['quantity'];
                                             genPrice =
                                                 widget.item.price! * quantity!;
@@ -384,6 +378,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: TextField(
+                                    controller: txtNotes,
                                     decoration: InputDecoration(
                                       hintText: 'Add Notes',
                                       hintStyle:
@@ -589,7 +584,13 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                             "assets/img/shopping_add.png",
                                                         color: TColor.primary,
                                                         onPressed: () async {
-                                                          await addCartItem();
+                                                          Map<String, dynamic> result = await addCartItem();
+                                                          bool success = result['success'];
+                                                          String message = result['message'];
+                                                          print(message);
+                                                          if (success) {
+                                                            //go back to menu items page 
+                                                          }
                                                         }),
                                                   )
                                                 ],

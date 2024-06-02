@@ -26,7 +26,6 @@ class _CartPageState extends State<CartPage> {
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> getCartItems(int userId) async {
-    //call it in future data
     final url = Uri.parse(
         '${SharedPreferencesService.url}get-cart-items?userId=$userId');
 
@@ -47,7 +46,6 @@ class _CartPageState extends State<CartPage> {
   }
 
   Future<Map<String, dynamic>> deleteCartItem(int cartItemId) async {
-    //call it when verify deletion
     final url =
         '${SharedPreferencesService.url}delete-cart-item?cartItemId=$cartItemId';
     try {
@@ -66,7 +64,6 @@ class _CartPageState extends State<CartPage> {
   }
 
   Future<void> _loadUserId() async {
-    //call it in future data
     int? id = await SharedPreferencesService.getId();
     setState(() {
       userId = id;
@@ -196,7 +193,7 @@ class _CartPageState extends State<CartPage> {
                         title: "Order Now",
                         onPressed: () {
                           pushReplacementWithAnimation(
-                              context, MyOrderView(items: cartItems, kitchen: widget.kitchen,));
+                              context, MyOrderView(items: cartItems, kitchen: widget.kitchen, userId: userId!));
                         },
                       ),
                     )),
