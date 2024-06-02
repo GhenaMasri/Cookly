@@ -86,6 +86,12 @@ app.use("/get-cart-items", getCartItemsRoute);
 const deleteCartItemRoute = require("./routes/user/delete_cart_item");
 app.use("/delete-cart-item", deleteCartItemRoute);
 
+const addOrderItemsRoute = require("./routes/user/add_order_items");
+app.use("/add-order-items", addOrderItemsRoute);
+
+const placeOrderRoute = require("./routes/user/place_order");
+app.use("/place-order", placeOrderRoute);
+
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

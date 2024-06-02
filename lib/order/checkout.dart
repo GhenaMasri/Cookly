@@ -4,11 +4,17 @@ import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/more/add_card_view.dart';
 import 'package:untitled/order/checkout_message_view.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class CheckoutView extends StatefulWidget {
   final double totalPrice;
   final double deliveryCost;
-  const CheckoutView({super.key, required this.totalPrice, required this.deliveryCost});
+  final int orderId;
+  final Map kitchen;
+  const CheckoutView(
+      {super.key, required this.totalPrice, required this.deliveryCost, required this.orderId, required this.kitchen});
 
   @override
   State<CheckoutView> createState() => _CheckoutViewState();
@@ -21,20 +27,60 @@ class _CheckoutViewState extends State<CheckoutView> {
     {"name": "test@gmail.com", "icon": "assets/img/paypal.png"},
   ];
 
-  double? discount = 5.0;
+  double? discount = 0.0;
   double? checkoutPrice = 0.0;
-
-  @override
-   void initState() {
-    super.initState();
-
-  checkoutPrice  = widget.deliveryCost+widget.totalPrice-discount!;
-  }
- 
 
   int selectMethod = -1;
   TextEditingController txtStreet = TextEditingController();
   TextEditingController txtNumber = TextEditingController();
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> placeOrder() async {
+    const String apiUrl = '${SharedPreferencesService.url}place-order';
+
+    final Map<String, dynamic> requestBody = {
+      'orderId': widget.orderId,
+      'totalPrice': widget.totalPrice,
+      'status': "pending",
+      'userNumber': txtNumber.text,
+      'kitchenNumber': widget.kitchen['contact'],
+      'city': widget.kitchen['city'],
+      'address': txtStreet.text
+    };
+
+    try {
+      final http.Response response = await http.put(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+  
+  Future<void> _loadUserNumber() async {
+    String? number = await SharedPreferencesService.getUserNumber();
+    setState(() {
+      txtNumber.text = number!;
+    });
+  }
+  /////////////////////////////////////////////////////////////////////////////////
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserNumber();
+    checkoutPrice = widget.deliveryCost + widget.totalPrice - discount!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +141,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                         vertical: 8,
                       ),
                       child: RoundTitleTextfield(
-                        title: "Street",
-                        hintText: "Street",
+                        title: "Address",
+                        hintText: "Enter Detaild Address",
                         controller: txtStreet,
                         validator: (value) =>
                             value!.isEmpty ? "Couldn't be empty" : null,
@@ -232,7 +278,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          widget.totalPrice.toString()+"₪",
+                          widget.totalPrice.toString() + "₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 13,
@@ -255,7 +301,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          widget.deliveryCost.toString()+"₪",
+                          widget.deliveryCost.toString() + "₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 13,
@@ -278,7 +324,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          discount.toString()+"₪",
+                          discount.toString() + "₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 13,
@@ -308,7 +354,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
-                          checkoutPrice.toString()+"₪",
+                          checkoutPrice.toString() + "₪",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 15,
@@ -331,14 +377,20 @@ class _CheckoutViewState extends State<CheckoutView> {
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
                 child: RoundButton(
                     title: "Send Order",
-                    onPressed: () {
-                      showModalBottomSheet(
+                    onPressed: () async {
+                      Map<String, dynamic> result = await placeOrder();
+                      bool success = result['success'];
+                      String message = result['message'];
+                      print(message);
+                      if (success) {
+                        showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.transparent,
                           isScrollControlled: true,
                           builder: (context) {
                             return const CheckoutMessageView();
                           });
+                      }
                     }),
               ),
             ],

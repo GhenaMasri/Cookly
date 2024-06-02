@@ -5,11 +5,15 @@ import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/checkout.dart';
+import 'dart:convert';
+import 'package:untitled/common/globs.dart';
+import 'package:http/http.dart' as http;
 
 class MyOrderView extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   final Map kitchen;
-  const MyOrderView({super.key, required this.items, required this.kitchen});
+  final int userId;
+  const MyOrderView({super.key, required this.items, required this.kitchen, required this.userId});
 
   @override
   State<MyOrderView> createState() => _MyOrderViewState();
@@ -21,11 +25,48 @@ class _MyOrderViewState extends State<MyOrderView> {
   double? totalPrice;
   double deliveryCost = 10.0;
   double? finalPrice;
+  int? cartId;
+  int? orderId;
 
   double calculateTotalPrice() {
     return widget.items.fold(0.0, (sum, item) {
       return sum + (item['price'].toDouble());
     });}
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> addOrderItems(userId, kitchenId, cartId, cartItems) async {
+    const String apiUrl = '${SharedPreferencesService.url}add-order-items';
+
+    final Map<String, dynamic> requestBody = {
+      'userId': userId,
+      'kitchenId': kitchenId,
+      'cartId': cartId,
+      'cartItems': cartItems,
+    };
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        setState(() {
+          orderId = responseData['orderId'];
+        });
+        return {'success': true};
+      } else {
+        return {'success': false};
+      }
+    } catch (error) {
+      return {'success': false};
+    }
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
@@ -33,6 +74,7 @@ class _MyOrderViewState extends State<MyOrderView> {
     delivery = "Yes";
     totalPrice = calculateTotalPrice();
     finalPrice  = deliveryCost+totalPrice!;
+    cartId = widget.items.isNotEmpty ? widget.items[0]['cart_id'] : null;
   }
 
   @override
@@ -285,7 +327,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Notes",
+                          "General notes on the order",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                               color: TColor.primaryText,
@@ -452,8 +494,13 @@ class _MyOrderViewState extends State<MyOrderView> {
                     ),
                     RoundButton(
                         title: "Checkout",
-                        onPressed: () {
-                          pushReplacementWithAnimation(context, CheckoutView(totalPrice:totalPrice!,deliveryCost:deliveryCost));
+                        onPressed: () async {
+                          Map<String, dynamic> result = await addOrderItems(widget.userId, widget.kitchen['id'], cartId, widget.items);
+                          bool success = result['success'];
+                          print(success);
+                          if (success) {
+                            pushReplacementWithAnimation(context, CheckoutView(totalPrice:totalPrice!,deliveryCost:deliveryCost, orderId: orderId!, kitchen: widget.kitchen));
+                          }
                           /* Navigator.push(
                             context,
                             MaterialPageRoute(
