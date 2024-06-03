@@ -157,6 +157,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   Widget buildContent() {
     return Scaffold(
+      backgroundColor: TColor.white,
         body: SingleChildScrollView(
             child: Form(
       key: formState,

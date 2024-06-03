@@ -224,6 +224,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   Widget buildContent() {
     var media = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: TColor.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

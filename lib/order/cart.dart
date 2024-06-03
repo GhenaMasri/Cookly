@@ -107,7 +107,9 @@ class _CartPageState extends State<CartPage> {
 
   Widget buildContent() {
     return Scaffold(
+      backgroundColor: TColor.white,
       appBar: AppBar(
+        backgroundColor: TColor.white,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);

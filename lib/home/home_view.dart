@@ -154,6 +154,7 @@ class _HomeViewState extends State<HomeView> {
   Widget buildContent() {
     var media = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: TColor.white,
       body: Stack(
         children: [
           Positioned(

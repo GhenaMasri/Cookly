@@ -130,6 +130,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
 
   Widget buildContent() {
     return Scaffold(
+      backgroundColor: TColor.white,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

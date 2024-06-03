@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
-import 'package:untitled/order/chef_order_view.dart';
+import 'package:untitled/order/chef_order_delivered.dart';
+import 'package:untitled/order/chef_order_inprogress.dart';
+import 'package:untitled/order/chef_order_pending.dart';
 
 class OrdersTabBar extends StatelessWidget {
   const OrdersTabBar({super.key});
@@ -9,9 +11,10 @@ class OrdersTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: 0,
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: TColor.white,
           title: Text(
             "Cookly",
             style: TextStyle(color: TColor.primary, fontSize: 30),
@@ -31,9 +34,10 @@ class OrdersTabBar extends StatelessWidget {
           bottom: const TabBar(
             tabs: <Widget>[
               Tab(
-                text: 'Current Orders',
+                text: 'Pending',
               ),
-              Tab(text: 'Past Orders'),
+              Tab(text: 'In Progress'),
+              Tab(text: 'Delivered'),
             ],
             indicatorColor: Color.fromARGB(255, 230, 81, 0),
             labelColor: Color.fromARGB(255, 230, 81, 0),
@@ -41,8 +45,9 @@ class OrdersTabBar extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            OrdersPage(),
-            OrdersPage(),
+            ChefOrderPending(),
+            ChefOrderInprogress(),
+            ChefOrderDelievered(),
           ],
         ),
       ),

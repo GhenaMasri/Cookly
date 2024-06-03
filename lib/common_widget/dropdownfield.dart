@@ -50,6 +50,7 @@ class RoundDropdown extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: DropdownButtonHideUnderline(
                 child: DropdownButtonFormField<String>(
+                  dropdownColor: TColor.white,
                   value: value,
                   isExpanded: true,
                   hint: Text(

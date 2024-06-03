@@ -320,6 +320,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                       borderRadius: BorderRadius.circular(5)),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton(
+                                      dropdownColor: TColor.white,
                                       isExpanded: true,
                                       value: selectedValue,
                                       items: listQuantities.map((e) {

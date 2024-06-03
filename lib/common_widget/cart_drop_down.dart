@@ -34,6 +34,7 @@ class _CartDropdownMenuState extends State<CartDropdownMenu> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DropdownButton<String>(
+          dropdownColor: TColor.white,
           isExpanded:
               true, // Ensures the dropdown button expands to fill available width
           value: selectedOption,

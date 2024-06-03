@@ -176,6 +176,7 @@ class _MenuItemViewState extends State<MenuItemView> {
 
   Widget buildContent() {
     return Scaffold(
+      backgroundColor: TColor.white,
       body: SingleChildScrollView(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
