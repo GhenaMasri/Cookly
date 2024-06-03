@@ -499,7 +499,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                           bool success = result['success'];
                           print(success);
                           if (success) {
-                            pushReplacementWithAnimation(context, CheckoutView(totalPrice:totalPrice!,deliveryCost:deliveryCost, orderId: orderId!, kitchen: widget.kitchen));
+                            pushReplacementWithAnimation(context, CheckoutView(totalPrice:totalPrice!,deliveryCost:deliveryCost, orderId: orderId!, kitchen: widget.kitchen, notes: txtNotes.text,));
                           }
                           /* Navigator.push(
                             context,

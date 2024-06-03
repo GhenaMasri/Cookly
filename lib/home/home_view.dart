@@ -57,6 +57,7 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+//////////////////////////////////// BACKEND SECTION //////////////////////////////////////
   Future<void> _loadUserName() async {
     String? name = await SharedPreferencesService.getUserName();
     if (mounted) {
@@ -129,7 +130,8 @@ class _HomeViewState extends State<HomeView> {
       throw Exception('Failed to load kitchen categories');
     }
   }
-
+/////////////////////////////////////////////////////////////////////////////////////////////
+  
   List<Map<String, dynamic>> categories = [];
   List<String> categoriesList = [];
   String? category;

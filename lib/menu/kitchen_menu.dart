@@ -28,10 +28,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
   late Future<void> _initDataFuture;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<List<MenuItem>> getMenuItems(
-      {required int kitchenId, String? name}) async {
-    final Uri uri =
-        Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
+  Future<List<MenuItem>> getMenuItems({required int kitchenId, String? name}) async {
+    final Uri uri = Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
       queryParameters: {
         'kitchenId': kitchenId.toString(),
         if (name != null) 'name': name,
