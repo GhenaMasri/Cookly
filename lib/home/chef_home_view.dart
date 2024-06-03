@@ -57,17 +57,21 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<List<MenuItem>> chefMenuItems() async {
-    final url =
-        '${SharedPreferencesService.url}chef-menu-items?kitchenId=$kitchenId';
-    try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-      );
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body)['items'];
-        List<MenuItem> menuItems = data.map((item) {
+  Future<List<MenuItem>> getMenuItems({required int kitchenId, String? name}) async {
+    final Uri uri = Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
+      queryParameters: {
+        'kitchenId': kitchenId.toString(),
+        if (name != null) 'name': name,
+      },
+    );
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      final List<dynamic> items = data['items'];
+      setState(() {
+        menuArr = items.map((item) {
           return MenuItem(
             kitchenId: item['kitchen_id'],
             itemId: item['id'],
@@ -75,17 +79,17 @@ class _ChefHomeViewState extends State<ChefHomeView> {
             name: item['name'],
             notes: item['notes'],
             quantity: item['quantity_id'],
-            category: item['category_id'],
+            category: item['category_id'], 
+            cName: item['category_name'],
             price: item['price'].toDouble(),
             time: item['time'],
+            qName: item['quantity_name']
           );
         }).toList();
-        return menuItems;
-      } else {
-        throw Exception('Failed to load menu items');
-      }
-    } catch (error) {
-      throw Exception('Error: $error');
+      });
+      return menuArr;
+    } else {
+      throw Exception('Failed to load menu items');
     }
   }
 
@@ -105,41 +109,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
-  Future<List<MenuItem>> searchMenuItems(String query) async {
-    final url = '${SharedPreferencesService.url}search-menu-items';
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'kitchenId': kitchenId,
-          'query': query,
-        }),
-      );
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body)['items'];
-        List<MenuItem> menuItems = data.map((item) {
-          return MenuItem(
-            kitchenId: item['kitchen_id'],
-            itemId: item['id'],
-            image: item['image'],
-            name: item['name'],
-            notes: item['notes'],
-            quantity: item['quantity_id'],
-            category: item['category_id'],
-            price: item['price'].toDouble(),
-            time: item['time'],
-          );
-        }).toList();
-        return menuItems;
-      } else {
-        throw Exception('Failed to load search results');
-      }
-    } catch (error) {
-      throw Exception('Error: $error');
-    }
-  }
-
+  
   Future<void> _loadKitchenId() async {
     int? kitchenid = await SharedPreferencesService.getKitchenId();
     if (mounted) {
@@ -154,15 +124,16 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       List<MenuItem> items;
       var fetchedCategories = await getFoodCategories();
       if (txtSearch.text.isNotEmpty) {
-        items = await searchMenuItems(txtSearch.text);
+        items = await getMenuItems(kitchenId: kitchenId!, name: txtSearch.text);
       } else {
-        items = await chefMenuItems();
+        items = await getMenuItems(kitchenId: kitchenId!);
       }
-      if (mounted)
+      if (mounted) {
         setState(() {
           menuArr = items;
           categories = fetchedCategories;
         });
+      }
     } catch (error) {
       print('Error loading menu items: $error');
     }

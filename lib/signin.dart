@@ -35,13 +35,26 @@ class _Signin extends State<Signin> {
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(response.body);
         Map<String, dynamic> userData = responseData['user'];
-        return {
-          'success': true,
-          'message': 'Sign in successful',
-          'user': userData
-        };
-      } else if (response.statusCode == 401) {
-        return {'success': false, 'message': response.body};
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        _clearSharedPreferences();
+        await prefs.setBool('isSet', true);
+        _saveDataToSharedPreferences(
+          userData['id'],
+          userData['first_name'],
+          userData['last_name'],
+          userData['email'],
+          userData['phone'],
+          userData['type']
+        );
+        if (userData['type'] == "chef") {
+          //store kitchen id in shared preferences
+          int chefId = await getChefId(userData['email']);
+          await prefs.setInt('kitchen_id', chefId);
+          //store kitchen name in shared preferences
+          String kitchenName = await getKitchenName(chefId);
+          await prefs.setString('kitchen_name', kitchenName);
+        }
+        return { 'success': true, 'message': 'Sign in successful' };
       } else {
         return {'success': false, 'message': response.body};
       }
@@ -292,32 +305,8 @@ class _Signin extends State<Signin> {
                                 String message = result['message'];
                                 print(success);
                                 print(message);
+                                ////////////////////////////////////////////////////////////////////////
                                 if (success) {
-                                  _clearSharedPreferences();
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  Map<String, dynamic> userData =
-                                      result['user'];
-                                  await prefs.setBool('isSet', true);
-                                  _saveDataToSharedPreferences(
-                                      userData['id'],
-                                      userData['first_name'],
-                                      userData['last_name'],
-                                      userData['email'],
-                                      userData['phone'],
-                                      userData['type']);
-                                  if (userData['type'] == "chef") {
-                                    //store kitchen id in shared preferences
-                                    int chefId =
-                                        await getChefId(userData['email']);
-                                    await prefs.setInt('kitchen_id', chefId);
-                                    //store kitchen name in shared preferences
-                                    String kitchenName =
-                                        await getKitchenName(chefId);
-                                    await prefs.setString(
-                                        'kitchen_name', kitchenName);
-                                  }
-                                  ////////////////////////////////////////////////////////////////////////
                                   setState(() {
                                     errorFlag = false;
                                     errorMessage = "";

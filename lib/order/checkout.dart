@@ -13,8 +13,9 @@ class CheckoutView extends StatefulWidget {
   final double deliveryCost;
   final int orderId;
   final Map kitchen;
+  final String notes;
   const CheckoutView(
-      {super.key, required this.totalPrice, required this.deliveryCost, required this.orderId, required this.kitchen});
+      {super.key, required this.totalPrice, required this.deliveryCost, required this.orderId, required this.kitchen, required this.notes});
 
   @override
   State<CheckoutView> createState() => _CheckoutViewState();
@@ -45,7 +46,8 @@ class _CheckoutViewState extends State<CheckoutView> {
       'userNumber': txtNumber.text,
       'kitchenNumber': widget.kitchen['contact'],
       'city': widget.kitchen['city'],
-      'address': txtStreet.text
+      'address': txtStreet.text,
+      'notes': widget.notes
     };
 
     try {

@@ -92,6 +92,12 @@ app.use("/add-order-items", addOrderItemsRoute);
 const placeOrderRoute = require("./routes/user/place_order");
 app.use("/place-order", placeOrderRoute);
 
+const getUserOrdersRoute = require("./routes/user/get_user_orders");
+app.use("/get-user-orders", getUserOrdersRoute);
+
+const getOrderDetailsRoute = require("./routes/user/get_order_details");
+app.use("/get-order-details", getOrderDetailsRoute);
+
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

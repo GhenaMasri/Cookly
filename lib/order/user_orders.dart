@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
-import 'package:untitled/order/chef_order_details.dart';
 import 'package:untitled/order/user_final_order_view.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class UserOrders extends StatefulWidget {
   @override
@@ -10,152 +12,32 @@ class UserOrders extends StatefulWidget {
 }
 
 class _UserOrdersState extends State<UserOrders> {
-  final List<Map<String, dynamic>> orders = [
-    {
-      "kitchen_name": "John Doe",
-      "street":"Rafidia",
-      "rate": 0,
-      "logo":"https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2F1715700074577?alt=media&token=15443768-f23b-4810-b462-65302da07d80",
-      "location": "123 Main St",
-      "category_name":"All",
-      "orderTime": "12:30 PM",
-      "status": "In Progress",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "quantity": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "quantity": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "quantity": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "quantity": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "quantity": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
-   {
-      "kitchen_name": "John Doe",
-      "street":"Rafidia",
-      "rate": 0,
-      "logo":"https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2F1715700074577?alt=media&token=15443768-f23b-4810-b462-65302da07d80",
-      "location": "123 Main St",
-      "category_name":"All",
-      "orderTime": "12:30 PM",
-      "status": "In Progress",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "quantity": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "quantity": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "quantity": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "quantity": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "quantity": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
-    {
-      "kitchen_name": "John Doe",
-      "street":"Rafidia",
-      "rate": 0,
-      "logo":"https://firebasestorage.googleapis.com/v0/b/cookly-495b4.appspot.com/o/images%2F1715700074577?alt=media&token=15443768-f23b-4810-b462-65302da07d80",
-      "location": "123 Main St",
-      "category_name":"All",
-      "orderTime": "12:30 PM",
-      "status": "In Progress",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "quantity": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "quantity": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "quantity": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "quantity": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "quantity": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
-  ];
+  List<Map<String, dynamic>> orders = [];
+  int? id;
+
+  //////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> fetchOrders() async { //call it initState()
+    final String apiUrl = '${SharedPreferencesService.url}get-user-orders?userId=$id';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        orders = data['orders'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+
+  Future<void> _loadUserId() async { //call it initState()
+    int? id = await SharedPreferencesService.getId();
+    setState(() {
+      this.id = id;
+    });
+  }
+  /////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +180,7 @@ class _UserOrdersState extends State<UserOrders> {
                   IconButton(
                     onPressed: () {
                       pushReplacementWithAnimation(
-                          context, FinalOrderView(order: order));
+                          context, FinalOrderView(orderId: order['id'],));
                       /* Navigator.push(
                         context,
                         MaterialPageRoute(

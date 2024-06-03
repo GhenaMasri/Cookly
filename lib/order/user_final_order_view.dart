@@ -5,10 +5,13 @@ import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/checkout.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class FinalOrderView extends StatefulWidget {
-  final Map<String, dynamic> order;
-  const FinalOrderView({super.key, required this.order});
+  final int orderId;
+  const FinalOrderView({super.key, required this.orderId});
 
   @override
   State<FinalOrderView> createState() => _FinalOrderViewState();
@@ -20,12 +23,33 @@ class _FinalOrderViewState extends State<FinalOrderView> {
   double? totalPrice;
   double deliveryCost = 10.0;
   double? finalPrice;
+  
+  Map<String, dynamic>? orderInfo;
+  List<dynamic> orderItems = [];
 
   double calculateTotalPrice() {
     return widget.order['items'].fold(0.0, (sum, item) {
       return sum + (item['price'].toDouble());
     });
   }
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> fetchOrderDetails() async { //call it initState()
+    final String apiUrl = '${SharedPreferencesService.url}get-order-details?orderId=${widget.orderId}';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        orderInfo = data['orderInfo'];
+        orderItems = data['orderItems'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
