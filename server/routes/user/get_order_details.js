@@ -16,6 +16,8 @@ router.get("/", async (req, res) => {
         o.address,
         o.delivery,
         o.notes AS order_notes,
+        o.pickup_time,
+        o.payment,
         k.name AS kitchen_name,
         k.logo,
         k.street,

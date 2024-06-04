@@ -3,9 +3,12 @@ const router = express.Router();
 const pool = require("../../db");
 
 router.put("/", async (req, res) => {
-    const { orderId, totalPrice, status, userNumber, kitchenNumber, city, address, notes} = req.body;
+    const { orderId, totalPrice, status, userNumber, kitchenNumber, city, address, notes, pickupTime, payment, delivery} = req.body;
 
-    if (!orderId || !totalPrice || !status || !userNumber || !kitchenNumber || !city) {
+    console.log(orderId," ", totalPrice," ", status," ", userNumber," ", kitchenNumber," ", city," ");
+    console.log(address," ", notes," ", pickupTime," ", payment," ", delivery)
+
+    if (!orderId || !totalPrice || !status || !userNumber || !kitchenNumber || !city || !payment) {
       return res.status(400).send("All fields are required");
     }
   
@@ -17,13 +20,16 @@ router.put("/", async (req, res) => {
         user_number = ?,
         kitchen_number = ?,
         city = ?,
-        address = ?
-        notes = ?
+        address = ?,
+        notes = ?,
+        pickup_time = ?,
+        payment = ?,
+        delivery = ?
       WHERE id = ?;
     `;
   
     try {
-      await pool.promise().execute(updateOrderQuery, [totalPrice, status, userNumber, kitchenNumber, city, address, notes, orderId]);
+      await pool.promise().execute(updateOrderQuery, [totalPrice, status, userNumber, kitchenNumber, city, address, notes, pickupTime, payment, delivery, orderId]);
       res.status(200).send("Order data inserted/updated successfully");
     } catch (error) {
       console.error("Error inserting/updating order data:", error);

@@ -40,8 +40,9 @@ router.post("/", async (req, res) => {
                     return res.status(500).send("Error executing query");
                 } else {
                     const cartItemIds = cartItems.map(item => item.id);
+                    const placeholders = cartItemIds.map(() => '?').join(',');
                     const deleteCartItemQuery = `
-                        DELETE FROM cart_item WHERE id IN (?)
+                      DELETE FROM cart_item WHERE id IN (${placeholders})
                     `;
                     pool.execute(deleteCartItemQuery, cartItemIds, (err, deleteCartItemsResult) => {
                         if (err) {
