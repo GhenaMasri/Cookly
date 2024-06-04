@@ -325,8 +325,9 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                   Text(
                                     "Notes: ${cObj["item_notes"]}",
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: TColor.primaryText,
                                       fontSize: 12,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
                                 if (cObj["item_notes"] != null ||
@@ -336,8 +337,9 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                   Text(
                                     "Sub-Quantity: ${cObj["sub_quantity"]}",
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: TColor.primaryText,
                                       fontSize: 12,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
                               ],
