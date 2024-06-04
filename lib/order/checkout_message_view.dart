@@ -62,7 +62,7 @@ class _CheckoutMessageViewState extends State<CheckoutMessageView> {
             height: 8,
           ),
           Text(
-            "for your order",
+            "Track Your Order In Orders Page",
             style: TextStyle(
                 color: TColor.primaryText,
                 fontSize: 17,

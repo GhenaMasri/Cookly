@@ -20,67 +20,80 @@ class FoodItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4.0,
-      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Container(
+    var media = MediaQuery.of(context).size;
+    return Stack(alignment: Alignment.centerLeft, children: [
+      Container(
+        width: media.width * 0.25,
+        height: 112,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: TColor.primary,
+          borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(35), bottomRight: Radius.circular(35)),
         ),
-        width: MediaQuery.of(context).size.width * 0.9, // Increased width
-        padding: EdgeInsets.all(10.0),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  width: 60,
-                  height: 60,
-                  color: Colors.grey[300],
-                  child: Center(
-                    child: CircularProgressIndicator(color: TColor.primary),
+      ),
+      Card(
+        elevation: 4.0,
+        margin: EdgeInsets.symmetric(vertical: 14.0, horizontal: 15.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25.0),
+          ),
+          width: MediaQuery.of(context).size.width * 0.9, // Increased width
+          padding: EdgeInsets.all(10.0),
+          child: Row(
+            children: [
+              ClipOval(
+              
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    width: 70,
+                    height: 70,
+                    color: Colors.grey[300],
+                    child: Center(
+                      child: CircularProgressIndicator(color: TColor.primary),
+                    ),
                   ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-            ),
-            SizedBox(width: 10.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(width: 10.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(foodName,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600)),
+                    SizedBox(height: 5.0),
+                    Text('Quantity: $quantity',
+                        style: TextStyle(color: TColor.secondaryText)),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(foodName,
+                  Text('${price.toStringAsFixed(2)}₪',
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  SizedBox(height: 5.0),
-                  Text('Quantity: $quantity',
-                      style: TextStyle(color: TColor.secondaryText)),
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  IconButton(
+                    icon: Icon(Icons.remove_circle, color: TColor.primary),
+                    onPressed: onRemove,
+                  ),
                 ],
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('${price.toStringAsFixed(2)}₪',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                IconButton(
-                  icon: Icon(Icons.remove_circle, color: TColor.primary),
-                  onPressed: onRemove,
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      )
+    ]);
   }
 }
