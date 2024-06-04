@@ -185,8 +185,8 @@ class _UserOrdersState extends State<UserOrders> {
                                       SizedBox(height: 5.0),
                                       Row(
                                         children: [
-                                          Icon(Icons.price_check_rounded,
-                                              size: 20, color: TColor.primary),
+                                          Text('₪',
+                                              style: TextStyle(color: TColor.primary,fontSize: 20),),
                                           SizedBox(width: 5.0),
                                           Text(order['total_price'].toString() + "₪"),
                                         ],

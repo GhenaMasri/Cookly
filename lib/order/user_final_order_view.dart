@@ -320,7 +320,8 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (cObj["item_notes"] != null)
+                                if (cObj["item_notes"] != null ||
+                                    cObj["item_notes"] != '')
                                   Text(
                                     "Notes: ${cObj["item_notes"]}",
                                     style: TextStyle(
@@ -328,7 +329,8 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                       fontSize: 12,
                                     ),
                                   ),
-                                if (cObj["item_notes"] != null)
+                                if (cObj["item_notes"] != null ||
+                                    cObj["item_notes"] != '')
                                   const SizedBox(height: 5),
                                 if (cObj["sub_quantity"] != null)
                                   Text(
@@ -460,28 +462,28 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                               fontSize: 13,
                               fontWeight: FontWeight.w700),
                         ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              totalPrice.toString() + "₪",
-                              style: TextStyle(
-                                  color: TColor.primary,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            if (delivery == 'Yes')
-                              Text(
-                                'Includes Delivery Cost',
-                                style: TextStyle(
-                                  color: TColor.secondaryText,
-                                  fontSize: 13,
-                                ),
-                              ),
-                          ],
-                        )
+                        Text(
+                          totalPrice.toString() + "₪",
+                          style: TextStyle(
+                              color: TColor.primary,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700),
+                        ),
                       ],
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (delivery == 'Yes')
+                          Text(
+                            'Includes Delivery Cost',
+                            style: TextStyle(
+                              color: TColor.secondaryText,
+                              fontSize: 12,
+                            ),
+                          ),
+                      ],
+                    )
                   ],
                 ),
               ),
