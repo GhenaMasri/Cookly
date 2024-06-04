@@ -359,11 +359,11 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (orderInfo?['order_notes'] != null)
+                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
                           SizedBox(
                             height: 5,
                           ),
-                        if (orderInfo?['order_notes'] != null)
+                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
                           Text(
                             "General Notes On Order",
                             textAlign: TextAlign.start,
@@ -372,11 +372,11 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700),
                           ),
-                        if (orderInfo?['order_notes'] != null)
+                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
                           SizedBox(
                             height: 5,
                           ),
-                        if (orderInfo?['order_notes'] != null)
+                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
                           RoundTitleTextfield(
                             title: "Notes",
                             hintText: "Your Notes",

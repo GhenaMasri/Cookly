@@ -32,6 +32,7 @@ class _MyOrderViewState extends State<MyOrderView> {
   int? cartId;
   int? orderId;
   bool deliver = true;
+  bool checkoutPressed = false;
 
   double calculateTotalPrice() {
     return widget.items.fold(0.0, (sum, item) {
@@ -529,23 +530,42 @@ class _MyOrderViewState extends State<MyOrderView> {
                     RoundButton(
                         title: "Checkout",
                         onPressed: () async {
-                          Map<String, dynamic> result = await addOrderItems(
+                          /////////////////// BACKEND SECTION /////////////////////////
+                          if (checkoutPressed == false) {
+                            Map<String, dynamic> result = await addOrderItems(
                               widget.userId,
                               widget.kitchen['id'],
                               cartId,
-                              widget.items);
-                          bool success = result['success'];
-                          print(success);
-                          if (success) {
-                            pushReplacementWithAnimation(
+                              widget.items
+                            );
+                            bool success = result['success'];
+                            print(success);
+                            if (success) {
+                              checkoutPressed = true;
+                              pushReplacementWithAnimation(
                                 context,
                                 CheckoutView(
-                                    totalPrice: totalPrice!,
-                                    deliveryCost: deliveryCost,
-                                    orderId: orderId!,
-                                    kitchen: widget.kitchen,
-                                    notes: txtNotes.text,
-                                    delivery: deliver));
+                                  totalPrice: totalPrice!,
+                                  deliveryCost: deliveryCost,
+                                  orderId: orderId!,
+                                  kitchen: widget.kitchen,
+                                  notes: txtNotes.text,
+                                  delivery: deliver
+                                )
+                              );
+                            }
+                          } else {
+                            pushReplacementWithAnimation(
+                              context,
+                              CheckoutView(
+                                totalPrice: totalPrice!,
+                                deliveryCost: deliveryCost,
+                                orderId: orderId!,
+                                kitchen: widget.kitchen,
+                                notes: txtNotes.text,
+                                delivery: deliver
+                              )
+                            );
                           }
                           /* Navigator.push(
                             context,

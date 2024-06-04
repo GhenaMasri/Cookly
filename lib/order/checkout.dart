@@ -42,6 +42,8 @@ class _CheckoutViewState extends State<CheckoutView> {
   int selectMethod = -1;
   TextEditingController txtStreet = TextEditingController();
   TextEditingController txtNumber = TextEditingController();
+  String? pickupTime;
+  String? payment = "cash";
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> placeOrder() async {
@@ -55,7 +57,10 @@ class _CheckoutViewState extends State<CheckoutView> {
       'kitchenNumber': widget.kitchen['contact'],
       'city': widget.kitchen['city'],
       'address': txtStreet.text,
-      'notes': widget.notes
+      'notes': widget.notes,
+      'pickupTime': pickupTime,
+      'payment': payment,
+      'delivery': widget.delivery
     };
 
     try {
@@ -158,8 +163,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                                 initTime: DateTime.now(),
                                 onChange: (dateTime) {
                                   // Implement your logic with select time
-                                  print(dateTime.hour);
-                                  print(dateTime.minute);
+                                  pickupTime = "${dateTime.hour}:${dateTime.minute}";
                                 },
                               )
                             ],

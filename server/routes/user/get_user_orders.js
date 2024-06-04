@@ -25,11 +25,7 @@ router.get("/", async (req, res) => {
       res.status(500).send("Internal server error");
       return;
     }
-    if (results.length === 0) {
-      res.status(401).send("There is no orders");
-    } else {
-      res.status(200).send({ orders: results });
-    }
+    res.status(200).send({ orders: results });
   });
 });
 

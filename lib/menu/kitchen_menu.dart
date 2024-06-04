@@ -27,6 +27,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
   TextEditingController txtSearch = TextEditingController();
   List<MenuItem> menuArr = [];
   late Future<void> _initDataFuture;
+  int? userId;
+  List<Map<String, dynamic>> cartItems = [];
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<List<MenuItem>> getMenuItems(
@@ -81,6 +83,52 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
       print('Error loading menu items: $error');
     }
   }
+
+  Future<void> getCartItems() async {
+    await _loadUserId();
+
+    final url = Uri.parse('${SharedPreferencesService.url}get-cart-items?userId=$userId');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          cartItems = List<Map<String, dynamic>>.from(data['cartItems']);
+        });
+      } else {
+        print('Failed to load cart items');
+      }
+    } catch (error) {
+      print('Error fetching cart items: $error');
+    }
+  }
+
+  Future<Map<String, dynamic>> emptyCart() async {
+    const url = '${SharedPreferencesService.url}empty-cart';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: cartItems
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    setState(() {
+      userId = id;
+    });
+  }
   /////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -129,8 +177,15 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        /////////////////// BACKEND SECTION /////////////////////
+                        await getCartItems();
+                        if (cartItems.isEmpty) {
+                          Navigator.pop(context);
+                        } else {
+                          //show alert 
+                        }
+                        /////////////////////////////////////////////////////////
                       },
                       icon: Image.asset("assets/img/btn_back.png",
                           width: 20, height: 20),
