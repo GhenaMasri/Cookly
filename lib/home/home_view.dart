@@ -6,6 +6,7 @@ import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/menu/user_kitchens_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -67,7 +68,8 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> kitchensByCategories({String? city, int? category}) async {
+  Future<List<Map<String, dynamic>>> kitchensByCategories(
+      {String? city, int? category}) async {
     final Uri uri = Uri.parse('${SharedPreferencesService.url}home-page')
         .replace(queryParameters: {
       if (city != null) 'city': city,
@@ -131,7 +133,7 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 /////////////////////////////////////////////////////////////////////////////////////////////
-  
+
   List<Map<String, dynamic>> categories = [];
   List<String> categoriesList = [];
   String? category;
@@ -194,12 +196,8 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     IconButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Container(),
-                          ),
-                        );
+                        pushReplacementWithAnimation(
+                            context, NotificationsView());
                       },
                       icon: Image.asset(
                         "assets/img/notification.png",

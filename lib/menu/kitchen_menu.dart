@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/menu/rating_page.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:untitled/order/item_details_view.dart';
@@ -28,8 +29,10 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
   late Future<void> _initDataFuture;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<List<MenuItem>> getMenuItems({required int kitchenId, String? name}) async {
-    final Uri uri = Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
+  Future<List<MenuItem>> getMenuItems(
+      {required int kitchenId, String? name}) async {
+    final Uri uri =
+        Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
       queryParameters: {
         'kitchenId': kitchenId.toString(),
         if (name != null) 'name': name,
@@ -44,18 +47,17 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
       setState(() {
         menuArr = items.map((item) {
           return MenuItem(
-            kitchenId: item['kitchen_id'],
-            itemId: item['id'],
-            image: item['image'],
-            name: item['name'],
-            notes: item['notes'],
-            quantity: item['quantity_id'],
-            category: item['category_id'], 
-            cName: item['category_name'],
-            price: item['price'].toDouble(),
-            time: item['time'],
-            qName: item['quantity_name']
-          );
+              kitchenId: item['kitchen_id'],
+              itemId: item['id'],
+              image: item['image'],
+              name: item['name'],
+              notes: item['notes'],
+              quantity: item['quantity_id'],
+              category: item['category_id'],
+              cName: item['category_name'],
+              price: item['price'].toDouble(),
+              time: item['time'],
+              qName: item['quantity_name']);
         }).toList();
       });
       return menuArr;
@@ -147,7 +149,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     IconButton(
                       onPressed: () {
-                        pushReplacementWithAnimation(context,CartPage(kitchen:widget.mObj));
+                        pushReplacementWithAnimation(
+                            context, CartPage(kitchen: widget.mObj));
                         /* Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -163,10 +166,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                     ),
                     IconButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Container()));
+                        pushReplacementWithAnimation(
+                            context, NotificationsView());
                       },
                       icon: Image.asset(
                         "assets/img/notification.png",
@@ -209,8 +210,9 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                   return MenuItemRow(
                     mObj: mObj1,
                     onTap: () {
-                      pushReplacementWithAnimation(context,ItemDetailsView(item: mObj1, kitchen: widget.mObj));
-                     /*  Navigator.push(
+                      pushReplacementWithAnimation(context,
+                          ItemDetailsView(item: mObj1, kitchen: widget.mObj));
+                      /*  Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const ItemDetailsView()),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/chef_order_delivered.dart';
 import 'package:untitled/order/chef_order_inprogress.dart';
 import 'package:untitled/order/chef_order_pending.dart';
@@ -22,10 +24,15 @@ class OrdersTabBar extends StatelessWidget {
           centerTitle: true,
           automaticallyImplyLeading: false,
           actions: [
-            Image.asset(
-              "assets/img/notification.png",
-              width: 25,
-              height: 25,
+            InkWell(
+              onTap: () {
+                pushReplacementWithAnimation(context, NotificationsView());
+              },
+              child: Image.asset(
+                "assets/img/notification.png",
+                width: 25,
+                height: 25,
+              ),
             ),
             SizedBox(
               width: 20,

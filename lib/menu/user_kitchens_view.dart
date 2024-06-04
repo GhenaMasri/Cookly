@@ -5,6 +5,7 @@ import 'package:untitled/common_widget/dropdown.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/menu/kitchen_menu.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -162,12 +163,8 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                         ),
                         IconButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Container(),
-                              ),
-                            );
+                            pushReplacementWithAnimation(
+                            context, NotificationsView());
                           },
                           icon: Image.asset("assets/img/notification.png", width: 25, height: 25),
                         ),

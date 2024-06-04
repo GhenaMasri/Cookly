@@ -613,7 +613,8 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                                 snackBarStyle:
                                                                     SnackBarStyle(
                                                                         backgroundColor:
-                                                                            TColor.primary));
+                                                                            TColor.primary,
+                                                                            labelTextStyle: TextStyle(fontWeight:FontWeight.bold,fontSize: 18)));
                                                           }
                                                         }),
                                                   ),
