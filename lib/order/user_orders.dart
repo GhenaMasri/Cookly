@@ -12,17 +12,20 @@ class UserOrders extends StatefulWidget {
 }
 
 class _UserOrdersState extends State<UserOrders> {
-  List<Map<String, dynamic>> orders = [];
+  late Map<String, dynamic> orders;
   int? id;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<void> fetchOrders() async { //call it initState()
-    final String apiUrl = '${SharedPreferencesService.url}get-user-orders?userId=$id';
+  Future<void> fetchOrders() async {
+    //call it initState()
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-user-orders?userId=$id';
 
     final response = await http.get(Uri.parse(apiUrl));
-
+   // print(response.body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
+      print(data);
       setState(() {
         orders = data['orders'];
       });
@@ -31,16 +34,46 @@ class _UserOrdersState extends State<UserOrders> {
     }
   }
 
-  Future<void> _loadUserId() async { //call it initState()
+  Future<void> _loadUserId() async {
+    //call it initState()
     int? id = await SharedPreferencesService.getId();
     setState(() {
       this.id = id;
     });
   }
+
   /////////////////////////////////////////////////////////////////////////////////
+  late Future<void> _initDataFuture;
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await _loadUserId();
+    await fetchOrders();
+  }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
+        } else if (snapshot.hasError) {
+          print(snapshot.error.toString());
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -76,7 +109,7 @@ class _UserOrdersState extends State<UserOrders> {
         child: ListView.builder(
           itemCount: orders.length,
           itemBuilder: (context, index) {
-            final order = orders[index];
+            var order = orders[index];
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Stack(
@@ -95,92 +128,121 @@ class _UserOrdersState extends State<UserOrders> {
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  order['kitchen_name'],
+                    child: (orders.isEmpty)
+                        ? Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 30, horizontal: 20),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.4),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Center(
+                                child: Text(
+                                  "No Orders Yet",
                                   style: TextStyle(
-                                    color: TColor.primaryText,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                SizedBox(height: 8.0),
-                                Row(
-                                  children: [
-                                    Icon(Icons.location_on,
-                                        size: 20, color: TColor.primary),
-                                    SizedBox(width: 5.0),
-                                    Text(order['location']),
-                                  ],
-                                ),
-                                SizedBox(height: 5.0),
-                                Row(
-                                  children: [
-                                    Icon(Icons.access_time,
-                                        size: 20, color: TColor.primary),
-                                    SizedBox(width: 5.0),
-                                    Text(order['orderTime']),
-                                  ],
-                                ),
-                                SizedBox(height: 5.0),
-                                  Row(
-                                  children: [
-                                    Icon(Icons.phone,
-                                        size: 20, color: TColor.primary),
-                                    SizedBox(width: 5.0),
-                                    Text(order['ContactNumber']),
-                                  ],
-                                ),
-                                SizedBox(height: 5.0),
-                                Row(
-                                  children: [
-                                    
-                                    Expanded(
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 8, horizontal: 20),
-                                        decoration: BoxDecoration(
-                                          color: order['status'] == 'Delivered'
-                                              ? Colors.green
-                                              : order['status'] == 'In Progress'
-                                                  ? TColor.primary
-                                                  : Color.fromARGB(255, 253, 231, 36),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            order['status'].toUpperCase(),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                              ),
+                            ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        order['name'],
+                                        style: TextStyle(
+                                          color: TColor.primaryText,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(height: 8.0),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.access_time,
+                                              size: 20, color: TColor.primary),
+                                          SizedBox(width: 5.0),
+                                          Text(order['time']),
+                                        ],
+                                      ),
+                                      SizedBox(height: 5.0),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.price_check_rounded,
+                                              size: 20, color: TColor.primary),
+                                          SizedBox(width: 5.0),
+                                          Text(order['tptal_price']
+                                                  .toDouble
+                                                  .toString() +
+                                              "₪"),
+                                        ],
+                                      ),
+                                      SizedBox(height: 5.0),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 8, horizontal: 20),
+                                              decoration: BoxDecoration(
+                                                color: order['status'] == 'done'
+                                                    ? Colors.green
+                                                    : order['status'] ==
+                                                            'in progress'
+                                                        ? TColor.primary
+                                                        : Color.fromARGB(
+                                                            255, 253, 231, 36),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  order['status'].toUpperCase(),
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
                   ),
                   IconButton(
                     onPressed: () {
                       pushReplacementWithAnimation(
-                          context, FinalOrderView(orderId: order['id'],));
+                          context,
+                          FinalOrderView(
+                            orderId: order['id'],
+                          ));
                       /* Navigator.push(
                         context,
                         MaterialPageRoute(
