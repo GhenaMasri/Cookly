@@ -21,21 +21,17 @@ class _FinalOrderViewState extends State<FinalOrderView> {
   TextEditingController txtNotes = TextEditingController();
   String? delivery;
   double? totalPrice;
-  double deliveryCost = 10.0;
+  String? deliverySystem;
   double? finalPrice;
-  
+
   Map<String, dynamic>? orderInfo;
   List<dynamic> orderItems = [];
 
-  double calculateTotalPrice() {
-    return widget.order['items'].fold(0.0, (sum, item) {
-      return sum + (item['price'].toDouble());
-    });
-  }
-
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<void> fetchOrderDetails() async { //call it initState()
-    final String apiUrl = '${SharedPreferencesService.url}get-order-details?orderId=${widget.orderId}';
+  Future<void> fetchOrderDetails() async {
+    //call it in initData
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-order-details?orderId=${widget.orderId}';
 
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -49,18 +45,45 @@ class _FinalOrderViewState extends State<FinalOrderView> {
       print('Error: ${response.statusCode}, ${response.body}');
     }
   }
-/////////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////////
+  late Future<void> _initDataFuture;
   @override
   void initState() {
     super.initState();
-    delivery = "Yes";
-    totalPrice = calculateTotalPrice();
-    finalPrice = deliveryCost + totalPrice!;
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await fetchOrderDetails();
+    if (orderInfo?['delivery'] == 'yes') {
+      delivery = 'Yes';
+      deliverySystem = "Delivery";
+    } else {
+      delivery = 'No';
+      deliverySystem = "Self Pick Up";
+    }
+    totalPrice = orderInfo?['total_price'].toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       backgroundColor: TColor.white,
       body: SingleChildScrollView(
@@ -120,21 +143,21 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                 radius: 40,
                                 backgroundColor: Colors.transparent,
                                 backgroundImage: CachedNetworkImageProvider(
-                                  widget.order['logo'],
+                                  orderInfo?['logo'],
                                 ),
                               ),
                             )),
                       ],
                     ),
                     const SizedBox(
-                      width: 8,
+                      width: 15,
                     ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.order['kitchen_name'],
+                            orderInfo?['kitchen_name'],
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: TColor.primaryText,
@@ -157,7 +180,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                 width: 4,
                               ),
                               Text(
-                                widget.order['rate'].toString(),
+                                orderInfo!['rate'].toString(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.primary, fontSize: 12),
@@ -186,7 +209,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                     color: TColor.primary, fontSize: 12),
                               ),
                               Text(
-                                widget.order['category_name'],
+                                orderInfo?['category'],
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.secondaryText, fontSize: 12),
@@ -210,7 +233,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                               ),
                               Expanded(
                                 child: Text(
-                                  widget.order['street'],
+                                  orderInfo?['street'],
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       color: TColor.secondaryText,
@@ -229,7 +252,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                               ),
                               Expanded(
                                 child: Text(
-                                  widget.order['ContactNumber'],
+                                  orderInfo?['contact'],
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       color: TColor.secondaryText,
@@ -253,7 +276,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
-                  itemCount: widget.order['items'].length,
+                  itemCount: orderItems.length,
                   separatorBuilder: ((context, index) => Divider(
                         indent: 25,
                         endIndent: 25,
@@ -261,7 +284,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                         height: 1,
                       )),
                   itemBuilder: ((context, index) {
-                    var cObj = widget.order['items'][index] as Map? ?? {};
+                    var cObj = orderItems[index] as Map? ?? {};
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 15),
@@ -271,7 +294,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                           children: [
                             Expanded(
                               child: Text(
-                                "${cObj["name"].toString()} x${cObj["quantity"].toString()}",
+                                "${cObj["item_name"].toString()} x${cObj["quantity"].toString()}",
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 13,
@@ -297,15 +320,16 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (cObj["notes"] != null)
+                                if (cObj["item_notes"] != null)
                                   Text(
-                                    "Notes: ${cObj["notes"]}",
+                                    "Notes: ${cObj["item_notes"]}",
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 12,
                                     ),
                                   ),
-                                const SizedBox(height: 5),
+                                if (cObj["item_notes"] != null)
+                                  const SizedBox(height: 5),
                                 if (cObj["sub_quantity"] != null)
                                   Text(
                                     "Sub-Quantity: ${cObj["sub_quantity"]}",
@@ -331,36 +355,42 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "General Notes",
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              color: TColor.primaryText,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        RoundTitleTextfield(
-                          title: "Notes",
-                          hintText: "Your Notes",
-                          controller: txtNotes,
-                          readOnly: true,
-                          maxLines: 2,
-                        ),
+                        if (orderInfo?['order_notes'] != null)
+                          SizedBox(
+                            height: 5,
+                          ),
+                        if (orderInfo?['order_notes'] != null)
+                          Text(
+                            "General Notes On Order",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                color: TColor.primaryText,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
+                          ),
+                        if (orderInfo?['order_notes'] != null)
+                          SizedBox(
+                            height: 5,
+                          ),
+                        if (orderInfo?['order_notes'] != null)
+                          RoundTitleTextfield(
+                            title: "Notes",
+                            hintText: "Your Notes",
+                            controller: txtNotes,
+                            readOnly: true,
+                            maxLines: 2,
+                          ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Divider(
-                      color: TColor.secondaryText.withOpacity(0.5),
-                      height: 1,
-                    ),
+                    if (orderInfo?['order_notes'] != null)
+                      const SizedBox(
+                        height: 5,
+                      ),
+                    if (orderInfo?['order_notes'] != null)
+                      Divider(
+                        color: TColor.secondaryText.withOpacity(0.5),
+                        height: 1,
+                      ),
                     const SizedBox(
                       height: 15,
                     ),
@@ -368,7 +398,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Sub Total",
+                          "Delivering System",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: TColor.primaryText,
@@ -376,7 +406,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          totalPrice.toString(),
+                          deliverySystem!,
                           style: TextStyle(
                               color: TColor.primary,
                               fontSize: 13,
@@ -384,29 +414,31 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                         )
                       ],
                     ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Delivery Cost",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: TColor.primaryText,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          deliveryCost.toString() + "₪",
-                          style: TextStyle(
-                              color: TColor.primary,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700),
-                        )
-                      ],
-                    ),
+                    if (delivery == 'Yes')
+                      const SizedBox(
+                        height: 8,
+                      ),
+                    if (delivery == 'Yes')
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Delivery Address",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: TColor.primaryText,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            orderInfo!['address'].toString(),
+                            style: TextStyle(
+                                color: TColor.primary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
+                          )
+                        ],
+                      ),
                     const SizedBox(
                       height: 15,
                     ),
@@ -428,12 +460,25 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                               fontSize: 13,
                               fontWeight: FontWeight.w700),
                         ),
-                        Text(
-                          finalPrice.toString() + "₪",
-                          style: TextStyle(
-                              color: TColor.primary,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              totalPrice.toString() + "₪",
+                              style: TextStyle(
+                                  color: TColor.primary,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            if (delivery == 'Yes')
+                              Text(
+                                'Includes Delivery Cost',
+                                style: TextStyle(
+                                  color: TColor.secondaryText,
+                                  fontSize: 13,
+                                ),
+                              ),
+                          ],
                         )
                       ],
                     ),
