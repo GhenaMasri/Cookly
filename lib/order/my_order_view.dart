@@ -329,8 +329,9 @@ class _MyOrderViewState extends State<MyOrderView> {
                                   Text(
                                     "Notes: ${cObj["notes"]}",
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: TColor.primaryText,
                                       fontSize: 12,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
                                 const SizedBox(height: 5),
@@ -338,8 +339,9 @@ class _MyOrderViewState extends State<MyOrderView> {
                                   Text(
                                     "Sub-Quantity: ${cObj["sub_quantity"]}",
                                     style: TextStyle(
-                                      color: Colors.black,
+                                      color: TColor.primaryText,
                                       fontSize: 12,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
                               ],

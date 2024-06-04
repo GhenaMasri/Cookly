@@ -169,8 +169,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Text(
                           "Notes: ${item["notes"]}",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: TColor.primaryText,
                             fontSize: 12,
+                            fontWeight: FontWeight.w400
                           ),
                         ),
                       const SizedBox(height: 5),
@@ -178,8 +179,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Text(
                           "Sub-Quantity: ${item["sub_quantity"]}",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: TColor.primaryText,
                             fontSize: 12,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                     ],
