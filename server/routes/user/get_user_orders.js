@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
     TIME_FORMAT(o.created_at, '%H:%i') AS time,
     k.name
     FROM orders as o
-    JOIN kitchen k ON k.id = o.kitchen_id
+    INNER JOIN kitchen k ON k.id = o.kitchen_id
     WHERE o.user_id = ?`;
     
   pool.execute(query, [userId], async (error, results, fields) => {

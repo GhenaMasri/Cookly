@@ -12,20 +12,17 @@ class UserOrders extends StatefulWidget {
 }
 
 class _UserOrdersState extends State<UserOrders> {
-  late Map<String, dynamic> orders;
+  late List<dynamic> orders;
   int? id;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrders() async {
-    //call it initState()
     final String apiUrl =
         '${SharedPreferencesService.url}get-user-orders?userId=$id';
 
     final response = await http.get(Uri.parse(apiUrl));
-   // print(response.body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
-      print(data);
       setState(() {
         orders = data['orders'];
       });
@@ -35,7 +32,6 @@ class _UserOrdersState extends State<UserOrders> {
   }
 
   Future<void> _loadUserId() async {
-    //call it initState()
     int? id = await SharedPreferencesService.getId();
     setState(() {
       this.id = id;
@@ -192,10 +188,7 @@ class _UserOrdersState extends State<UserOrders> {
                                           Icon(Icons.price_check_rounded,
                                               size: 20, color: TColor.primary),
                                           SizedBox(width: 5.0),
-                                          Text(order['tptal_price']
-                                                  .toDouble
-                                                  .toString() +
-                                              "₪"),
+                                          Text(order['total_price'].toString() + "₪"),
                                         ],
                                       ),
                                       SizedBox(height: 5.0),
