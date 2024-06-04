@@ -137,20 +137,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (widget.delivery == true)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                        ),
-                        child: RoundTitleTextfield(
-                          title: "Address",
-                          hintText: "Enter Detaild Address",
-                          controller: txtStreet,
-                          validator: (value) =>
-                              value!.isEmpty ? "Couldn't be empty" : null,
-                        ),
-                      )
-                    else if(widget.delivery == false && widget.kitchen['order_system']==0)
+                          if(widget.kitchen['order_system']==0)
                       Padding(
                           padding: const EdgeInsets.symmetric(
                             vertical: 8, horizontal: 8
@@ -177,6 +164,19 @@ class _CheckoutViewState extends State<CheckoutView> {
                               )
                             ],
                           )),
+                    if (widget.delivery == true)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                        ),
+                        child: RoundTitleTextfield(
+                          title: "Address",
+                          hintText: "Enter Detaild Address",
+                          controller: txtStreet,
+                          validator: (value) =>
+                              value!.isEmpty ? "Couldn't be empty" : null,
+                        ),
+                      ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         vertical: 8,
@@ -229,7 +229,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           return Container(
                             margin: const EdgeInsets.symmetric(vertical: 8.0),
                             padding: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 15.0),
+                                vertical: 12.0, horizontal: 15.0),
                             decoration: BoxDecoration(
                                 color: TColor.textfield,
                                 borderRadius: BorderRadius.circular(5),
@@ -271,7 +271,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                                         ? Icons.radio_button_on
                                         : Icons.radio_button_off,
                                     color: TColor.primary,
-                                    size: 15,
+                                    size: 20,
                                   ),
                                 )
                               ],

@@ -6,6 +6,7 @@ import 'package:untitled/common_widget/cart_drop_down.dart';
 import 'package:untitled/common_widget/food_list_tile.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/my_order_view.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -127,8 +128,8 @@ class _CartPageState extends State<CartPage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Container()));
+              pushReplacementWithAnimation(
+                            context, NotificationsView());
             },
             icon: Image.asset(
               "assets/img/notification.png",

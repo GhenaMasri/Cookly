@@ -13,6 +13,8 @@ import 'package:untitled/menu/menu_item.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:untitled/more/notification_view.dart';
+
 class ChefHomeView extends StatefulWidget {
   const ChefHomeView({Key? key}) : super(key: key);
 
@@ -57,8 +59,10 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<List<MenuItem>> getMenuItems({required int kitchenId, String? name}) async {
-    final Uri uri = Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
+  Future<List<MenuItem>> getMenuItems(
+      {required int kitchenId, String? name}) async {
+    final Uri uri =
+        Uri.parse('${SharedPreferencesService.url}chef-menu-items').replace(
       queryParameters: {
         'kitchenId': kitchenId.toString(),
         if (name != null) 'name': name,
@@ -73,18 +77,17 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       setState(() {
         menuArr = items.map((item) {
           return MenuItem(
-            kitchenId: item['kitchen_id'],
-            itemId: item['id'],
-            image: item['image'],
-            name: item['name'],
-            notes: item['notes'],
-            quantity: item['quantity_id'],
-            category: item['category_id'], 
-            cName: item['category_name'],
-            price: item['price'].toDouble(),
-            time: item['time'],
-            qName: item['quantity_name']
-          );
+              kitchenId: item['kitchen_id'],
+              itemId: item['id'],
+              image: item['image'],
+              name: item['name'],
+              notes: item['notes'],
+              quantity: item['quantity_id'],
+              category: item['category_id'],
+              cName: item['category_name'],
+              price: item['price'].toDouble(),
+              time: item['time'],
+              qName: item['quantity_name']);
         }).toList();
       });
       return menuArr;
@@ -109,7 +112,6 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
-  
   Future<void> _loadKitchenId() async {
     int? kitchenid = await SharedPreferencesService.getKitchenId();
     if (mounted) {
@@ -154,7 +156,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
   Future<void> _initData() async {
     await _loadKitchenId();
-     try {
+    try {
       await _updateMenuArr();
     } catch (error) {
       print('Error loading menu items: $error');
@@ -216,10 +218,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                   ),
                   IconButton(
                     onPressed: () {
-                      /* Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Notifications()));*/
+                      pushReplacementWithAnimation(
+                          context, NotificationsView());
                     },
                     icon: Image.asset(
                       "assets/img/notification.png",

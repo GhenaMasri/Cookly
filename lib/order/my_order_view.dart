@@ -245,6 +245,27 @@ class _MyOrderViewState extends State<MyOrderView> {
                               ),
                             ],
                           ),
+                           const SizedBox(
+                            height: 4,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(Icons.phone, color: TColor.primary,size: 13),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                              Expanded(
+                                child: Text(
+                                  widget.kitchen['contact'],
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: TColor.secondaryText,
+                                      fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),

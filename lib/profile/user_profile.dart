@@ -4,6 +4,8 @@ import 'package:untitled/common/globs.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:untitled/profile/change_password.dart';
 import 'package:untitled/welcome_page.dart';
@@ -183,12 +185,8 @@ class _UserProfileViewState extends State<UserProfileView> {
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Container(),
-                      ),
-                    );
+                    pushReplacementWithAnimation(
+                            context, NotificationsView());
                   },
                   icon: Image.asset(
                     "assets/img/notification.png",
