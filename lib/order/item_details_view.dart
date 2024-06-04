@@ -1,5 +1,7 @@
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:untitled/common/MenuItem.dart';
 import 'package:untitled/common_widget/round_icon_button.dart';
@@ -46,11 +48,11 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'userId': userId,
-          'menuItemId': widget.item.itemId, 
+          'menuItemId': widget.item.itemId,
           'quantity': qty,
           'price': finalPrice,
-          'notes': txtNotes.text, 
-          'subQuantityId': quantityId 
+          'notes': txtNotes.text,
+          'subQuantityId': quantityId
         }),
       );
       if (response.statusCode == 200) {
@@ -97,7 +99,9 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
   void initState() {
     super.initState();
     finalPrice = widget.item.price!;
-    time = widget.kitchen["order_system"] == 0 ? "Day before" : widget.item.time!.toString();
+    time = widget.kitchen["order_system"] == 0
+        ? "Day before"
+        : widget.item.time!.toString();
     _initDataFuture = _initData();
   }
 
@@ -217,9 +221,13 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500),
                                         ),
-                                        SizedBox(height: 4,),
+                                        SizedBox(
+                                          height: 4,
+                                        ),
                                         Text(
-                                          time == "Day before" ? "Should order day before": "Preparation Time: ${time!}",
+                                          time == "Day before"
+                                              ? "Should order day before"
+                                              : "Preparation Time: ${time!}",
                                           style: TextStyle(
                                               color: TColor.secondaryText,
                                               fontSize: 14,
@@ -346,7 +354,8 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                         val,
                                                     orElse: () => {});
                                             quantityId = selectedItem['id'];
-                                            discount = selectedItem['discount'].toDouble();
+                                            discount = selectedItem['discount']
+                                                .toDouble();
                                             quantity = selectedItem['quantity'];
                                             genPrice =
                                                 widget.item.price! * quantity!;
@@ -577,29 +586,49 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                     height: 15,
                                                   ),
                                                   SizedBox(
-                                                    width: 130,
-                                                    height: 25,
+                                                    width: 200,
+                                                    height: 35,
                                                     child: RoundIconButton(
                                                         title: "Add to Cart",
                                                         icon:
                                                             "assets/img/shopping_add.png",
                                                         color: TColor.primary,
                                                         onPressed: () async {
-                                                          Map<String, dynamic> result = await addCartItem();
-                                                          bool success = result['success'];
-                                                          String message = result['message'];
+                                                          Map<String, dynamic>
+                                                              result =
+                                                              await addCartItem();
+                                                          bool success =
+                                                              result['success'];
+                                                          String message =
+                                                              result['message'];
                                                           print(message);
                                                           if (success) {
-                                                            //go back to menu items page 
+                                                            IconSnackBar.show(
+                                                                context,
+                                                                snackBarType:
+                                                                    SnackBarType
+                                                                        .success,
+                                                                label:
+                                                                    'Added To Cart',
+                                                                snackBarStyle:
+                                                                    SnackBarStyle(
+                                                                        backgroundColor:
+                                                                            TColor.primary));
                                                           }
                                                         }),
-                                                  )
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
                                                 ],
                                               )),
                                           InkWell(
                                             onTap: () {
                                               pushReplacementWithAnimation(
-                                                  context, CartPage(kitchen: widget.kitchen,));
+                                                  context,
+                                                  CartPage(
+                                                    kitchen: widget.kitchen,
+                                                  ));
                                               /* Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
@@ -629,7 +658,11 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                       color: TColor.primary),
                                                   onPressed: () {
                                                     pushReplacementWithAnimation(
-                                                        context, CartPage(kitchen: widget.kitchen,));
+                                                        context,
+                                                        CartPage(
+                                                          kitchen:
+                                                              widget.kitchen,
+                                                        ));
                                                   },
                                                 )),
                                           ),
@@ -678,7 +711,8 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                       ),
                       IconButton(
                         onPressed: () {
-                          pushReplacementWithAnimation(context, CartPage(kitchen:widget.kitchen));
+                          pushReplacementWithAnimation(
+                              context, CartPage(kitchen: widget.kitchen));
                         },
                         icon: Image.asset(
                           "assets/img/shopping_cart.png",

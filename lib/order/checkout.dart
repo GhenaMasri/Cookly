@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
@@ -14,8 +16,15 @@ class CheckoutView extends StatefulWidget {
   final int orderId;
   final Map kitchen;
   final String notes;
+  final bool delivery;
   const CheckoutView(
-      {super.key, required this.totalPrice, required this.deliveryCost, required this.orderId, required this.kitchen, required this.notes});
+      {super.key,
+      required this.totalPrice,
+      required this.deliveryCost,
+      required this.orderId,
+      required this.kitchen,
+      required this.notes,
+      required this.delivery});
 
   @override
   State<CheckoutView> createState() => _CheckoutViewState();
@@ -25,7 +34,6 @@ class _CheckoutViewState extends State<CheckoutView> {
   List paymentArr = [
     {"name": "Cash on delivery", "icon": "assets/img/cash.png"},
     {"name": "**** **** **** 2187", "icon": "assets/img/visa_icon.png"},
-    {"name": "test@gmail.com", "icon": "assets/img/paypal.png"},
   ];
 
   double? discount = 0.0;
@@ -68,7 +76,7 @@ class _CheckoutViewState extends State<CheckoutView> {
       return {'success': false, 'message': '$error'};
     }
   }
-  
+
   Future<void> _loadUserNumber() async {
     String? number = await SharedPreferencesService.getUserNumber();
     setState(() {
@@ -129,27 +137,46 @@ class _CheckoutViewState extends State<CheckoutView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Delivery Address",
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(color: TColor.secondaryText, fontSize: 12),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                      ),
-                      child: RoundTitleTextfield(
-                        title: "Address",
-                        hintText: "Enter Detaild Address",
-                        controller: txtStreet,
-                        validator: (value) =>
-                            value!.isEmpty ? "Couldn't be empty" : null,
-                      ),
-                    ),
+                    if (widget.delivery == true)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                        ),
+                        child: RoundTitleTextfield(
+                          title: "Address",
+                          hintText: "Enter Detaild Address",
+                          controller: txtStreet,
+                          validator: (value) =>
+                              value!.isEmpty ? "Couldn't be empty" : null,
+                        ),
+                      )
+                    else if(widget.delivery == false && widget.kitchen['order_system']==0)
+                      Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 8
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Time To Pick Up Next Day",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              TimePickerSpinnerPopUp(
+                                mode: CupertinoDatePickerMode.time,
+                                initTime: DateTime.now(),
+                                onChange: (dateTime) {
+                                  // Implement your logic with select time
+                                  print(dateTime.hour);
+                                  print(dateTime.minute);
+                                },
+                              )
+                            ],
+                          )),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         vertical: 8,
@@ -178,6 +205,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 10,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -386,12 +414,12 @@ class _CheckoutViewState extends State<CheckoutView> {
                       print(message);
                       if (success) {
                         showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          isScrollControlled: true,
-                          builder: (context) {
-                            return const CheckoutMessageView();
-                          });
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            isScrollControlled: true,
+                            builder: (context) {
+                              return const CheckoutMessageView();
+                            });
                       }
                     }),
               ),

@@ -13,7 +13,11 @@ class MyOrderView extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   final Map kitchen;
   final int userId;
-  const MyOrderView({super.key, required this.items, required this.kitchen, required this.userId});
+  const MyOrderView(
+      {super.key,
+      required this.items,
+      required this.kitchen,
+      required this.userId});
 
   @override
   State<MyOrderView> createState() => _MyOrderViewState();
@@ -27,14 +31,17 @@ class _MyOrderViewState extends State<MyOrderView> {
   double? finalPrice;
   int? cartId;
   int? orderId;
+  bool deliver = true;
 
   double calculateTotalPrice() {
     return widget.items.fold(0.0, (sum, item) {
       return sum + (item['price'].toDouble());
-    });}
+    });
+  }
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<Map<String, dynamic>> addOrderItems(userId, kitchenId, cartId, cartItems) async {
+  Future<Map<String, dynamic>> addOrderItems(
+      userId, kitchenId, cartId, cartItems) async {
     const String apiUrl = '${SharedPreferencesService.url}add-order-items';
 
     final Map<String, dynamic> requestBody = {
@@ -71,9 +78,10 @@ class _MyOrderViewState extends State<MyOrderView> {
   @override
   void initState() {
     super.initState();
-    delivery = "Yes";
+    delivery = "Delivery";
+    deliver = true;
     totalPrice = calculateTotalPrice();
-    finalPrice  = deliveryCost+totalPrice!;
+    finalPrice = deliveryCost + totalPrice!;
     cartId = widget.items.isNotEmpty ? widget.items[0]['cart_id'] : null;
   }
 
@@ -121,27 +129,31 @@ class _MyOrderViewState extends State<MyOrderView> {
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
                 child: Row(
                   children: [
-                    ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: CachedNetworkImage(
-                          imageUrl: widget.kitchen['logo'],
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[300],
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                  color: TColor.primary),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                        )),
+                    Stack(
+                      children: <Widget>[
+                        Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: TColor.primary,
+                                  width: 2,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 40,
+                                backgroundColor: Colors.transparent,
+                                backgroundImage: CachedNetworkImageProvider(
+                                  widget.kitchen['logo'],
+                                ),
+                              ),
+                            )),
+                      ],
+                    ),
                     const SizedBox(
-                      width: 8,
+                      width: 15,
                     ),
                     Expanded(
                       child: Column(
@@ -292,7 +304,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (cObj["notes"] != null)
+                                if (cObj["notes"] != '')
                                   Text(
                                     "Notes: ${cObj["notes"]}",
                                     style: TextStyle(
@@ -326,59 +338,59 @@ class _MyOrderViewState extends State<MyOrderView> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        SizedBox(
+                          height: 7,
+                        ),
                         Text(
-                          "General notes on the order",
+                          "General Notes On Order",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 13,
                               fontWeight: FontWeight.w700),
                         ),
+                        SizedBox(
+                          height: 7,
+                        ),
                         RoundTitleTextfield(
                           title: "Notes",
                           hintText: "Add Notes",
+                          maxLines: 2,
                           controller: txtNotes,
                         ),
                       ],
                     ),
                     const SizedBox(
-                      height: 4,
+                      height: 15,
                     ),
                     Divider(
                       color: TColor.secondaryText.withOpacity(0.5),
                       height: 1,
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 7,
                     ),
                     Row(
                       children: [
-                        Text("Delivery:",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: TColor.primaryText,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700)),
-                        SizedBox(width: 10),
+                        SizedBox(width: 7),
                         Flexible(
                           child: Row(
                             children: [
                               Radio(
                                 activeColor: Color.fromARGB(255, 239, 108, 0),
-                                value: "Yes",
+                                value: "Delivery",
                                 groupValue: delivery,
                                 onChanged: (value) {
                                   setState(() {
                                     delivery = value;
                                     deliveryCost = 10.0;
-                                    finalPrice  = deliveryCost+totalPrice!;
-                                    setState(() {
-                                      
-                                    });
+                                    deliver = true;
+                                    finalPrice = deliveryCost + totalPrice!;
+                                    setState(() {});
                                   });
                                 },
                               ),
-                              Text("Yes",
+                              Text("Delivery",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       color: TColor.primaryText,
@@ -392,20 +404,19 @@ class _MyOrderViewState extends State<MyOrderView> {
                             children: [
                               Radio(
                                 activeColor: Color.fromARGB(255, 239, 108, 0),
-                                value: "No",
+                                value: "Self Pick Up",
                                 groupValue: delivery,
                                 onChanged: (value) {
                                   setState(() {
                                     delivery = value;
+                                    deliver = false;
                                     deliveryCost = 0.0;
-                                    finalPrice  = deliveryCost+totalPrice!;
-                                    setState(() {
-                                      
-                                    });
+                                    finalPrice = deliveryCost + totalPrice!;
+                                    setState(() {});
                                   });
                                 },
                               ),
-                              Text("No",
+                              Text("Self Pick Up",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       color: TColor.primaryText,
@@ -451,7 +462,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          deliveryCost.toString()+"₪",
+                          deliveryCost.toString() + "₪",
                           style: TextStyle(
                               color: TColor.primary,
                               fontSize: 13,
@@ -481,7 +492,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          finalPrice.toString()+"₪",
+                          finalPrice.toString() + "₪",
                           style: TextStyle(
                               color: TColor.primary,
                               fontSize: 22,
@@ -495,11 +506,23 @@ class _MyOrderViewState extends State<MyOrderView> {
                     RoundButton(
                         title: "Checkout",
                         onPressed: () async {
-                          Map<String, dynamic> result = await addOrderItems(widget.userId, widget.kitchen['id'], cartId, widget.items);
+                          Map<String, dynamic> result = await addOrderItems(
+                              widget.userId,
+                              widget.kitchen['id'],
+                              cartId,
+                              widget.items);
                           bool success = result['success'];
                           print(success);
                           if (success) {
-                            pushReplacementWithAnimation(context, CheckoutView(totalPrice:totalPrice!,deliveryCost:deliveryCost, orderId: orderId!, kitchen: widget.kitchen, notes: txtNotes.text,));
+                            pushReplacementWithAnimation(
+                                context,
+                                CheckoutView(
+                                    totalPrice: totalPrice!,
+                                    deliveryCost: deliveryCost,
+                                    orderId: orderId!,
+                                    kitchen: widget.kitchen,
+                                    notes: txtNotes.text,
+                                    delivery: deliver));
                           }
                           /* Navigator.push(
                             context,
