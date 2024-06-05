@@ -31,7 +31,7 @@ class _MyOrderViewState extends State<MyOrderView> {
   double? finalPrice;
   int? cartId;
   int? orderId;
-  bool deliver = true;
+  String deliver = 'yes';
   bool checkoutPressed = false;
 
   double calculateTotalPrice() {
@@ -80,7 +80,7 @@ class _MyOrderViewState extends State<MyOrderView> {
   void initState() {
     super.initState();
     delivery = "Delivery";
-    deliver = true;
+    deliver = 'yes';
     totalPrice = calculateTotalPrice();
     finalPrice = deliveryCost + totalPrice!;
     cartId = widget.items.isNotEmpty ? widget.items[0]['cart_id'] : null;
@@ -408,7 +408,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                                   setState(() {
                                     delivery = value;
                                     deliveryCost = 10.0;
-                                    deliver = true;
+                                    deliver = 'yes';
                                     finalPrice = deliveryCost + totalPrice!;
                                     setState(() {});
                                   });
@@ -433,7 +433,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                                 onChanged: (value) {
                                   setState(() {
                                     delivery = value;
-                                    deliver = false;
+                                    deliver = 'no';
                                     deliveryCost = 0.0;
                                     finalPrice = deliveryCost + totalPrice!;
                                     setState(() {});

@@ -7,6 +7,7 @@ import 'package:untitled/menu/rating_page.dart';
 import 'package:untitled/order/cart.dart';
 import 'package:untitled/order/item_details_view.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/order/my_order_view.dart';
 import '../../common_widget/menu_item_row.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -87,7 +88,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
   Future<void> getCartItems() async {
     await _loadUserId();
 
-    final url = Uri.parse('${SharedPreferencesService.url}get-cart-items?userId=$userId');
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}get-cart-items?userId=$userId');
 
     try {
       final response = await http.get(url);
@@ -108,11 +110,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
   Future<Map<String, dynamic>> emptyCart() async {
     const url = '${SharedPreferencesService.url}empty-cart';
     try {
-      final response = await http.delete(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: cartItems
-      );
+      final response = await http.delete(Uri.parse(url),
+          headers: {'Content-Type': 'application/json'}, body: cartItems);
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
       } else {
@@ -183,7 +182,56 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                         if (cartItems.isEmpty) {
                           Navigator.pop(context);
                         } else {
-                          //show alert 
+                          //show alert
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: TColor.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  title:
+                                      Text('Are you sure you want to leave?'),
+                                  content: Text(
+                                      'If you leave, the items in the cart will be deleted.'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                        child: Text(
+                                          'Leave',
+                                          style:
+                                              TextStyle(color: TColor.primary),
+                                        ),
+                                        onPressed: () async {
+                                          Map<String, dynamic> result =
+                                              await emptyCart();
+                                          bool success = result['success'];
+                                          print(success);
+                                          if (success) {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop();
+                                          } else {
+                                            Navigator.of(context)
+                                                .pop(); // Stay on the page to test
+                                          }
+                                        }),
+                                    TextButton(
+                                      child: Text(
+                                        'Proceed with order',
+                                        style: TextStyle(color: TColor.primary),
+                                      ),
+                                      onPressed: () {
+                                        pushReplacementWithAnimation(
+                                            context,
+                                            MyOrderView(
+                                                items: cartItems,
+                                                kitchen: widget.mObj,
+                                                userId: userId!));
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
                         }
                         /////////////////////////////////////////////////////////
                       },

@@ -6,6 +6,7 @@ import 'package:untitled/common_widget/cart_drop_down.dart';
 import 'package:untitled/common_widget/food_list_tile.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/menu/kitchen_menu.dart';
 import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/my_order_view.dart';
 import 'dart:convert';
@@ -113,7 +114,11 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: TColor.white,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            pushReplacementWithAnimation(
+                context,
+                KitchenMenuView(
+                  mObj: widget.kitchen,
+                ));
           },
           icon: Image.asset("assets/img/btn_back.png", width: 20, height: 20),
         ),
@@ -128,8 +133,7 @@ class _CartPageState extends State<CartPage> {
         actions: [
           IconButton(
             onPressed: () {
-              pushReplacementWithAnimation(
-                            context, NotificationsView());
+              pushReplacementWithAnimation(context, NotificationsView());
             },
             icon: Image.asset(
               "assets/img/notification.png",
@@ -196,7 +200,11 @@ class _CartPageState extends State<CartPage> {
                         title: "Order Now",
                         onPressed: () {
                           pushReplacementWithAnimation(
-                              context, MyOrderView(items: cartItems, kitchen: widget.kitchen, userId: userId!));
+                              context,
+                              MyOrderView(
+                                  items: cartItems,
+                                  kitchen: widget.kitchen,
+                                  userId: userId!));
                         },
                       ),
                     )),
