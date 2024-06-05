@@ -29,21 +29,6 @@ class _CheckoutMessageViewState extends State<CheckoutMessageView> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: TColor.primaryText,
-                  size: 25,
-                ),
-              )
-            ],
-          ),
           Image.asset(
             "assets/img/thank_you.png",
             width: media.width * 0.55,

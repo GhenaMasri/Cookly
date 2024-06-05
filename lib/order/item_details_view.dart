@@ -610,11 +610,23 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                                         .success,
                                                                 label:
                                                                     'Added To Cart',
-                                                                snackBarStyle:
-                                                                    SnackBarStyle(
-                                                                        backgroundColor:
-                                                                            TColor.primary,
-                                                                            labelTextStyle: TextStyle(fontWeight:FontWeight.bold,fontSize: 18)));
+                                                                snackBarStyle: SnackBarStyle(
+                                                                    backgroundColor:
+                                                                        TColor
+                                                                            .primary,
+                                                                    labelTextStyle: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontSize:
+                                                                            18)));
+                                                             await Future.delayed(
+                                                                const Duration(
+                                                                    seconds:
+                                                                        2)); 
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
                                                           }
                                                         }),
                                                   ),

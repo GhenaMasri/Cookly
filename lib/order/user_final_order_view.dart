@@ -320,8 +320,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (cObj["item_notes"] != null ||
-                                    cObj["item_notes"] != '')
+                                if (!cObj["item_notes"].toString().isEmpty)
                                   Text(
                                     "Notes: ${cObj["item_notes"]}",
                                     style: TextStyle(
@@ -330,8 +329,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
-                                if (cObj["item_notes"] != null ||
-                                    cObj["item_notes"] != '')
+                                if (!cObj["item_notes"].toString().isEmpty)
                                   const SizedBox(height: 5),
                                 if (cObj["sub_quantity"] != null)
                                   Text(
@@ -356,41 +354,43 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
+                    if (!orderInfo!['order_notes'].toString().isEmpty)
+                      SizedBox(
+                        height: 5,
+                      ),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
-                          SizedBox(
-                            height: 5,
-                          ),
-                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
+                        if (!orderInfo!['order_notes'].toString().isEmpty)
                           Text(
                             "General Notes On Order",
-                            textAlign: TextAlign.start,
                             style: TextStyle(
                                 color: TColor.primaryText,
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w700),
-                          ),
-                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
-                          SizedBox(
-                            height: 5,
-                          ),
-                        if (orderInfo?['order_notes'] != null || orderInfo?['order_notes'] == '')
-                          RoundTitleTextfield(
-                            title: "Notes",
-                            hintText: "Your Notes",
-                            controller: txtNotes,
-                            readOnly: true,
-                            maxLines: 2,
                           ),
                       ],
                     ),
-                    if (orderInfo?['order_notes'] != null)
+                    if (!orderInfo!['order_notes'].toString().isEmpty)
+                      SizedBox(
+                        height: 5,
+                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (!orderInfo!['order_notes'].toString().isEmpty)
+                          Text(
+                            orderInfo?['order_notes'],
+                            style: TextStyle(
+                                color: TColor.secondaryText, fontSize: 14),
+                          ),
+                      ],
+                    ),
+                    if (!orderInfo!['order_notes'].toString().isEmpty)
                       const SizedBox(
                         height: 5,
                       ),
-                    if (orderInfo?['order_notes'] != null)
+                    if (!orderInfo!['order_notes'].toString().isEmpty)
                       Divider(
                         color: TColor.secondaryText.withOpacity(0.5),
                         height: 1,
@@ -443,6 +443,31 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                           )
                         ],
                       ),
+                    if (orderInfo!['pickup_time'] != null)
+                      const SizedBox(
+                        height: 8,
+                      ),
+                    if (orderInfo!['pickup_time'] != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Pick Up Time",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: TColor.primaryText,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            orderInfo!['pickup_time'],
+                            style: TextStyle(
+                                color: TColor.primary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700),
+                          )
+                        ],
+                      ),
                     const SizedBox(
                       height: 15,
                     ),
@@ -452,6 +477,29 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                     ),
                     const SizedBox(
                       height: 15,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Payment Method",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          orderInfo!['payment'],
+                          style: TextStyle(
+                              color: TColor.primary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                     const SizedBox(
+                      height: 8,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

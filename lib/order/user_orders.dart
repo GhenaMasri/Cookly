@@ -18,7 +18,8 @@ class _UserOrdersState extends State<UserOrders> {
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrders() async {
     await _loadUserId();
-    final String apiUrl = '${SharedPreferencesService.url}get-user-orders?userId=$id';
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-user-orders?userId=$id';
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -48,6 +49,7 @@ class _UserOrdersState extends State<UserOrders> {
 
   Future<void> _initData() async {
     await fetchOrders();
+    print(orders.isEmpty);
   }
 
   @override
@@ -101,59 +103,31 @@ class _UserOrdersState extends State<UserOrders> {
       backgroundColor: TColor.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: ListView.builder(
-          itemCount: orders.length,
-          itemBuilder: (context, index) {
-            var order = orders[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Stack(
-                alignment: Alignment.centerRight,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 7,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: (orders.isEmpty)
-                        ? Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 30, horizontal: 20),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.4),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Center(
-                                child: Text(
-                                  "No Orders Yet",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
+        child: (orders.isEmpty)
+            ? Center(child: Text('No Orders Yet'))
+            : ListView.builder(
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  var order = orders[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 7,
+                                offset: Offset(0, 4),
                               ),
-                            ),
-                          )
-                        : Padding(
+                            ],
+                          ),
+                          child: Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -184,8 +158,12 @@ class _UserOrdersState extends State<UserOrders> {
                                       SizedBox(height: 5.0),
                                       Row(
                                         children: [
-                                          Text('₪',
-                                              style: TextStyle(color: TColor.primary,fontSize: 20),),
+                                          Text(
+                                            '₪',
+                                            style: TextStyle(
+                                                color: TColor.primary,
+                                                fontSize: 20),
+                                          ),
                                           SizedBox(width: 5.0),
                                           Text(order['total_price'].toString()),
                                         ],
@@ -227,47 +205,47 @@ class _UserOrdersState extends State<UserOrders> {
                               ],
                             ),
                           ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      pushReplacementWithAnimation(
-                          context,
-                          FinalOrderView(
-                            orderId: order['id'],
-                          ));
-                      /* Navigator.push(
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            pushReplacementWithAnimation(
+                                context,
+                                FinalOrderView(
+                                  orderId: order['id'],
+                                ));
+                            /* Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => OrderDetailsPage(order: order),
                         ),
                       ); */
-                    },
-                    icon: Container(
-                      width: 35,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(17.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
+                          },
+                          icon: Container(
+                            width: 35,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(17.5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: TColor.primary,
+                            ),
                           ),
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.arrow_forward,
-                        color: TColor.primary,
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
     );
   }
