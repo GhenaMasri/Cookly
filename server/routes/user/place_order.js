@@ -5,9 +5,6 @@ const pool = require("../../db");
 router.put("/", async (req, res) => {
     const { orderId, totalPrice, status, userNumber, kitchenNumber, city, address, notes, pickupTime, payment, delivery} = req.body;
 
-    console.log(orderId," ", totalPrice," ", status," ", userNumber," ", kitchenNumber," ", city," ");
-    console.log(address," ", notes," ", pickupTime," ", payment," ", delivery)
-
     if (!orderId || !totalPrice || !status || !userNumber || !kitchenNumber || !city || !payment) {
       return res.status(400).send("All fields are required");
     }
