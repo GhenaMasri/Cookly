@@ -51,7 +51,7 @@ class _CheckoutViewState extends State<CheckoutView> {
 
     final Map<String, dynamic> requestBody = {
       'orderId': widget.orderId,
-      'totalPrice': widget.totalPrice,
+      'totalPrice': checkoutPrice,
       'status': "pending",
       'userNumber': txtNumber.text,
       'kitchenNumber': widget.kitchen['contact'],
@@ -88,7 +88,6 @@ class _CheckoutViewState extends State<CheckoutView> {
       txtNumber.text = number!;
     });
   }
-
   /////////////////////////////////////////////////////////////////////////////////
   GlobalKey<FormState> formState = GlobalKey();
   @override

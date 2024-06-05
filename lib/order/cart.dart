@@ -114,11 +114,7 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: TColor.white,
         leading: IconButton(
           onPressed: () {
-            pushReplacementWithAnimation(
-                context,
-                KitchenMenuView(
-                  mObj: widget.kitchen,
-                ));
+            Navigator.of(context).pop();
           },
           icon: Image.asset("assets/img/btn_back.png", width: 20, height: 20),
         ),

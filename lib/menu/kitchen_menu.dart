@@ -110,8 +110,12 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
   Future<Map<String, dynamic>> emptyCart() async {
     const url = '${SharedPreferencesService.url}empty-cart';
     try {
-      final response = await http.delete(Uri.parse(url),
-          headers: {'Content-Type': 'application/json'}, body: cartItems);
+      final body = jsonEncode({'items': cartItems});
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'}, 
+        body: body
+      );
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
       } else {
@@ -203,16 +207,14 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
                                               TextStyle(color: TColor.primary),
                                         ),
                                         onPressed: () async {
-                                          Map<String, dynamic> result =
-                                              await emptyCart();
+                                          Map<String, dynamic> result = await emptyCart();
                                           bool success = result['success'];
                                           print(success);
                                           if (success) {
                                             Navigator.of(context).pop();
                                             Navigator.of(context).pop();
                                           } else {
-                                            Navigator.of(context)
-                                                .pop(); // Stay on the page to test
+                                            print("there is an error, success is false");
                                           }
                                         }),
                                     TextButton(
