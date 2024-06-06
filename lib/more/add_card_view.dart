@@ -17,7 +17,8 @@ class _AddCardViewState extends State<AddCardView> {
   TextEditingController txtCardCode = TextEditingController();
   TextEditingController txtFirstName = TextEditingController();
   TextEditingController txtLastName = TextEditingController();
-  bool isAnyTime = false;
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -29,114 +30,164 @@ class _AddCardViewState extends State<AddCardView> {
           color: TColor.white,
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Add Credit/Debit Card",
-                style: TextStyle(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Add Credit/Debit Card",
+                  style: TextStyle(
+                      color: TColor.primaryText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700),
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.close,
                     color: TColor.primaryText,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700),
-              ),
-              IconButton(
+                    size: 25,
+                  ),
+                )
+              ],
+            ),
+            Divider(
+              color: TColor.secondaryText.withOpacity(0.4),
+              height: 1,
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            RoundTextfield(
+              hintText: "Card Number",
+              controller: txtCardNumber,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a card number';
+                } else if (!RegExp(r'^[0-9]{16}$').hasMatch(value)) {
+                  return 'Enter a valid 16-digit card number';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              children: [
+                Text(
+                  "Expiry",
+                  style: TextStyle(
+                      color: TColor.primaryText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: 100,
+                  child: RoundTextfield(
+                    hintText: "MM",
+                    controller: txtCardMonth,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Field Required';
+                      } else if (!RegExp(r'^(0[1-9]|1[0-2])$').hasMatch(value)) {
+                        return 'Syntax: MM';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 25),
+                SizedBox(
+                  width: 100,
+                  child: RoundTextfield(
+                    hintText: "YYYY",
+                    controller: txtCardYear,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Field Required';
+                      } else if (!RegExp(r'^[0-9]{4}$').hasMatch(value) || int.parse(value) < DateTime.now().year) {
+                        return 'Syntax: YYYY';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            RoundTextfield(
+              hintText: "Card Security Code",
+              controller: txtCardCode,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the security code';
+                } else if (!RegExp(r'^[0-9]{3,4}$').hasMatch(value)) {
+                  return 'Enter a valid 3 or 4 digit code';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            RoundTextfield(
+              hintText: "First Name",
+              controller: txtFirstName,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your first name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            RoundTextfield(
+              hintText: "Last Name",
+              controller: txtLastName,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your last name';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(
+              height: 25,
+            ),
+            RoundIconButton(
+                title: "Add Card",
+                icon: "assets/img/add.png",
+                color: TColor.primary,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: TColor.primaryText,
-                  size: 25,
-                ),
-              )
-            ],
-          ),
-          Divider(
-            color: TColor.secondaryText.withOpacity(0.4),
-            height: 1,
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          RoundTextfield(
-            hintText: "Card Number",
-            controller: txtCardNumber,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Row(
-            children: [
-              Text(
-                "Expiry",
-                style: TextStyle(
-                    color: TColor.primaryText,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: 100,
-                child: RoundTextfield(
-                  hintText: "MM",
-                  controller: txtCardMonth,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              const SizedBox(width: 25),
-              SizedBox(
-                width: 100,
-                child: RoundTextfield(
-                  hintText: "YYYY",
-                  controller: txtCardYear,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          RoundTextfield(
-            hintText: "Card Security Code",
-            controller: txtCardCode,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          RoundTextfield(
-            hintText: "First Name",
-            controller: txtFirstName,
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          RoundTextfield(
-            hintText: "Last Name",
-            controller: txtLastName,
-          ),
-          const SizedBox(
-            height: 25,
-          ),
-          RoundIconButton(
-              title: "Add Card",
-              icon: "assets/img/add.png",
-              color: TColor.primary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          const SizedBox(
-            height: 25,
-          ),
-        ],
+                  if (_formKey.currentState!.validate()) {
+                    // Process the card addition
+                    Navigator.pop(context);
+                  }
+                }),
+            const SizedBox(
+              height: 25,
+            ),
+          ],
+        ),
       ),
     );
   }

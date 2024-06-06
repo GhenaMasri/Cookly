@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/chat.dart';
 import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/more/payment_details_view.dart';
 import 'package:untitled/welcome_page.dart';
@@ -113,7 +114,7 @@ class _MoreViewState extends State<MoreView> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Container()));
+                                    builder: (context) => ChatPage()));
                           case "3":
                             Navigator.push(
                                 context,
