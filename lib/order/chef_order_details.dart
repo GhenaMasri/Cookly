@@ -165,7 +165,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (item["notes"] != null)
+                      if (!item["item_notes"].toString().isEmpty)
                         Text(
                           "Notes: ${item["notes"]}",
                           style: TextStyle(
@@ -175,7 +175,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                           ),
                         ),
                       const SizedBox(height: 5),
-                      if (item["sub_quantity"] != null)
+                      if (!item["item_notes"].toString().isEmpty)
                         Text(
                           "Sub-Quantity: ${item["sub_quantity"]}",
                           style: TextStyle(

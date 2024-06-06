@@ -423,8 +423,9 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                         height: 8,
                       ),
                     if (delivery == 'Yes')
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        spacing: 8.0, // Add space between the elements
+                        runSpacing: 4.0, // Add space between the lines
                         children: [
                           Text(
                             "Delivery Address",
@@ -440,7 +441,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                 color: TColor.primary,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700),
-                          )
+                          ),
                         ],
                       ),
                     if (orderInfo!['pickup_time'] != null)
@@ -498,7 +499,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                         ),
                       ],
                     ),
-                     const SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                     Row(
