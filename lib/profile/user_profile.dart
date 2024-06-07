@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:flutter/material.dart';
@@ -206,6 +207,25 @@ class _UserProfileViewState extends State<UserProfileView> {
                 fontSize: 16,
                 fontWeight: FontWeight.w700),
           ),
+          SizedBox(height: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      FontAwesomeIcons.crown,
+                      color: Colors.amber,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Your Points",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        
+                      ),
+                    ),
+                  ],
+                ),
           TextButton(
             onPressed: () {
               signOut(context);

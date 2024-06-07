@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/more/more_view.dart';
+import 'package:untitled/more/user_more_view.dart';
 import 'package:untitled/order/chef_order_pending.dart';
 import 'package:untitled/order/orders_tab_bar.dart';
 import 'package:untitled/order/user_orders.dart';
@@ -50,7 +51,7 @@ class _MainViewState extends State<MainView> {
       body: PageStorage(bucket: storageBucket, child: selectPageView),
       backgroundColor: TColor.white,
       bottomNavigationBar: BottomAppBar(
-        color: TColor.white, 
+        color: TColor.white,
         elevation: 1,
         height: 64,
         child: SafeArea(
@@ -114,7 +115,12 @@ class _MainViewState extends State<MainView> {
                   onTap: () {
                     if (selectTab != 4) {
                       selectTab = 4;
-                      selectPageView = MoreView();
+
+                      if (type == "chef") {
+                        selectPageView = MoreView();
+                      } else {
+                        selectPageView = UserMoreView();
+                      }
                     }
                     if (mounted) {
                       setState(() {});

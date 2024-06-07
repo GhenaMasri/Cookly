@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/admin/admin_main.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/main_page.dart';
 import 'package:untitled/reset_password.dart';
@@ -22,7 +23,7 @@ class _Signin extends State<Signin> {
   String? password;
   String errorMessage = '';
   bool errorFlag = false;
-
+  late Map<String, dynamic> userData;
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> signIn() async {
     const url = '${SharedPreferencesService.url}signin';
@@ -34,18 +35,17 @@ class _Signin extends State<Signin> {
       );
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(response.body);
-        Map<String, dynamic> userData = responseData['user'];
+        userData = responseData['user'];
         SharedPreferences prefs = await SharedPreferences.getInstance();
         _clearSharedPreferences();
         await prefs.setBool('isSet', true);
         _saveDataToSharedPreferences(
-          userData['id'],
-          userData['first_name'],
-          userData['last_name'],
-          userData['email'],
-          userData['phone'],
-          userData['type']
-        );
+            userData['id'],
+            userData['first_name'],
+            userData['last_name'],
+            userData['email'],
+            userData['phone'],
+            userData['type']);
         if (userData['type'] == "chef") {
           //store kitchen id in shared preferences
           int chefId = await getChefId(userData['email']);
@@ -54,7 +54,7 @@ class _Signin extends State<Signin> {
           String kitchenName = await getKitchenName(chefId);
           await prefs.setString('kitchen_name', kitchenName);
         }
-        return { 'success': true, 'message': 'Sign in successful' };
+        return {'success': true, 'message': 'Sign in successful'};
       } else {
         return {'success': false, 'message': response.body};
       }
@@ -311,9 +311,15 @@ class _Signin extends State<Signin> {
                                     errorFlag = false;
                                     errorMessage = "";
                                   });
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) => MainView()));
+                                  if (userData['type'] == "admin") {
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) => AdminMainView()));
+                                  } else {
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) => MainView()));
+                                  }
                                 } else {
                                   setState(() {
                                     errorFlag = true;

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:flutter/material.dart';

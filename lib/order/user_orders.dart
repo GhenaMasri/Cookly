@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/user_final_order_view.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -86,8 +87,8 @@ class _UserOrdersState extends State<UserOrders> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Container()));
+                 pushReplacementWithAnimation(
+                            context, NotificationsView());
             },
             icon: Image.asset(
               "assets/img/notification.png",
