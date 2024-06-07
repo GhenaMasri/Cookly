@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
         title: "Cookly",
         theme: ThemeData(
           fontFamily: "Metropolis",
+          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         // ignore: prefer_const_constructors
         home: SplashView());

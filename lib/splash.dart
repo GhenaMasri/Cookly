@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/admin/admin_main.dart';
 import 'package:untitled/welcome_page.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/main_page.dart';
@@ -18,17 +19,23 @@ class _StarupViewState extends State<SplashView> {
   }
 
   void goWelcomePage() async {
-      await Future.delayed( const Duration(seconds: 3) );
-      //Navigator.push(context, MaterialPageRoute(builder: (context) => const WelcomeView()));
-      welcomePage();
+    await Future.delayed(const Duration(seconds: 3));
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => const WelcomeView()));
+    welcomePage();
   }
 
-  void welcomePage() async{
+  void welcomePage() async {
     bool? isSet = await SharedPreferencesService.getIsSet();
-    if (isSet == true) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const MainView()));
-    } else{
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const WelcomeView()));
+    String? type = await SharedPreferencesService.getType();
+    if (isSet == true && type != 'admin') {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const MainView()));
+    } else if (isSet == true && type == 'admin') {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const AdminMainView()));
+    } else {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const WelcomeView()));
     }
   }
 
@@ -48,7 +55,7 @@ class _StarupViewState extends State<SplashView> {
           ),
           Image.asset(
             "assets/img/app_cookly.png",
-             width: media.width * 0.55,
+            width: media.width * 0.55,
             height: media.width * 0.55,
             fit: BoxFit.contain,
           ),

@@ -10,36 +10,29 @@ import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/more/payment_details_view.dart';
 import 'package:untitled/welcome_page.dart';
 
-class MoreView extends StatefulWidget {
-  const MoreView({super.key});
+class UserMoreView extends StatefulWidget {
+  const UserMoreView({super.key});
 
   @override
-  State<MoreView> createState() => _MoreViewState();
+  State<UserMoreView> createState() => _UserMoreViewState();
 }
 
-class _MoreViewState extends State<MoreView> {
+class _UserMoreViewState extends State<UserMoreView> {
   List moreArr = [
-    
     {
       "index": "1",
-      "name": "My Subscription",
-      "image": "assets/img/subscription.png",
-      "base": 0
-    },
-    {
-      "index": "2",
       "name": "Inbox",
       "image": "assets/img/more_inbox.png",
       "base": 0
     },
     {
-      "index": "3",
+      "index": "2",
       "name": "About Us",
       "image": "assets/img/more_info.png",
       "base": 0
     },
     {
-      "index": "4",
+      "index": "3",
       "name": "Logout",
       "image": "assets/img/more_logout.png",
       "base": 0
@@ -83,7 +76,7 @@ class _MoreViewState extends State<MoreView> {
                     ),
                     IconButton(
                       onPressed: () {
-                       pushReplacementWithAnimation(
+                        pushReplacementWithAnimation(
                             context, NotificationsView());
                       },
                       icon: Image.asset(
@@ -106,24 +99,17 @@ class _MoreViewState extends State<MoreView> {
                     return InkWell(
                       onTap: () {
                         switch (mObj["index"].toString()) {
-                        
                           case "1":
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>SubscriptionManagementPage()));
-
+                                    builder: (context) => ChatPage()));
                           case "2":
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ChatPage()));
-                          case "3":
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
                                     builder: (context) => AboutUsPage()));
-                          case "4":
+                          case "3":
                             signOut(context);
 
                           default:
@@ -202,9 +188,7 @@ class _MoreViewState extends State<MoreView> {
                                   color: TColor.textfield,
                                   borderRadius: BorderRadius.circular(15)),
                               child: Image.asset("assets/img/btn_next.png",
-                                  width: 10,
-                                  height: 10,
-                                  color: TColor.primary),
+                                  width: 10, height: 10, color: TColor.primary),
                             ),
                           ],
                         ),
