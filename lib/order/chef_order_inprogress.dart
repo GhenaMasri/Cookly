@@ -11,10 +11,57 @@ class ChefOrderInprogress extends StatefulWidget {
 class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
   final List<Map<String, dynamic>> orders = [
     {
+      
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "In Progress",
+      "status": "done",
+      "delivery": "yes",
+      "items": [
+        {
+          "name": "Beef Burger",
+          "qty": "1",
+          "price": 16.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Classic Burger",
+          "qty": "1",
+          "price": 14.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Cheese Chicken Burger",
+          "qty": "1",
+          "price": 17.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "Chicken Legs Basket",
+          "qty": "1",
+          "price": 15.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        },
+        {
+          "name": "French Fries Large",
+          "qty": "1",
+          "price": 6.0,
+          "notes": "Nothing to add",
+          "sub_quantity": "1 person"
+        }
+      ],
+      "ContactNumber": "0597280457"
+    },
+ {
+      "customerName": "John Doe",
+      "location": "123 Main St",
+      "orderTime": "12:30 PM",
+      "status": "done",
+      "delivery": "no",
       "items": [
         {
           "name": "Beef Burger",
@@ -58,7 +105,8 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "In Progress",
+      "status": "in progress",
+       "delivery": "no",
       "items": [
         {
           "name": "Beef Burger",
@@ -98,11 +146,12 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
       ],
       "ContactNumber": "0597280457"
     },
-    {
+     {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "In Progress",
+      "status": "in progress",
+       "delivery": "yes",
       "items": [
         {
           "name": "Beef Burger",
@@ -142,50 +191,7 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
       ],
       "ContactNumber": "0597280457"
     },
-    {
-      "customerName": "John Doe",
-      "location": "123 Main St",
-      "orderTime": "12:30 PM",
-      "status": "In Progress",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "qty": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "qty": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "qty": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "qty": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "qty": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
+    
   ];
 
  @override

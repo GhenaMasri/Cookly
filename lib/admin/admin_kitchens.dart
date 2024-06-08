@@ -1,6 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/common/globs.dart';
+import 'package:untitled/common_widget/cart_drop_down.dart';
+import 'package:untitled/common_widget/dropdown.dart';
+import 'package:http/http.dart' as http;
 
 class AdminKitchensPage extends StatefulWidget {
   @override
@@ -9,6 +15,53 @@ class AdminKitchensPage extends StatefulWidget {
 
 class _AdminKitchensPageState extends State<AdminKitchensPage> {
   String selectedCity = 'Nablus';
+  int? selectedCategoryId;
+  late Future<void> _initDataFuture;
+  List<Map<String, dynamic>> categories = [];
+  List<String> categoriesList = [];
+  String? category;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    try {
+      var fetchedCategories = await getKitchenCategories();
+      if (mounted) {
+        setState(() {
+          categories = fetchedCategories;
+
+          for (var element in categories) {
+            if (element.containsKey('category')) {
+              categoriesList.add(element['category']);
+            }
+          }
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getKitchenCategories() async {
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> categoryList = data['categories'];
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
+        return {'id': category['id'], 'category': category['category']};
+      }).toList();
+      return categories;
+    } else {
+      throw Exception('Failed to load kitchen categories');
+    }
+  }
+
   final Map<String, List<Kitchen>> kitchens = {
     'Nablus': [
       Kitchen('Kitchen 1', 'Active', 4.5, '123-456-7890'),
@@ -30,6 +83,22 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -49,34 +118,70 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Select a City',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10),
-            DropdownButton<String>(
-              dropdownColor: TColor.white,
-              value: selectedCity,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedCity = newValue!;
-                });
-              },
-              items: <String>['Nablus', 'Ramallah', 'Jenin', 'Tulkarm']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              isExpanded: true,
-              icon: Icon(Icons.arrow_drop_down, color: TColor.primary),
-              underline: Container(
-                height: 2,
-                color: TColor.primary,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: [
+                  // Location Dropdown
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Select City",
+                          style: TextStyle(
+                            color: TColor.secondaryText,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        MyDropdownMenu(
+                          value: selectedCity,
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedCity = newValue!;
+                              //_updateMenuArr();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                      width: 10),
+                  // Category Dropdown
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Category",
+                          style: TextStyle(
+                            color: TColor.secondaryText,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        CartDropdownMenu(
+                          items: categoriesList,
+                          hint: 'Choose Category',
+                          value: category,
+                          onChanged: (newValue) {
+                            setState(() {
+                              category = newValue;
+                              var selectedItem = categories.firstWhere(
+                                (element) => element['category'] == newValue,
+                                orElse: () => {},
+                              );
+                              selectedCategoryId = selectedItem['id'];
+                              //_updateMenuArr();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 20),

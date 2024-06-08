@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/admin/admin_main.dart';
+import 'package:untitled/delivery/delivery_main.dart';
 import 'package:untitled/welcome_page.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/main_page.dart';
@@ -27,12 +28,15 @@ class _StarupViewState extends State<SplashView> {
   void welcomePage() async {
     bool? isSet = await SharedPreferencesService.getIsSet();
     String? type = await SharedPreferencesService.getType();
-    if (isSet == true && type != 'admin') {
+    if (isSet == true && type != 'admin' && type != 'delivery') {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => const MainView()));
     } else if (isSet == true && type == 'admin') {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const AdminMainView()));
+    } else if (isSet == true && type == 'delivery') {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const DeliveryMainView()));
     } else {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const WelcomeView()));

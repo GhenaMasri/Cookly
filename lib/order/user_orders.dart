@@ -177,7 +177,7 @@ class _UserOrdersState extends State<UserOrders> {
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 8, horizontal: 20),
                                               decoration: BoxDecoration(
-                                                color: order['status'] == 'done'
+                                                color: order['status'] == 'done' || order['status'] == 'delivered'
                                                     ? Colors.green
                                                     : order['status'] ==
                                                             'in progress'
