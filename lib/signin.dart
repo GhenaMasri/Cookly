@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/admin/admin_main.dart';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/delivery/delivery_main.dart';
 import 'package:untitled/main_page.dart';
 import 'package:untitled/reset_password.dart';
 import 'package:untitled/signup.dart';
@@ -311,10 +312,17 @@ class _Signin extends State<Signin> {
                                     errorFlag = false;
                                     errorMessage = "";
                                   });
+                                  print(userData['type']);
                                   if (userData['type'] == "admin") {
                                     Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
-                                            builder: (context) => AdminMainView()));
+                                            builder: (context) =>
+                                                AdminMainView()));
+                                  } else if (userData['type'] == "delivery") {
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                DeliveryMainView()));
                                   } else {
                                     Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
