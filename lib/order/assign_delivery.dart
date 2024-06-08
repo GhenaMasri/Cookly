@@ -19,14 +19,6 @@ class _AssignDeliveryViewState extends State<AssignDeliveryView> {
     DeliveryMan('Bob Brown', '456-789-0123'),
   ];
 
-  TextEditingController txtCardNumber = TextEditingController();
-  TextEditingController txtCardMonth = TextEditingController();
-  TextEditingController txtCardYear = TextEditingController();
-  TextEditingController txtCardCode = TextEditingController();
-  TextEditingController txtFirstName = TextEditingController();
-  TextEditingController txtLastName = TextEditingController();
-
-  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
