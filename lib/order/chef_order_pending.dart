@@ -14,7 +14,8 @@ class _ChefOrderPendingState extends State<ChefOrderPending> {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "Pending",
+      "status": "pending",
+       "delivery": "yes",
       "items": [
         {
           "name": "Beef Burger",
@@ -58,7 +59,8 @@ class _ChefOrderPendingState extends State<ChefOrderPending> {
       "customerName": "John Doe",
       "location": "123 Main St",
       "orderTime": "12:30 PM",
-      "status": "Pending",
+      "status": "pending",
+       "delivery": "no",
       "items": [
         {
           "name": "Beef Burger",
@@ -98,95 +100,6 @@ class _ChefOrderPendingState extends State<ChefOrderPending> {
       ],
       "ContactNumber": "0597280457"
     },
-    {
-      "customerName": "John Doe",
-      "location": "123 Main St",
-      "orderTime": "12:30 PM",
-      "status": "Pending",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "qty": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "qty": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "qty": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "qty": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "qty": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
-    {
-      "customerName": "John Doe",
-      "location": "123 Main St",
-      "orderTime": "12:30 PM",
-      "status": "Pending",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "qty": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "qty": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "qty": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "qty": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "qty": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
-    // Add more orders here
   ];
 
  @override

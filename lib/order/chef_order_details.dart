@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/order/assign_delivery.dart';
 import '../common_widget/round_button.dart';
 
 class OrderDetailsPage extends StatefulWidget {
@@ -45,8 +46,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             children: [
               _buildCustomerDetails(),
               const SizedBox(height: 20),
-              _buildStatusSegmentedControl(),
-              const SizedBox(height: 20),
+              if (_currentStatus != 'delivered') _buildStatusSegmentedControl(),
+              if (_currentStatus != 'delivered') const SizedBox(height: 20),
               Text(
                 'Items:',
                 style: TextStyle(
@@ -62,12 +63,43 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               const SizedBox(height: 15),
               _buildCostSummary(subtotal, deliveryCost, total),
               const SizedBox(height: 25),
-              
+              if ((_currentStatus == 'done') &&
+                  widget.order['delivery'] == 'yes')
+                _bulidAssignButton()
+              else if ((_currentStatus == 'done') &&
+                  widget.order['delivery'] == 'no')
+                _bulidPickedUpButton(),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _bulidAssignButton() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: RoundButton(
+            title: "Assign to Delivery",
+            onPressed: () {
+              showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  builder: (context) {
+                    return const AssignDeliveryView();
+                  });
+            }));
+  }
+
+  Widget _bulidPickedUpButton() {
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: RoundButton(
+            title: "Picked Up",
+            onPressed: () {
+              //Convert the status of the order to done
+            }));
   }
 
   Widget _buildCustomerDetails() {
@@ -169,10 +201,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                         Text(
                           "Notes: ${item["notes"]}",
                           style: TextStyle(
-                            color: TColor.primaryText,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400
-                          ),
+                              color: TColor.primaryText,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400),
                         ),
                       const SizedBox(height: 5),
                       if (!item["item_notes"].toString().isEmpty)
@@ -285,65 +316,66 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     );
   }
 
- Widget _buildStatusSegmentedControl() {
-  List<String> statusesOrder = ['Pending', 'In Progress', 'Delivered'];
+  Widget _buildStatusSegmentedControl() {
+    List<String> statusesOrder = ['pending', 'in progress', 'done'];
 
-  // Find the index of the current status in the order
-  int currentStatusIndex = statusesOrder.indexOf(_currentStatus);
+    // Find the index of the current status in the order
+    int currentStatusIndex = statusesOrder.indexOf(_currentStatus);
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Text(
-          'Order Status',
-          style: TextStyle(
-            color: TColor.primaryText,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            'Order Status',
+            style: TextStyle(
+              color: TColor.primaryText,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
-      ),
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: ToggleButtons(
-            borderRadius: BorderRadius.circular(10),
-            children: <Widget>[
-              _buildStatusButton(
-                  'Pending', Colors.yellow, _currentStatus == 'Pending'),
-              _buildStatusButton('In Progress', Colors.orange,
-                  _currentStatus == 'In Progress'),
-              _buildStatusButton(
-                  'Delivered', Colors.green, _currentStatus == 'Delivered'),
-            ],
-            isSelected: [
-              _currentStatus == 'Pending',
-              _currentStatus == 'In Progress',
-              _currentStatus == 'Delivered',
-            ],
-            onPressed: (int index) {
-              int nextStatusIndex = currentStatusIndex + 1;
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ToggleButtons(
+              borderRadius: BorderRadius.circular(10),
+              children: <Widget>[
+                _buildStatusButton(
+                    'Pending', Colors.yellow, _currentStatus == 'pending'),
+                _buildStatusButton('In Progress', Colors.orange,
+                    _currentStatus == 'in progress'),
+                _buildStatusButton(
+                    'Done', Colors.green, _currentStatus == 'done'),
+              ],
+              isSelected: [
+                _currentStatus == 'pending',
+                _currentStatus == 'in progress',
+                _currentStatus == 'done'
+              ],
+              onPressed: (int index) {
+                int nextStatusIndex = currentStatusIndex + 1;
 
-              if (index == nextStatusIndex && nextStatusIndex < statusesOrder.length) {
-                setState(() {
-                  _currentStatus = statusesOrder[nextStatusIndex];
-                });
-              }
-            },
-            color: TColor.primaryText,
-            selectedColor: TColor.white,
-            fillColor: Colors.transparent,
-            selectedBorderColor: TColor.white,
-            //borderColor: TColor.primary,
+                if (index == nextStatusIndex &&
+                    nextStatusIndex < statusesOrder.length) {
+                  setState(() {
+                    _currentStatus = statusesOrder[nextStatusIndex];
+                    //If current status == 'done' and no delivery send noification to the user
+                  });
+                }
+              },
+              color: TColor.primaryText,
+              selectedColor: TColor.white,
+              fillColor: Colors.transparent,
+              selectedBorderColor: TColor.white,
+              //borderColor: TColor.primary,
+            ),
           ),
         ),
-      ),
-    ],
-  );
-}
-
+      ],
+    );
+  }
 
   Widget _buildStatusButton(String text, Color color, bool isSelected) {
     return Container(
