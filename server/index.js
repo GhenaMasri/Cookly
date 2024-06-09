@@ -2,10 +2,18 @@ const express = require("express");
 const app = express();
 const pool = require("./db");
 const cors = require("cors");
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey');
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(cors());
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+module.exports.admin = admin
 
 //chef routes
 const chefSignupdRoute = require("./routes/chef/chef_signup");
@@ -25,6 +33,15 @@ app.use("/chef-data", chefDataRoute);
 
 const editChefRoute = require("./routes/chef/edit_chef_profile");
 app.use("/edit-chef", editChefRoute);
+
+const getChefOrdersRoute = require("./routes/chef/get_orders");
+app.use("/get-chef-orders", getChefOrdersRoute);
+
+const updateOrderStatusRoute = require("./routes/chef/update_order_status");
+app.use("/update-order-status", updateOrderStatusRoute);
+
+const getChefOrderDetailsRoute = require("./routes/chef/get_order_details");
+app.use("/chef-order-details", getChefOrderDetailsRoute);
 
 //general routes
 const foodCategoriesRoute = require("./routes/general/food_categories");
@@ -47,6 +64,9 @@ app.use("/kitchen-categories", kitchenCategoriesRoute);
 
 const subFoodQuantitiesRoute = require("./routes/general/sub_food_quantities");
 app.use("/sub-food-quantities", subFoodQuantitiesRoute);
+
+const saveTokenRoute = require("./routes/general/save_token");
+app.use("/save-token", saveTokenRoute);
 
 //menu item routes
 const newMenuItemRoute = require("./routes/menu item/add_menu_item");

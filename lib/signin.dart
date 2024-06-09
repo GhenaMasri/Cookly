@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled/home/chef_home_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Signin extends StatefulWidget {
   const Signin({Key? key});
@@ -25,6 +26,7 @@ class _Signin extends State<Signin> {
   String errorMessage = '';
   bool errorFlag = false;
   late Map<String, dynamic> userData;
+
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> signIn() async {
     const url = '${SharedPreferencesService.url}signin';
@@ -55,6 +57,7 @@ class _Signin extends State<Signin> {
           String kitchenName = await getKitchenName(chefId);
           await prefs.setString('kitchen_name', kitchenName);
         }
+        await _saveFCMToken(userData['id']);
         return {'success': true, 'message': 'Sign in successful'};
       } else {
         return {'success': false, 'message': response.body};
@@ -98,6 +101,20 @@ class _Signin extends State<Signin> {
 
   Future<void> _clearSharedPreferences() async {
     await SharedPreferencesService.clearSharedPreferences();
+  }
+
+  Future<void> _saveFCMToken(int id) async {
+    String fakeToken = 'fakeToken_$id';
+    await http.post(
+      Uri.parse('${SharedPreferencesService.url}save-token'),
+      headers: <String, String> {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, String>{
+        'token': fakeToken,
+        'userId': '$id', 
+      }),
+    );
   }
   //////////////////////////////////////////////////////////////////////////////////
 

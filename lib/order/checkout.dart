@@ -60,7 +60,8 @@ class _CheckoutViewState extends State<CheckoutView> {
       'notes': widget.notes,
       'pickupTime': pickupTime,
       'payment': payment,
-      'delivery': widget.delivery
+      'delivery': widget.delivery,
+      'userId': widget.kitchen['id']
     };
 
     try {

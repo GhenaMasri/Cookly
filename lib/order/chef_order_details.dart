@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/order/assign_delivery.dart';
 import '../common_widget/round_button.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -14,6 +17,46 @@ class OrderDetailsPage extends StatefulWidget {
 
 class _OrderDetailsPageState extends State<OrderDetailsPage> {
   late String _currentStatus;
+  Map<String, dynamic>? orderInfo;
+  List<dynamic> orderItems = [];
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  
+  /*Future<void> fetchOrderDetails() async {
+    final String apiUrl = '${SharedPreferencesService.url}chef-order-details?orderId=${widget.orderId}';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        orderInfo = data['orderInfo'];
+        orderItems = data['orderItems'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }*/
+
+  /*Future<Map<String, dynamic>> updateOrderStatus(String newStatus) async {
+    final String apiUrl ='${SharedPreferencesService.url}update-order-status?orderId=${widget.orderId}';
+    try {
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"status": newStatus})
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false,'message': response.body};
+      }
+    } catch (e) {
+      return {'success': false,'message': '$e'};
+    }
+  }*/
+/////////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
@@ -23,8 +66,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    double subtotal =
-        widget.order['items'].fold(0, (sum, item) => sum + item['price']);
+    double subtotal = widget.order['items'].fold(0, (sum, item) => sum + item['price']);
     double deliveryCost = 2.0; // example delivery cost
     double total = subtotal + deliveryCost;
 

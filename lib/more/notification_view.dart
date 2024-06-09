@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class NotificationsView extends StatefulWidget {
   const NotificationsView({super.key});
@@ -9,40 +10,36 @@ class NotificationsView extends StatefulWidget {
 }
 
 class _NotificationsViewState extends State<NotificationsView> {
-  List notificationArr = [
-    {
-      "title": "Your orders has been picked up",
-      "time": "Now",
-    },
-    {
-      "title": "Your order has been delivered",
-      "time": "1 h ago",
-    },
-    {
-      "title": "Your orders has been picked up",
-      "time": "3 h ago",
-    },
-    {
-      "title": "Your order has been delivered",
-      "time": "5 h ago",
-    },
-    {
-      "title": "Your orders has been picked up",
-      "time": "05 Jun 2023",
-    },
-    {
-      "title": "Your order has been delivered",
-      "time": "05 Jun 2023",
-    },
-    {
-      "title": "Your orders has been picked up",
-      "time": "06 Jun 2023",
-    },
-    {
-      "title": "Your order has been delivered",
-      "time": "06 Jun 2023",
-    },
-  ];
+  List notificationArr = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Received message in the foreground: ${message.messageId}');
+      if (message.notification != null) {
+        setState(() {
+          notificationArr.insert(0, {
+            "title": message.notification!.title ?? '',
+            "time": "Just now",
+          });
+        });
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      if (message.notification != null) {
+        setState(() {
+          notificationArr.insert(0, {
+            "title": message.notification!.title ?? '',
+            "time": "Just now",
+          });
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/chef_order_details.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class ChefOrderPending extends StatefulWidget {
   @override
@@ -9,98 +12,32 @@ class ChefOrderPending extends StatefulWidget {
 }
 
 class _ChefOrderPendingState extends State<ChefOrderPending> {
-  final List<Map<String, dynamic>> orders = [
-    {
-      "customerName": "John Doe",
-      "location": "123 Main St",
-      "orderTime": "12:30 PM",
-      "status": "pending",
-       "delivery": "yes",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "qty": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "qty": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "qty": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "qty": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "qty": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
-    {
-      "customerName": "John Doe",
-      "location": "123 Main St",
-      "orderTime": "12:30 PM",
-      "status": "pending",
-       "delivery": "no",
-      "items": [
-        {
-          "name": "Beef Burger",
-          "qty": "1",
-          "price": 16.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Classic Burger",
-          "qty": "1",
-          "price": 14.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Cheese Chicken Burger",
-          "qty": "1",
-          "price": 17.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "Chicken Legs Basket",
-          "qty": "1",
-          "price": 15.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        },
-        {
-          "name": "French Fries Large",
-          "qty": "1",
-          "price": 6.0,
-          "notes": "Nothing to add",
-          "sub_quantity": "1 person"
-        }
-      ],
-      "ContactNumber": "0597280457"
-    },
-  ];
+  int? kitchenId;
+  List<dynamic> orders = [];
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> fetchOrders() async {
+    await _loadKitchenId();
+    final String apiUrl ='${SharedPreferencesService.url}get-chef-orders?kitchenId=$kitchenId&status=pending';
+
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        orders = data['orders'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+
+  Future<void> _loadKitchenId() async {
+    int? id = await SharedPreferencesService.getKitchenId();
+    setState(() {
+      kitchenId = id;
+    });
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
  @override
   Widget build(BuildContext context) {
