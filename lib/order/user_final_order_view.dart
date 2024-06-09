@@ -29,7 +29,6 @@ class _FinalOrderViewState extends State<FinalOrderView> {
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrderDetails() async {
-    //call it in initData
     final String apiUrl =
         '${SharedPreferencesService.url}get-order-details?orderId=${widget.orderId}';
 
