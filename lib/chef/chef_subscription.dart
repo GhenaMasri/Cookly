@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:untitled/common/globs.dart';
 
 class SubscriptionPage extends StatefulWidget {
   @override
@@ -23,6 +26,36 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
       isAnnually = !isAnnually;
     });
   }
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> subscribeKitchen(String type) async {
+    int kitchenId = await _loadKitchenId();
+    final url = Uri.parse('${SharedPreferencesService.url}subscribe?id=$kitchenId');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'type': type}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<int> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
+    return kitchenid!;
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {

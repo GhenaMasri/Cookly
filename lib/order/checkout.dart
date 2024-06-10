@@ -47,6 +47,7 @@ class _CheckoutViewState extends State<CheckoutView> {
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> placeOrder() async {
+    int userId = await _loadUserId();
     const String apiUrl = '${SharedPreferencesService.url}place-order';
 
     final Map<String, dynamic> requestBody = {
@@ -61,7 +62,8 @@ class _CheckoutViewState extends State<CheckoutView> {
       'pickupTime': pickupTime,
       'payment': payment,
       'delivery': widget.delivery,
-      'userId': widget.kitchen['id']
+      'kitchenId': widget.kitchen['id'],
+      'userId': userId
     };
 
     try {
@@ -88,6 +90,11 @@ class _CheckoutViewState extends State<CheckoutView> {
     setState(() {
       txtNumber.text = number!;
     });
+  }
+
+  Future<int> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    return id!;
   }
   /////////////////////////////////////////////////////////////////////////////////
   GlobalKey<FormState> formState = GlobalKey();

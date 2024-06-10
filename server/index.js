@@ -2,20 +2,13 @@ const express = require("express");
 const app = express();
 const pool = require("./db");
 const cors = require("cors");
-const admin = require('firebase-admin');
-const serviceAccount = require('./serviceAccountKey');
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(cors());
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+//////////////////////////////////////////// CHEF ROUTES //////////////////////////////////////
 
-module.exports.admin = admin
-
-//chef routes
 const chefSignupdRoute = require("./routes/chef/chef_signup");
 app.use("/chef-signup", chefSignupdRoute);
 
@@ -43,7 +36,20 @@ app.use("/update-order-status", updateOrderStatusRoute);
 const getChefOrderDetailsRoute = require("./routes/chef/get_order_details");
 app.use("/chef-order-details", getChefOrderDetailsRoute);
 
-//general routes
+const changeKitchenStatusRoute = require("./routes/chef/change_kitchen_status");
+app.use("/change-kitchen-status", changeKitchenStatusRoute);
+
+const subscribeRoute = require("./routes/chef/subscribe");
+app.use("/subscribe", subscribeRoute);
+
+const getSubscriptionDataRoute = require("./routes/chef/show_subscription");
+app.use("/get-subscription", getSubscriptionDataRoute);
+
+const checkSubscriptionRoute = require("./routes/chef/check_subscription");
+app.use("/check-subscription", checkSubscriptionRoute);
+
+//////////////////////////////////////////// GENERAL ROUTES //////////////////////////////////////
+
 const foodCategoriesRoute = require("./routes/general/food_categories");
 app.use("/food-categories", foodCategoriesRoute);
 
@@ -68,7 +74,14 @@ app.use("/sub-food-quantities", subFoodQuantitiesRoute);
 const saveTokenRoute = require("./routes/general/save_token");
 app.use("/save-token", saveTokenRoute);
 
-//menu item routes
+const getNotificationsRoute = require("./routes/general/get_notifications");
+app.use("/get-notifications", getNotificationsRoute);
+
+const changeNotificationStatusRoute = require("./routes/general/change_notification_status");
+app.use("/change-notification-status", changeNotificationStatusRoute);
+
+//////////////////////////////////////////// MENU ITEM ROUTES //////////////////////////////////////
+
 const newMenuItemRoute = require("./routes/menu item/add_menu_item");
 app.use("/add-menu-item", newMenuItemRoute);
 
@@ -81,7 +94,8 @@ app.use("/delete-menu-item", deleteMenuItemRoute);
 const editMenuItemRoute = require("./routes/menu item/edit_menu_item");
 app.use("/edit-menu-item", editMenuItemRoute);
 
-//user routes
+/////////////////////////////////////////////// USER ROUTES ///////////////////////////////////////////
+
 const userIdRoute = require("./routes/user/get_user_id");
 app.use("/userId", userIdRoute);
 
@@ -121,6 +135,7 @@ app.use("/get-order-details", getOrderDetailsRoute);
 const emptyCartRoute = require("./routes/user/empty_cart");
 app.use("/empty-cart", emptyCartRoute);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

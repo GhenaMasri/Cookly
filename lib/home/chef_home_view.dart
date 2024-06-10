@@ -26,6 +26,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   String? selectedLocation;
   TextEditingController txtSearch = TextEditingController();
   int? kitchenId;
+  bool? isActive;
   late Future<void> _initDataFuture;
   List<Map<String, dynamic>> categories = [];
 
@@ -140,6 +141,47 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       print('Error loading menu items: $error');
     }
   }
+
+  Future<Map<String, dynamic>> changeKitchenStatus(String status) async {
+    final url = Uri.parse('${SharedPreferencesService.url}change-kitchen-status?kitchenId=$kitchenId');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      }  else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<bool> checkSubscription() async {
+    final url = Uri.parse('${SharedPreferencesService.url}check-subscription?id=$kitchenId');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        return responseBody['isActive'];
+      } else {
+        print('Error: ${response.statusCode}');
+        return false;
+      }
+    } catch (error) {
+      print('Error: $error');
+      return false;
+    }
+  }
   //////////////////////////////////////////////////////////////////////////////////
 
   String getCategoryName(int? categoryId) {
@@ -156,6 +198,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
   Future<void> _initData() async {
     await _loadKitchenId();
+    isActive = await checkSubscription();
     try {
       await _updateMenuArr();
     } catch (error) {

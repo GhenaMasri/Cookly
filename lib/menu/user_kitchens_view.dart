@@ -59,10 +59,10 @@ class _UserKitchensViewState extends State<UserKitchensView> {
             'rates_num': kitchen['rates_num'],
             'rate': kitchen['rate'],
             'order_system': kitchen['order_system'],
-            'status': 'open', // Replace this with actual status
+            'status': kitchen['status'],
             'street': kitchen['street'], 
             'contact': kitchen['contact'],
-            'city': kitchen['city']
+            'city': kitchen['city'],
           };
         }).toList();
       });

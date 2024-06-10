@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:untitled/common/globs.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class NotificationsView extends StatefulWidget {
   const NotificationsView({super.key});
@@ -10,36 +12,72 @@ class NotificationsView extends StatefulWidget {
 }
 
 class _NotificationsViewState extends State<NotificationsView> {
+  Map<String, dynamic>? notifications;
   List notificationArr = [];
 
-  @override
-  void initState() {
-    super.initState();
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> fetchNotifications() async {
+    int id;
+    String type = await _loadUserType();
+    if (type == "chef") {
+      id = await _loadKitchenId();
+    } else {
+      id = await _loadUserId();
+    }
+    const String url = '${SharedPreferencesService.url}get-notifications';
+    final Map<String, dynamic> queryParams = {
+      'id': id,
+      'destination': type,
+    };
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Received message in the foreground: ${message.messageId}');
-      if (message.notification != null) {
+    final Uri uri = Uri.parse(url).replace(queryParameters: queryParams);
+    
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
         setState(() {
-          notificationArr.insert(0, {
-            "title": message.notification!.title ?? '',
-            "time": "Just now",
-          });
+          notifications = jsonData['notifications'];
         });
+      } else {
+        print('Failed to fetch notifications: ${response.statusCode}');
       }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('A new onMessageOpenedApp event was published!');
-      if (message.notification != null) {
-        setState(() {
-          notificationArr.insert(0, {
-            "title": message.notification!.title ?? '',
-            "time": "Just now",
-          });
-        });
-      }
-    });
+    } catch (error) {
+      print('Error fetching notifications: $error');
+    }
   }
+
+  Future<Map<String, dynamic>> updateNotification(int id) async {
+    final url = Uri.parse('${SharedPreferencesService.url}change-notification-status?notoficationId=$id');
+
+    try {
+      final response = await http.put(url);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      }  else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<int> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    return id!;
+  }
+
+  Future<int> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
+    return kitchenid!;
+  }
+
+  Future<String> _loadUserType() async {
+    String? userType = await SharedPreferencesService.getType();
+    return userType!;
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +137,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                cObj["title"].toString(),
+                                cObj["userId"].toString(),
                                 style: TextStyle(
                                     color: TColor.primaryText,
                                     fontSize: 14,
@@ -109,7 +147,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                 height: 4,
                               ),
                               Text(
-                                cObj["time"].toString(),
+                                cObj["orderId"].toString(),
                                 style: TextStyle(
                                     color: TColor.secondaryText,
                                     fontSize: 12,
