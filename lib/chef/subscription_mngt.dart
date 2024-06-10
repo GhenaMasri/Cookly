@@ -3,6 +3,9 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_icon_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:untitled/common/globs.dart';
 
 class SubscriptionManagementPage extends StatefulWidget {
   @override
@@ -10,10 +13,8 @@ class SubscriptionManagementPage extends StatefulWidget {
       _SubscriptionManagementPageState();
 }
 
-class _SubscriptionManagementPageState
-    extends State<SubscriptionManagementPage> {
-  // Sample data for subscription details
-  final bool isActive = true; // Assuming the subscription is active
+class _SubscriptionManagementPageState extends State<SubscriptionManagementPage> {
+  final bool isActive = true; 
   final String expiryDate = "31st December 2024";
   bool isAnnually = false;
   void toggleSubscriptionPlan() {
@@ -22,17 +23,68 @@ class _SubscriptionManagementPageState
     });
   }
 
+  TextEditingController txtCardNumber = TextEditingController();
+  TextEditingController txtCardMonth = TextEditingController();
+  TextEditingController txtCardYear = TextEditingController();
+  TextEditingController txtCardCode = TextEditingController();
+  TextEditingController txtFirstName = TextEditingController();
+  TextEditingController txtLastName = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
+  Map<String, dynamic>? subscriptionInfo;
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> subscribeKitchen(String type) async {
+    int kitchenId = await _loadKitchenId();
+    final url = Uri.parse('${SharedPreferencesService.url}subscribe?id=$kitchenId');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'type': type}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+  
+  Future<void> fetchSubscriptionDetails() async {
+    int kitchenId = await _loadKitchenId();
+    final url = Uri.parse('${SharedPreferencesService.url}get-subscription?id=$kitchenId'); 
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        subscriptionInfo = json.decode(response.body)['subscription'];
+        return;
+      } else {
+        throw Exception('No kitchen found with this id');
+      }
+    } catch (error) {
+      print('Error: $error');
+      throw error;
+    }
+  }
+
+  Future<int> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
+    return kitchenid!;
+  }
+/////////////////////////////////////////////////////////////////////////////////
+
   @override
   Widget build(BuildContext context) {
-    TextEditingController txtCardNumber = TextEditingController();
-    TextEditingController txtCardMonth = TextEditingController();
-    TextEditingController txtCardYear = TextEditingController();
-    TextEditingController txtCardCode = TextEditingController();
-    TextEditingController txtFirstName = TextEditingController();
-    TextEditingController txtLastName = TextEditingController();
-
-    final _formKey = GlobalKey<FormState>();
-
     return Scaffold(
         backgroundColor: TColor.white,
         appBar: AppBar(

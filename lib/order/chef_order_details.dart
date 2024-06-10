@@ -36,9 +36,9 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     } else {
       print('Error: ${response.statusCode}, ${response.body}');
     }
-  }*/
+  }
 
-  /*Future<Map<String, dynamic>> updateOrderStatus(String newStatus) async {
+  Future<Map<String, dynamic>> updateOrderStatus(String newStatus) async {
     final String apiUrl ='${SharedPreferencesService.url}update-order-status?orderId=${widget.orderId}';
     try {
       final response = await http.put(

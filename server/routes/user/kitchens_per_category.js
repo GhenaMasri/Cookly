@@ -16,13 +16,14 @@ router.get("/", (req, res) => {
       k.contact,
       k.street,
       k.city,
+      k.status,
       CASE 
         WHEN k.rates_num = 0 THEN 0 
         ELSE k.rate / k.rates_num 
       END AS rate
     FROM kitchen k
     INNER JOIN kitchen_category kc ON k.category_id = kc.id
-    WHERE k.category_id = ?
+    WHERE k.category_id = ? AND k.is_active = 1
   `;
 
   const queryParams = [category_id];

@@ -57,8 +57,7 @@ class _Signin extends State<Signin> {
           String kitchenName = await getKitchenName(chefId);
           await prefs.setString('kitchen_name', kitchenName);
         }
-        await _saveFCMToken(userData['id']);
-        return {'success': true, 'message': 'Sign in successful'};
+        return {'success': true, 'message':  response.body};
       } else {
         return {'success': false, 'message': response.body};
       }

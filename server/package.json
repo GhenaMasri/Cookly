@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.7",
     "nodemailer": "^6.9.13",
+    "socket.io": "^4.7.5",
     "stripe": "^15.8.0"
   }
 }
