@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_icon_button.dart';
@@ -9,17 +11,17 @@ import 'package:untitled/common/globs.dart';
 
 class SubscriptionManagementPage extends StatefulWidget {
   @override
-  _SubscriptionManagementPageState createState() =>
-      _SubscriptionManagementPageState();
+  _SubscriptionManagementPageState createState() => _SubscriptionManagementPageState();
 }
 
 class _SubscriptionManagementPageState extends State<SubscriptionManagementPage> {
-  final bool isActive = true; 
-  final String expiryDate = "31st December 2024";
-  bool isAnnually = false;
+   bool? isActive; 
+   String? expiryDate;
+  bool? isAnnually;
+
   void toggleSubscriptionPlan() {
     setState(() {
-      isAnnually = !isAnnually;
+      isAnnually = !isAnnually!;
     });
   }
 
@@ -34,7 +36,6 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
 
   Map<String, dynamic>? subscriptionInfo;
 
-//////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> subscribeKitchen(String type) async {
     int kitchenId = await _loadKitchenId();
     final url = Uri.parse('${SharedPreferencesService.url}subscribe?id=$kitchenId');
@@ -57,7 +58,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
       return {'success': false, 'message': '$error'};
     }
   }
-  
+
   Future<void> fetchSubscriptionDetails() async {
     int kitchenId = await _loadKitchenId();
     final url = Uri.parse('${SharedPreferencesService.url}get-subscription?id=$kitchenId'); 
@@ -67,7 +68,6 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
 
       if (response.statusCode == 200) {
         subscriptionInfo = json.decode(response.body)['subscription'];
-        return;
       } else {
         throw Exception('No kitchen found with this id');
       }
@@ -78,30 +78,65 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
   }
 
   Future<int> _loadKitchenId() async {
-    int? kitchenid = await SharedPreferencesService.getKitchenId();
-    return kitchenid!;
+    int? kitchenId = await SharedPreferencesService.getKitchenId();
+    return kitchenId!;
   }
-/////////////////////////////////////////////////////////////////////////////////
+
+   late Future<void> _initDataFuture;
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await fetchSubscriptionDetails();
+    if(subscriptionInfo!['subscription_type'] == 'annually') isAnnually = true;
+    else isAnnually = false;
+    expiryDate = subscriptionInfo!['expiry_date'];
+     if(subscriptionInfo!['is_active'] == 1) isActive = true;
+    else isActive = false;
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(
+            color: TColor.primary,
+          ));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
-        backgroundColor: TColor.white,
-        appBar: AppBar(
-          title: Text(
-            'Subscription Management',
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+      backgroundColor: TColor.white,
+      appBar: AppBar(
+        title: Text(
+          'Subscription Management',
+          style: TextStyle(
+            color: TColor.primaryText,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          backgroundColor: TColor.white,
         ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
+        backgroundColor: TColor.white,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20.0),
+        children: <Widget>[
+          Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -113,65 +148,67 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                       color: TColor.primary),
                 ),
                 SizedBox(height: 20),
-                Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Subscription Expiry: $expiryDate',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        SizedBox(height: 10),
-                     
-                        Text(
-                          'Type: ${isAnnually ? 'Annual' : 'Monthly'}',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                           SizedBox(height: 10),
-                        Text(
-                          'Status: ${isActive ? 'Active' : 'Expired'}',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: isActive ? Colors.green : Colors.red),
-                        ),
-                      ],
+                Center(
+                  child: Card(
+                    elevation: 5,
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Subscription Expiry: $expiryDate',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'Type: ${subscriptionInfo!['subscription_type'] == 'annually' ? 'Annually' : 'Monthly'}',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          SizedBox(height: 10),
+                          Text('Price: ${subscriptionInfo!['subscription_type'] == 'annually' ? '300₪/year' : '30₪/month'}', style: TextStyle(fontSize: 18),),
+                          SizedBox(height: 10),
+                          Text(
+                            'Status: ${isActive! ? 'Active' : 'Expired'}',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isActive! ? Colors.green : Colors.red),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ChoiceChip(
-                      label: Text('Monthly'),
-                      selected: !isAnnually,
-                      onSelected: (bool selected) {
-                        if (selected) toggleSubscriptionPlan();
-                      },
-                      backgroundColor: TColor.placeholder,
-                      selectedColor: Colors.deepOrange[100],
-                    ),
-                    SizedBox(width: 10),
-                    ChoiceChip(
-                      label: Text('Annually'),
-                      selected: isAnnually,
-                      onSelected: (bool selected) {
-                        if (selected) toggleSubscriptionPlan();
-                      },
-                      backgroundColor: TColor.placeholder,
-                      selectedColor: Colors.deepOrange[100],
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
+              Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      ChoiceChip(
+                        label: Text('Monthly'),
+                        selected: !isAnnually!,
+                        onSelected: (bool selected) {
+                         if (selected) toggleSubscriptionPlan();
+                        },
+                        backgroundColor: TColor.placeholder,
+                        selectedColor: Colors.deepOrange[100],
+                      ),
+                      SizedBox(width: 10),
+                      ChoiceChip(
+                        label: Text('Annually'),
+                        selected: isAnnually!,
+                        onSelected: (bool selected) {
+                          if (selected) toggleSubscriptionPlan();
+                        },
+                        backgroundColor: TColor.placeholder,
+                        selectedColor: Colors.deepOrange[100],
+                      ),
+                    ],
+                  ),
+                
+                SizedBox(height: 20),
                 RoundTextfield(
                   hintText: "Card Number",
                   controller: txtCardNumber,
@@ -185,9 +222,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 Row(
                   children: [
                     Text(
@@ -197,9 +232,8 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                           fontSize: 14,
                           fontWeight: FontWeight.w600),
                     ),
-                    const Spacer(),
-                    SizedBox(
-                      width: 100,
+                    SizedBox(width: 20),
+                    Expanded(
                       child: RoundTextfield(
                         hintText: "MM",
                         controller: txtCardMonth,
@@ -207,17 +241,15 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Field Required';
-                          } else if (!RegExp(r'^(0[1-9]|1[0-2])$')
-                              .hasMatch(value)) {
+                          } else if (!RegExp(r'^(0[1-9]|1[0-2])$').hasMatch(value)) {
                             return 'Syntax: MM';
                           }
                           return null;
                         },
                       ),
                     ),
-                    const SizedBox(width: 25),
-                    SizedBox(
-                      width: 100,
+                    SizedBox(width: 25),
+                    Expanded(
                       child: RoundTextfield(
                         hintText: "YYYY",
                         controller: txtCardYear,
@@ -225,8 +257,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Field Required';
-                          } else if (!RegExp(r'^[0-9]{4}$').hasMatch(value) ||
-                              int.parse(value) < DateTime.now().year) {
+                          } else if (!RegExp(r'^[0-9]{4}$').hasMatch(value) || int.parse(value) < DateTime.now().year) {
                             return 'Syntax: YYYY';
                           }
                           return null;
@@ -235,9 +266,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 RoundTextfield(
                   hintText: "Card Security Code",
                   controller: txtCardCode,
@@ -251,9 +280,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 RoundTextfield(
                   hintText: "First Name",
                   controller: txtFirstName,
@@ -264,9 +291,7 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 RoundTextfield(
                   hintText: "Last Name",
                   controller: txtLastName,
@@ -277,16 +302,42 @@ class _SubscriptionManagementPageState extends State<SubscriptionManagementPage>
                     return null;
                   },
                 ),
-                Spacer(),
+                SizedBox(height: 20),
                 RoundButton(
                   title: 'Activate Subscription',
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {}
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                    
+                      await subscribeKitchen(isAnnually! ? 'annually' : 'monthly').then((result) {
+                        if (result['success']) {
+                              QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            text: 'Subscription Activated!',
+                            confirmBtnColor: Colors.green,
+                            onConfirmBtnTap: () {
+                              Navigator.pop(context);
+                              txtCardCode.clear();
+                              txtCardMonth.clear();
+                              txtCardNumber.clear();
+                              txtCardYear.clear();
+                              txtFirstName.clear();
+                              txtLastName.clear();
+                              Navigator.pop(context);
+                            },
+                          );
+                        } 
+                      }).catchError((error) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: $error')),
+                        );
+                      });
+                    }
                   },
                 ),
               ],
             ),
           ),
-        ));
-  }
+        ]),
+      ); }
 }

@@ -3,6 +3,7 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/chef_order_delivered.dart';
+import 'package:untitled/order/chef_order_done.dart';
 import 'package:untitled/order/chef_order_inprogress.dart';
 import 'package:untitled/order/chef_order_pending.dart';
 
@@ -13,7 +14,7 @@ class OrdersTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: 0,
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: TColor.white,
@@ -39,11 +40,14 @@ class OrdersTabBar extends StatelessWidget {
             )
           ],
           bottom: const TabBar(
+            tabAlignment: TabAlignment.center,
+            isScrollable: true,
             tabs: <Widget>[
               Tab(
                 text: 'Pending',
               ),
               Tab(text: 'In Progress'),
+              Tab(text: 'Done'),
               Tab(text: 'Delivered'),
             ],
             indicatorColor: Color.fromARGB(255, 230, 81, 0),
@@ -54,6 +58,7 @@ class OrdersTabBar extends StatelessWidget {
           children: <Widget>[
             ChefOrderPending(),
             ChefOrderInprogress(),
+            ChefOrderDone(),
             ChefOrderDelievered(),
           ],
         ),

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:untitled/common/globs.dart';
+import 'package:untitled/main_page.dart';
 
 class SubscriptionPage extends StatefulWidget {
   @override
@@ -21,13 +24,13 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
   TextEditingController txtLastName = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
   void toggleSubscriptionPlan() {
     setState(() {
       isAnnually = !isAnnually;
     });
   }
 
-//////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> subscribeKitchen(String type) async {
     int kitchenId = await _loadKitchenId();
     final url = Uri.parse('${SharedPreferencesService.url}subscribe?id=$kitchenId');
@@ -55,37 +58,38 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
     int? kitchenid = await SharedPreferencesService.getKitchenId();
     return kitchenid!;
   }
-/////////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: TColor.white,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Text(
-            'Subscription Plans',
-            style: TextStyle(
-              color: TColor.primaryText,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+      backgroundColor: TColor.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text(
+          'Subscription Plans',
+          style: TextStyle(
+            color: TColor.primaryText,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          backgroundColor: TColor.white,
         ),
-        body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
+        backgroundColor: TColor.white,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20.0),
+        children: <Widget>[
+          Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   'Choose Your Subscription Plan',
                   style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: TColor.primary),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: TColor.primary,
+                  ),
                 ),
                 SizedBox(height: 20),
                 Row(
@@ -116,14 +120,11 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                 Center(
                   child: SubscriptionCard(
                     planName: isAnnually ? 'Annual Plan' : 'Monthly Plan',
-                    description:
-                        'Access to all features for ${isAnnually ? '12 months' : '1 month'}.',
+                    description: 'Access to all features for ${isAnnually ? '12 months' : '1 month'}.',
                     price: isAnnually ? '300₪/year' : '30₪/month',
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                SizedBox(height: 20),
                 RoundTextfield(
                   hintText: "Card Number",
                   controller: txtCardNumber,
@@ -137,19 +138,18 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 Row(
                   children: [
                     Text(
                       "Expiry",
                       style: TextStyle(
-                          color: TColor.primaryText,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600),
+                        color: TColor.primaryText,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    const Spacer(),
+                    Spacer(),
                     SizedBox(
                       width: 100,
                       child: RoundTextfield(
@@ -159,15 +159,14 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Field Required';
-                          } else if (!RegExp(r'^(0[1-9]|1[0-2])$')
-                              .hasMatch(value)) {
+                          } else if (!RegExp(r'^(0[1-9]|1[0-2])$').hasMatch(value)) {
                             return 'Syntax: MM';
                           }
                           return null;
                         },
                       ),
                     ),
-                    const SizedBox(width: 25),
+                    SizedBox(width: 25),
                     SizedBox(
                       width: 100,
                       child: RoundTextfield(
@@ -177,8 +176,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Field Required';
-                          } else if (!RegExp(r'^[0-9]{4}$').hasMatch(value) ||
-                              int.parse(value) < DateTime.now().year) {
+                          } else if (!RegExp(r'^[0-9]{4}$').hasMatch(value) || int.parse(value) < DateTime.now().year) {
                             return 'Syntax: YYYY';
                           }
                           return null;
@@ -187,9 +185,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 RoundTextfield(
                   hintText: "Card Security Code",
                   controller: txtCardCode,
@@ -203,9 +199,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 RoundTextfield(
                   hintText: "First Name",
                   controller: txtFirstName,
@@ -216,9 +210,7 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     return null;
                   },
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                SizedBox(height: 15),
                 RoundTextfield(
                   hintText: "Last Name",
                   controller: txtLastName,
@@ -229,20 +221,36 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                     return null;
                   },
                 ),
-                Spacer(),
+                SizedBox(height: 20),  // Ensure there's enough space at the bottom
                 Center(
                   child: RoundButton(
                     title: 'Subscribe Now',
-                    onPressed: () {
-                      // Handle subscription logic
-                      if (_formKey.currentState!.validate()) {}
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        String type = isAnnually ? 'annually' : 'monthly';
+                        Map<String, dynamic> result = await subscribeKitchen(type);
+                        if (result['success']) {
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            text: 'Subscription successful!',
+                            confirmBtnColor: Colors.green,
+                            onConfirmBtnTap: () {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                          );
+                        }
+                      }
                     },
                   ),
                 ),
               ],
             ),
           ),
-        ));
+        ],
+      ),
+    );
   }
 }
 
@@ -251,35 +259,25 @@ class SubscriptionCard extends StatelessWidget {
   final String description;
   final String price;
 
-  SubscriptionCard(
-      {required this.planName, required this.description, required this.price});
+  SubscriptionCard({required this.planName, required this.description, required this.price});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
+
       margin: EdgeInsets.symmetric(vertical: 10),
-      color: Colors.white, // Set background color to white
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text(planName,
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: TColor
-                        .primary // Replace TColor.primary with an appropriate color
-                    )),
+            Text(planName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: TColor.primary)),
             SizedBox(height: 10),
             Text(description, style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Text(price,
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green)),
+            Text(price, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
           ],
         ),
       ),

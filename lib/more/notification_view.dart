@@ -3,6 +3,9 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common/globs.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/order/chef_order_details.dart';
+import 'package:untitled/order/user_final_order_view.dart';
 
 class NotificationsView extends StatefulWidget {
   const NotificationsView({super.key});
@@ -13,12 +16,12 @@ class NotificationsView extends StatefulWidget {
 
 class _NotificationsViewState extends State<NotificationsView> {
   Map<String, dynamic>? notifications;
-  List notificationArr = [];
-
+  String? type;
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
+
   Future<void> fetchNotifications() async {
     int id;
-    String type = await _loadUserType();
+    type = await _loadUserType();
     if (type == "chef") {
       id = await _loadKitchenId();
     } else {
@@ -31,7 +34,7 @@ class _NotificationsViewState extends State<NotificationsView> {
     };
 
     final Uri uri = Uri.parse(url).replace(queryParameters: queryParams);
-    
+
     try {
       final response = await http.get(uri);
       if (response.statusCode == 200) {
@@ -48,14 +51,15 @@ class _NotificationsViewState extends State<NotificationsView> {
   }
 
   Future<Map<String, dynamic>> updateNotification(int id) async {
-    final url = Uri.parse('${SharedPreferencesService.url}change-notification-status?notoficationId=$id');
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}change-notification-status?notoficationId=$id');
 
     try {
       final response = await http.put(url);
 
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
-      }  else {
+      } else {
         return {'success': false, 'message': response.body};
       }
     } catch (error) {
@@ -77,10 +81,40 @@ class _NotificationsViewState extends State<NotificationsView> {
     String? userType = await SharedPreferencesService.getType();
     return userType!;
   }
+
 /////////////////////////////////////////////////////////////////////////////////
+  late Future<void> _initDataFuture;
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await fetchNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(
+            color: TColor.primary,
+          ));
+        } else if (snapshot.hasError) {
+          print(snapshot.error);
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       backgroundColor: TColor.white,
       appBar: AppBar(
@@ -103,7 +137,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
-                itemCount: notificationArr.length,
+                itemCount: notifications!.length,
                 separatorBuilder: ((context, index) => Divider(
                       //indent: 25,
                       //endIndent: 25,
@@ -111,54 +145,74 @@ class _NotificationsViewState extends State<NotificationsView> {
                       height: 1,
                     )),
                 itemBuilder: ((context, index) {
-                  var cObj = notificationArr[index] as Map? ?? {};
-                  return Container(
-                    decoration: BoxDecoration(
-                        color:
-                            index % 2 == 0 ? TColor.white : TColor.textfield),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 25),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(top: 4),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                              color: TColor.primary,
-                              borderRadius: BorderRadius.circular(4)),
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                cObj["userId"].toString(),
-                                style: TextStyle(
-                                    color: TColor.primaryText,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600),
+                  var cObj = notifications![index] as Map? ?? {};
+                  return InkWell(
+                      onTap: () async {
+                        if (cObj['is_read'] == 0) {
+                          Map<String, dynamic> result =
+                              await updateNotification(cObj['id']);
+                          bool success = result['success'];
+                        }
+                        if (type == 'chef') {
+                          pushReplacementWithAnimation(
+                              context,
+                              OrderDetailsPage(
+                                  orderId: notifications!['order_id']));
+                        } else if (type == 'normal') {
+                          pushReplacementWithAnimation(
+                              context,
+                              FinalOrderView(
+                                  orderId: notifications!['order_id']));
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: cObj['is_read'] == 1
+                                ? TColor.white
+                                : Colors.deepOrange[100]),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 25),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 4),
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                  color: TColor.primary,
+                                  borderRadius: BorderRadius.circular(4)),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    cObj["message"].toString(),
+                                    style: TextStyle(
+                                        color: TColor.primaryText,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  const SizedBox(
+                                    height: 4,
+                                  ),
+                                  Text(
+                                    cObj["time"].toString(),
+                                    style: TextStyle(
+                                        color: TColor.secondaryText,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(
-                                height: 4,
-                              ),
-                              Text(
-                                cObj["orderId"].toString(),
-                                style: TextStyle(
-                                    color: TColor.secondaryText,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
+                      ));
                 }),
               ),
             ],

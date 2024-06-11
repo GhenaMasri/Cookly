@@ -6,19 +6,20 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:untitled/common/globs.dart';
 
-class ChefOrderDelievered extends StatefulWidget {
+class ChefOrderDone extends StatefulWidget {
   @override
-  _ChefOrderDelieveredState createState() => _ChefOrderDelieveredState();
+  _ChefOrderDoneState createState() => _ChefOrderDoneState();
 }
 
-class _ChefOrderDelieveredState extends State<ChefOrderDelievered> {
-  List<dynamic> orders = [];
+class _ChefOrderDoneState extends State<ChefOrderDone> {
   int? kitchenId;
+  List<dynamic> orders = [];
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrders() async {
     await _loadKitchenId();
-    final String apiUrl ='${SharedPreferencesService.url}get-chef-orders?kitchenId=$kitchenId&status=delivered';
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-chef-orders?kitchenId=$kitchenId&status=done';
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -37,8 +38,9 @@ class _ChefOrderDelieveredState extends State<ChefOrderDelievered> {
       kitchenId = id;
     });
   }
+
 /////////////////////////////////////////////////////////////////////////////////
-late Future<void> _initDataFuture;
+  late Future<void> _initDataFuture;
   @override
   void initState() {
     super.initState();
@@ -47,6 +49,18 @@ late Future<void> _initDataFuture;
 
   Future<void> _initData() async {
     await fetchOrders();
+  }
+
+  Future<void> _navigateToOrderDetails(BuildContext context, int orderId) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderDetailsPage(orderId: orderId),
+      ),
+    );
+    if (result == true) {
+      await fetchOrders(); // Refresh the orders when returning
+    }
   }
 
   @override
@@ -248,8 +262,7 @@ late Future<void> _initDataFuture;
                     right: 10,
                     child: IconButton(
                       onPressed: () {
-                        pushReplacementWithAnimation(
-                            context, OrderDetailsPage(orderId: order['id']));
+                      _navigateToOrderDetails(context, order['id']);
                         /* Navigator.push(
                           context,
                           MaterialPageRoute(

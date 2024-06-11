@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/order/assign_delivery.dart';
 import '../common_widget/round_button.dart';
@@ -7,9 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:untitled/common/globs.dart';
 
 class OrderDetailsPage extends StatefulWidget {
-  final Map<String, dynamic> order;
+  final int orderId;
 
-  OrderDetailsPage({required this.order});
+  OrderDetailsPage({required this.orderId});
 
   @override
   _OrderDetailsPageState createState() => _OrderDetailsPageState();
@@ -21,9 +22,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   List<dynamic> orderItems = [];
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  
-  /*Future<void> fetchOrderDetails() async {
-    final String apiUrl = '${SharedPreferencesService.url}chef-order-details?orderId=${widget.orderId}';
+
+  Future<void> fetchOrderDetails() async {
+    final String apiUrl =
+        '${SharedPreferencesService.url}chef-order-details?orderId=${widget.orderId}';
 
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -39,36 +41,61 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   }
 
   Future<Map<String, dynamic>> updateOrderStatus(String newStatus) async {
-    final String apiUrl ='${SharedPreferencesService.url}update-order-status?orderId=${widget.orderId}';
+    final String apiUrl =
+        '${SharedPreferencesService.url}update-order-status?orderId=${widget.orderId}';
     try {
-      final response = await http.put(
-        Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({"status": newStatus})
-      );
+      final response = await http.put(Uri.parse(apiUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({"status": newStatus}));
 
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
       } else {
-        return {'success': false,'message': response.body};
+        return {'success': false, 'message': response.body};
       }
     } catch (e) {
-      return {'success': false,'message': '$e'};
+      return {'success': false, 'message': '$e'};
     }
-  }*/
+  }
 /////////////////////////////////////////////////////////////////////////////////
 
+  late Future<void> _initDataFuture;
   @override
   void initState() {
     super.initState();
-    _currentStatus = widget.order['status'];
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await fetchOrderDetails();
+    _currentStatus = orderInfo!['status'];
   }
 
   @override
   Widget build(BuildContext context) {
-    double subtotal = widget.order['items'].fold(0, (sum, item) => sum + item['price']);
-    double deliveryCost = 2.0; // example delivery cost
-    double total = subtotal + deliveryCost;
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(
+            color: TColor.primary,
+          ));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
+    //double subtotal = orderItems.fold(0, (sum, item) => sum + item['price']);
+    double deliveryCost = 10.0; // example delivery cost
+    double total = orderInfo!['total_price'].toDouble();
+    double subtotal = total; // not used
+    if (orderInfo!['delivery'] == 'yes') total = total - 10;
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -78,6 +105,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           style: TextStyle(color: TColor.white),
         ),
         backgroundColor: TColor.primary,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, true); // Pass a result back
+          },
+        ),
         iconTheme: IconThemeData(color: TColor.white),
       ),
       body: SingleChildScrollView(
@@ -101,15 +134,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               const SizedBox(height: 10),
               _buildOrderItems(),
               const SizedBox(height: 20),
-              _buildOrderNotes(),
-              const SizedBox(height: 15),
+              if (!orderInfo!['order_notes'].toString().isEmpty)
+                _buildOrderNotes(),
+              if (!orderInfo!['order_notes'].toString().isEmpty)
+                const SizedBox(height: 15),
               _buildCostSummary(subtotal, deliveryCost, total),
               const SizedBox(height: 25),
-              if ((_currentStatus == 'done') &&
-                  widget.order['delivery'] == 'yes')
+              if ((_currentStatus == 'done') && orderInfo!['delivery'] == 'yes')
                 _bulidAssignButton()
               else if ((_currentStatus == 'done') &&
-                  widget.order['delivery'] == 'no')
+                  orderInfo!['delivery'] == 'no')
                 _bulidPickedUpButton(),
             ],
           ),
@@ -139,8 +173,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: RoundButton(
             title: "Picked Up",
-            onPressed: () {
-              //Convert the status of the order to done
+            onPressed: () async {
+              await updateOrderStatus('delivered');
+               IconSnackBar.show(context,
+                        snackBarType: SnackBarType.success,
+                        label: 'Order Delivered',
+                        snackBarStyle: SnackBarStyle(
+                            backgroundColor: TColor.primary,
+                            labelTextStyle: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18)));
+                                Navigator.pop(context,true);
             }));
   }
 
@@ -153,7 +195,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.order['customerName'],
+                orderInfo!['full_name'],
                 style: TextStyle(
                   color: TColor.primaryText,
                   fontSize: 18,
@@ -162,7 +204,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Location: ${widget.order['location']}',
+                'Order Time: ${orderInfo!['order_time']}',
                 style: TextStyle(
                   color: TColor.secondaryText,
                   fontSize: 12,
@@ -170,15 +212,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Order Time: ${widget.order['orderTime']}',
-                style: TextStyle(
-                  color: TColor.secondaryText,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Contact Number: ${widget.order['ContactNumber']}',
+                'Contact Number: ${orderInfo!['user_number']}',
                 style: TextStyle(
                   color: TColor.secondaryText,
                   fontSize: 12,
@@ -198,7 +232,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.zero,
-        itemCount: widget.order['items'].length,
+        itemCount: orderItems.length,
         separatorBuilder: (context, index) => Divider(
           indent: 25,
           endIndent: 25,
@@ -206,7 +240,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           height: 1,
         ),
         itemBuilder: (context, index) {
-          var item = widget.order['items'][index];
+          var item = orderItems[index];
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
             child: ExpansionTile(
@@ -215,7 +249,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "${item['name']} x${item['qty']}",
+                    "${item['item_name']} x${item['quantity'].toString()}",
                     style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 13,
@@ -223,7 +257,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                   Text(
-                    "${item['price']}₪",
+                    "${item['price'].toString()}₪",
                     style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 13,
@@ -282,7 +316,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Notes',
+          orderInfo!['order_notes'],
           style: TextStyle(
             color: TColor.primary,
             fontSize: 13,
@@ -299,10 +333,113 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   Widget _buildCostSummary(double subtotal, double deliveryCost, double total) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildCostRow('Sub Total', subtotal),
-        const SizedBox(height: 8),
-        _buildCostRow('Delivery Cost', deliveryCost),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Delivery Method",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: TColor.primaryText,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700),
+            ),
+            if (orderInfo!['delivery'] == 'yes')
+              Text("Delivery",
+                  style: TextStyle(
+                      color: TColor.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700))
+            else
+              Text("Self Pick-up",
+                  style: TextStyle(
+                      color: TColor.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700))
+          ],
+        ),
+        if (orderInfo!['delivery'] == 'yes')
+          SizedBox(
+            height: 8,
+          ),
+        if (orderInfo!['delivery'] == 'yes') const SizedBox(height: 4),
+        if (orderInfo!['delivery'] == 'yes')
+          Wrap(
+            alignment: WrapAlignment.start,
+            spacing: 8.0, // Add space between the elements
+            runSpacing: 4.0, // Add space between the lines
+            children: [
+              Text(
+                "Delivery Address",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: TColor.primaryText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700),
+              ),
+              Text(
+                orderInfo!['address'].toString(),
+                style: TextStyle(
+                    color: TColor.primary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        SizedBox(
+          height: 8,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Payment Method",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: TColor.primaryText,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700),
+            ),
+            if (orderInfo!['payment'] == 'cash')
+              Text(orderInfo!['payment'],
+                  style: TextStyle(
+                      color: TColor.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700))
+            else
+              Text(orderInfo!['payment'] + " (Paid)",
+                  style: TextStyle(
+                      color: TColor.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700))
+          ],
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        if (orderInfo!['pickup_time'] != null)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Pick Up Time",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: TColor.primaryText,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700),
+              ),
+              Text(
+                orderInfo!['pickup_time'],
+                style: TextStyle(
+                    color: TColor.primary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700),
+              )
+            ],
+          ),
         const SizedBox(height: 15),
         Divider(
           color: TColor.secondaryText.withOpacity(0.5),
@@ -396,15 +533,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 _currentStatus == 'in progress',
                 _currentStatus == 'done'
               ],
-              onPressed: (int index) {
+              onPressed: (int index) async {
                 int nextStatusIndex = currentStatusIndex + 1;
 
                 if (index == nextStatusIndex &&
                     nextStatusIndex < statusesOrder.length) {
                   setState(() {
                     _currentStatus = statusesOrder[nextStatusIndex];
+
                     //If current status == 'done' and no delivery send noification to the user
                   });
+                  await updateOrderStatus(_currentStatus);
                 }
               },
               color: TColor.primaryText,
