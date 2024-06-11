@@ -15,25 +15,22 @@ class NotificationsView extends StatefulWidget {
 }
 
 class _NotificationsViewState extends State<NotificationsView> {
-  Map<String, dynamic>? notifications;
+  List<dynamic>? notifications;
   String? type;
+  int? id;
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
 
   Future<void> fetchNotifications() async {
-    int id;
     type = await _loadUserType();
     if (type == "chef") {
       id = await _loadKitchenId();
     } else {
       id = await _loadUserId();
     }
-    const String url = '${SharedPreferencesService.url}get-notifications';
-    final Map<String, dynamic> queryParams = {
-      'id': id,
-      'destination': type,
-    };
+    final String url = '${SharedPreferencesService.url}get-notifications?id=$id&destination=$type';
 
-    final Uri uri = Uri.parse(url).replace(queryParameters: queryParams);
+
+    final Uri uri = Uri.parse(url);
 
     try {
       final response = await http.get(uri);
@@ -52,11 +49,11 @@ class _NotificationsViewState extends State<NotificationsView> {
 
   Future<Map<String, dynamic>> updateNotification(int id) async {
     final url = Uri.parse(
-        '${SharedPreferencesService.url}change-notification-status?notoficationId=$id');
+        '${SharedPreferencesService.url}change-notification-status?notificationId=$id');
 
     try {
       final response = await http.put(url);
-
+      print(response.body);
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
       } else {
@@ -149,20 +146,18 @@ class _NotificationsViewState extends State<NotificationsView> {
                   return InkWell(
                       onTap: () async {
                         if (cObj['is_read'] == 0) {
-                          Map<String, dynamic> result =
-                              await updateNotification(cObj['id']);
-                          bool success = result['success'];
+                          Map<String, dynamic> result = await updateNotification(cObj['id']);
                         }
                         if (type == 'chef') {
                           pushReplacementWithAnimation(
                               context,
                               OrderDetailsPage(
-                                  orderId: notifications!['order_id']));
+                                  orderId: cObj['order_id']));
                         } else if (type == 'normal') {
                           pushReplacementWithAnimation(
                               context,
                               FinalOrderView(
-                                  orderId: notifications!['order_id']));
+                                  orderId: cObj['order_id']));
                         }
                       },
                       child: Container(

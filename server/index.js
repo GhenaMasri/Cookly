@@ -48,6 +48,9 @@ app.use("/get-subscription", getSubscriptionDataRoute);
 const checkSubscriptionRoute = require("./routes/chef/check_subscription");
 app.use("/check-subscription", checkSubscriptionRoute);
 
+const getKitchenStatusRoute = require("./routes/chef/get_kitchen_status");
+app.use("/get-kitchen-status", getKitchenStatusRoute);
+
 //////////////////////////////////////////// GENERAL ROUTES //////////////////////////////////////
 
 const foodCategoriesRoute = require("./routes/general/food_categories");
