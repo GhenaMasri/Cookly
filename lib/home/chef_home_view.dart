@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
+import 'package:untitled/chef/chef_subscription.dart';
 import 'package:untitled/common/MenuItem.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/dropdown.dart';
@@ -29,6 +31,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   bool? isActive;
   late Future<void> _initDataFuture;
   List<Map<String, dynamic>> categories = [];
+  bool statusBool = true; //open
+  String status = 'open';
 
   late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
@@ -143,7 +147,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<Map<String, dynamic>> changeKitchenStatus(String status) async {
-    final url = Uri.parse('${SharedPreferencesService.url}change-kitchen-status?kitchenId=$kitchenId');
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}change-kitchen-status?kitchenId=$kitchenId');
 
     try {
       final response = await http.put(
@@ -156,7 +161,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
 
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
-      }  else {
+      } else {
         return {'success': false, 'message': response.body};
       }
     } catch (error) {
@@ -165,7 +170,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<bool> checkSubscription() async {
-    final url = Uri.parse('${SharedPreferencesService.url}check-subscription?id=$kitchenId');
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}check-subscription?id=$kitchenId');
 
     try {
       final response = await http.get(url);
@@ -199,11 +205,39 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   Future<void> _initData() async {
     await _loadKitchenId();
     isActive = await checkSubscription();
+    print(isActive);
+    //Retrive Status and store it in the status / statusBool variable I intialized
+     if (!isActive!) {
+      _showSubscriptionAlert();
+    }
     try {
       await _updateMenuArr();
     } catch (error) {
       print('Error loading menu items: $error');
     }
+  }
+
+    void _showSubscriptionAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: TColor.white,
+          title: Text('Activate Kitchen'),
+          content: Text('Activate your kitchen by subscribing now.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Subscribe Now', style: TextStyle(color: TColor.primary),),
+              onPressed: () {
+                Navigator.of(context).pop();
+                pushReplacementWithAnimation(context,SubscriptionPage());
+              },
+            ),
+         
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -273,7 +307,65 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(
+              height: 15,
+            ),
+            Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(width: 10,),
+                      Text(
+                        "Status",
+                        style: TextStyle(
+                            color: TColor.primaryText,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const Spacer(),
+                      Transform.scale(
+                        scale:
+                            1.3, // Adjust this value to increase or decrease the size
+                        child: Switch(
+                          value: statusBool,
+                          activeColor: TColor.primary,
+                          onChanged: (newVal) async {
+                            setState(() {
+                              statusBool = newVal;
+                              if (statusBool == true)
+                                status = 'open';
+                              else
+                                status = 'close';
+                            });
+                            Map<String, dynamic> result =
+                                await changeKitchenStatus(status);
+                            bool success = result['success'];
+                            print(success);
+                            if (statusBool) {
+                              IconSnackBar.show(context,
+                                  snackBarType: SnackBarType.success,
+                                  label: 'Can Receive Orders Now',
+                                  snackBarStyle: SnackBarStyle(
+                                      backgroundColor: TColor.primary,
+                                      labelTextStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18)));
+                            } else {
+                              IconSnackBar.show(context,
+                                  snackBarType: SnackBarType.fail,
+                                  label: 'Cannot Receive Orders Now',
+                                  snackBarStyle: SnackBarStyle(
+                                      //backgroundColor: TColor.primary,
+                                      labelTextStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18)));
+                            }
+                          },
+                        ),
+                      )
+                    ])),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: RoundTextfield(

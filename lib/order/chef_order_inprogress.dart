@@ -18,7 +18,8 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrders() async {
     await _loadKitchenId();
-    final String apiUrl ='${SharedPreferencesService.url}get-chef-orders?kitchenId=$kitchenId&status=in progress';
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-chef-orders?kitchenId=$kitchenId&status=in progress';
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -37,10 +38,52 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
       kitchenId = id;
     });
   }
-/////////////////////////////////////////////////////////////////////////////////
 
- @override
+/////////////////////////////////////////////////////////////////////////////////
+  late Future<void> _initDataFuture;
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await fetchOrders();
+  }
+
+  Future<void> _navigateToOrderDetails(
+      BuildContext context, int orderId) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderDetailsPage(orderId: orderId),
+      ),
+    );
+    if (result == true) {
+      await fetchOrders(); // Refresh the orders when returning
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(
+            color: TColor.primary,
+          ));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       backgroundColor: TColor.white,
       body: Padding(
@@ -77,7 +120,7 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  order['customerName'],
+                                  order['full_name'],
                                   style: TextStyle(
                                     color: TColor.primaryText,
                                     fontSize: 22,
@@ -87,19 +130,10 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
                                 SizedBox(height: 8.0),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on,
-                                        size: 20, color: TColor.primary),
-                                    SizedBox(width: 5.0),
-                                    Text(order['location']),
-                                  ],
-                                ),
-                                SizedBox(height: 5.0),
-                                Row(
-                                  children: [
                                     Icon(Icons.access_time,
                                         size: 20, color: TColor.primary),
                                     SizedBox(width: 5.0),
-                                    Text(order['orderTime']),
+                                    Text(order['time']),
                                   ],
                                 ),
                                 SizedBox(height: 5.0),
@@ -109,8 +143,51 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
                                         size: 20, color: TColor.primary),
                                     SizedBox(width: 5.0),
                                     Text(
-                                      order['ContactNumber'],
+                                      order['user_number'],
                                     ),
+                                  ],
+                                ),
+                                SizedBox(height: 5.0),
+                                Row(
+                                  children: [
+                                    Icon(Icons.delivery_dining,
+                                        size: 20, color: TColor.primary),
+                                    SizedBox(width: 5.0),
+                                    if (order['delivery'] == 'yes')
+                                      Text(
+                                        "Delivery",
+                                      )
+                                    else
+                                      Text(
+                                        "Self Pick-up",
+                                      ),
+                                    SizedBox(width: 15.0),
+                                    if (order['pickup_time'] != null)
+                                      Icon(Icons.access_time,
+                                          size: 20, color: TColor.primary),
+                                    if (order['pickup_time'] != null)
+                                      SizedBox(width: 5.0),
+                                    if (order['pickup_time'] != null)
+                                      Text(order['pickup_time']),
+                                  ],
+                                ),
+                                SizedBox(height: 5.0),
+                                Row(
+                                  children: [
+                                    Icon(Icons.payment,
+                                        size: 20, color: TColor.primary),
+                                    SizedBox(width: 5.0),
+                                    Text(
+                                      order['payment'],
+                                    ),
+                                    SizedBox(width: 15.0),
+                                    Text(
+                                      '₪',
+                                      style: TextStyle(
+                                          color: TColor.primary, fontSize: 20),
+                                    ),
+                                    SizedBox(width: 5.0),
+                                    Text(order['total_price'].toString()),
                                   ],
                                 ),
                               ],
@@ -186,8 +263,7 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
                     right: 10,
                     child: IconButton(
                       onPressed: () {
-                        pushReplacementWithAnimation(
-                            context, OrderDetailsPage(order: order));
+                        _navigateToOrderDetails(context, order['id']);
                         /* Navigator.push(
                           context,
                           MaterialPageRoute(

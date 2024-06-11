@@ -594,39 +594,59 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                             "assets/img/shopping_add.png",
                                                         color: TColor.primary,
                                                         onPressed: () async {
-                                                          Map<String, dynamic>
-                                                              result =
-                                                              await addCartItem();
-                                                          bool success =
-                                                              result['success'];
-                                                          String message =
-                                                              result['message'];
-                                                          print(message);
-                                                          if (success) {
+                                                          if (widget.kitchen[
+                                                                  'status'] ==
+                                                              'open') {
+                                                            Map<String, dynamic>
+                                                                result =
+                                                                await addCartItem();
+                                                            bool success =
+                                                                result[
+                                                                    'success'];
+                                                            String message =
+                                                                result[
+                                                                    'message'];
+                                                            print(message);
+                                                            if (success) {
+                                                              IconSnackBar.show(
+                                                                  context,
+                                                                  snackBarType:
+                                                                      SnackBarType
+                                                                          .success,
+                                                                  label:
+                                                                      'Added To Cart',
+                                                                  snackBarStyle: SnackBarStyle(
+                                                                      backgroundColor:
+                                                                          TColor
+                                                                              .primary,
+                                                                      labelTextStyle: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              18)));
+                                                              await Future.delayed(
+                                                                  const Duration(
+                                                                      seconds:
+                                                                          2));
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                            }
+                                                          } else {
                                                             IconSnackBar.show(
                                                                 context,
                                                                 snackBarType:
                                                                     SnackBarType
-                                                                        .success,
+                                                                        .fail,
                                                                 label:
-                                                                    'Added To Cart',
+                                                                    'Kitchen Is Closed Now',
                                                                 snackBarStyle: SnackBarStyle(
-                                                                    backgroundColor:
-                                                                        TColor
-                                                                            .primary,
                                                                     labelTextStyle: TextStyle(
                                                                         fontWeight:
                                                                             FontWeight
                                                                                 .bold,
                                                                         fontSize:
                                                                             18)));
-                                                             await Future.delayed(
-                                                                const Duration(
-                                                                    seconds:
-                                                                        2)); 
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
                                                           }
                                                         }),
                                                   ),

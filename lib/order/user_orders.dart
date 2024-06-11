@@ -87,8 +87,7 @@ class _UserOrdersState extends State<UserOrders> {
         actions: [
           IconButton(
             onPressed: () {
-                 pushReplacementWithAnimation(
-                            context, NotificationsView());
+              pushReplacementWithAnimation(context, NotificationsView());
             },
             icon: Image.asset(
               "assets/img/notification.png",
@@ -177,13 +176,19 @@ class _UserOrdersState extends State<UserOrders> {
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 8, horizontal: 20),
                                               decoration: BoxDecoration(
-                                                color: order['status'] == 'done' || order['status'] == 'delivered'
-                                                    ? Colors.green
+                                                color: order['status'] == 'done'
+                                                    ? Color.fromARGB(255, 142, 231, 143)
                                                     : order['status'] ==
-                                                            'in progress'
-                                                        ? TColor.primary
-                                                        : Color.fromARGB(
-                                                            255, 253, 231, 36),
+                                                            'delivered'
+                                                        ? Colors.green
+                                                        : order['status'] ==
+                                                                'in progress'
+                                                            ? TColor.primary
+                                                            : Color.fromARGB(
+                                                                255,
+                                                                253,
+                                                                231,
+                                                                36),
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                               ),

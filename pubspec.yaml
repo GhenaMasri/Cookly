@@ -54,6 +54,7 @@ dependencies:
   time_picker_spinner_pop_up: ^2.0.0
   cloud_firestore: ^5.0.0
   fl_chart: ^0.68.0
+  toggle_switch: ^2.3.0
   
 
 dev_dependencies:
