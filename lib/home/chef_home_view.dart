@@ -31,8 +31,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   bool? isActive;
   late Future<void> _initDataFuture;
   List<Map<String, dynamic>> categories = [];
-  bool statusBool = true; //open
-  String status = 'open';
+  bool? statusBool; //open
+  String? status;
 
   late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
@@ -170,8 +170,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<bool> checkSubscription() async {
-    final url = Uri.parse(
-        '${SharedPreferencesService.url}check-subscription?id=$kitchenId');
+    final url = Uri.parse('${SharedPreferencesService.url}check-subscription?id=$kitchenId');
 
     try {
       final response = await http.get(url);
@@ -186,6 +185,16 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     } catch (error) {
       print('Error: $error');
       return false;
+    }
+  }
+
+  Future<String> fetchKitchenStatus() async {
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-kitchen-status?id=$kitchenId'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['status'];
+    } else {
+      throw Exception('Failed to load status');
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
@@ -206,7 +215,12 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     await _loadKitchenId();
     isActive = await checkSubscription();
     print(isActive);
-    //Retrive Status and store it in the status / statusBool variable I intialized
+    status = await fetchKitchenStatus();
+    if (status == "open") {
+      statusBool = true;
+    } else {
+      statusBool = false;
+    }
      if (!isActive!) {
       _showSubscriptionAlert();
     }
@@ -328,7 +342,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                         scale:
                             1.3, // Adjust this value to increase or decrease the size
                         child: Switch(
-                          value: statusBool,
+                          value: statusBool!,
                           activeColor: TColor.primary,
                           onChanged: (newVal) async {
                             setState(() {
@@ -336,13 +350,13 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                               if (statusBool == true)
                                 status = 'open';
                               else
-                                status = 'close';
+                                status = 'closed';
                             });
                             Map<String, dynamic> result =
-                                await changeKitchenStatus(status);
+                                await changeKitchenStatus(status!);
                             bool success = result['success'];
                             print(success);
-                            if (statusBool) {
+                            if (statusBool!) {
                               IconSnackBar.show(context,
                                   snackBarType: SnackBarType.success,
                                   label: 'Can Receive Orders Now',
