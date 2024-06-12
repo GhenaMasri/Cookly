@@ -6,6 +6,7 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/more/about_us.dart';
 import 'package:untitled/more/chat.dart';
+import 'package:untitled/more/inbox.dart';
 import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/more/payment_details_view.dart';
 import 'package:untitled/welcome_page.dart';
@@ -103,7 +104,7 @@ class _UserMoreViewState extends State<UserMoreView> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ChatPage()));
+                                    builder: (context) => InboxPage()));
                           case "2":
                             Navigator.push(
                                 context,
