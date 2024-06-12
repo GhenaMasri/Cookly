@@ -3,33 +3,9 @@ const router = express.Router();
 const pool = require("../../db");
 
 router.put("/", async (req, res) => {
-  const {
-    orderId,
-    totalPrice,
-    status,
-    userNumber,
-    kitchenNumber,
-    city,
-    address,
-    notes,
-    pickupTime,
-    payment,
-    delivery,
-    kitchenId,
-    userId,
-  } = req.body;
+  const {orderId, totalPrice, status, userNumber, kitchenNumber, city, address, notes, pickupTime, payment, delivery, kitchenId, userId,} = req.body;
 
-  if (
-    !orderId ||
-    !totalPrice ||
-    !status ||
-    !userNumber ||
-    !kitchenNumber ||
-    !city ||
-    !payment ||
-    !kitchenId ||
-    !userId
-  ) {
+  if (!orderId || !totalPrice || !status || !userNumber || !kitchenNumber || !city || !payment || !kitchenId || !userId) {
     return res.status(400).send("All fields are required");
   }
 
@@ -84,7 +60,29 @@ router.put("/", async (req, res) => {
         orderId,
         notificationMessage,
         destColumn,
-      ]);
+    ]);
+
+    // update user points
+    let points;
+    if (delivery === "yes") {
+      points = (totalPrice - 10) / 5;
+    } else {
+      points = totalPrice / 5;
+    }
+    points = Math.floor(points);
+
+    const [userRows] = await pool.promise().query("SELECT points FROM user WHERE id = ?", [userId]);
+
+    if (userRows.length === 0) {
+      return res.status(404).send("User not found");
+    }
+
+    const currentPoints = userRows[0].points;
+    const newPoints = currentPoints + points;
+
+    const updateUserPointsQuery = "UPDATE user SET points = ? WHERE id = ?";
+    await pool.promise().execute(updateUserPointsQuery, [newPoints, userId]);
+
     res.status(200).send("Order placed successfully");
   } catch (error) {
     console.error("Error inserting/updating order data:", error);

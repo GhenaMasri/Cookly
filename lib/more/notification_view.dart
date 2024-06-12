@@ -15,19 +15,22 @@ class NotificationsView extends StatefulWidget {
 }
 
 class _NotificationsViewState extends State<NotificationsView> {
-  List<dynamic>? notifications;
+  List<dynamic> notifications = [];
   String? type;
   int? id;
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
 
   Future<void> fetchNotifications() async {
+    String? tempType;
     type = await _loadUserType();
     if (type == "chef") {
       id = await _loadKitchenId();
-    } else {
+      tempType = type;
+    } else if (type == "normal") {
       id = await _loadUserId();
+      tempType = "user";
     }
-    final String url = '${SharedPreferencesService.url}get-notifications?id=$id&destination=$type';
+    final String url = '${SharedPreferencesService.url}get-notifications?id=$id&destination=$tempType';
 
 
     final Uri uri = Uri.parse(url);
@@ -134,7 +137,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
-                itemCount: notifications!.length,
+                itemCount: notifications.length,
                 separatorBuilder: ((context, index) => Divider(
                       //indent: 25,
                       //endIndent: 25,
@@ -142,7 +145,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                       height: 1,
                     )),
                 itemBuilder: ((context, index) {
-                  var cObj = notifications![index] as Map? ?? {};
+                  var cObj = notifications[index] as Map? ?? {};
                   return InkWell(
                       onTap: () async {
                         if (cObj['is_read'] == 0) {

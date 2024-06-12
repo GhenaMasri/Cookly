@@ -83,6 +83,9 @@ app.use("/get-notifications", getNotificationsRoute);
 const changeNotificationStatusRoute = require("./routes/general/change_notification_status");
 app.use("/change-notification-status", changeNotificationStatusRoute);
 
+const unreadNotificationsRoute = require("./routes/general/unread_notifications");
+app.use("/unread-notifications", unreadNotificationsRoute);
+
 //////////////////////////////////////////// MENU ITEM ROUTES //////////////////////////////////////
 
 const newMenuItemRoute = require("./routes/menu item/add_menu_item");
@@ -137,6 +140,18 @@ app.use("/get-order-details", getOrderDetailsRoute);
 
 const emptyCartRoute = require("./routes/user/empty_cart");
 app.use("/empty-cart", emptyCartRoute);
+
+const rateKitchenRoute = require("./routes/user/rate_kitchen");
+app.use("/rate-kitchen", rateKitchenRoute);
+
+const getPointsRoute = require("./routes/user/get_points");
+app.use("/get-points", getPointsRoute);
+
+const deletePointsRoute = require("./routes/user/delete_points");
+app.use("/delete-points", deletePointsRoute);
+
+const deleteOrderRoute = require("./routes/user/delete_order");
+app.use("/delete-order", deleteOrderRoute);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 const port = 3000;
