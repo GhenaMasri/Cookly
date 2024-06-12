@@ -41,8 +41,7 @@ class _MyOrderViewState extends State<MyOrderView> {
   }
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<Map<String, dynamic>> addOrderItems(
-      userId, kitchenId, cartId, cartItems) async {
+  Future<Map<String, dynamic>> addOrderItems(userId, kitchenId, cartId, cartItems) async {
     const String apiUrl = '${SharedPreferencesService.url}add-order-items';
 
     final Map<String, dynamic> requestBody = {
@@ -72,6 +71,23 @@ class _MyOrderViewState extends State<MyOrderView> {
       }
     } catch (error) {
       return {'success': false};
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteOrder() async {
+    final url ='${SharedPreferencesService.url}delete-order?orderId=$orderId';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
     }
   }
 /////////////////////////////////////////////////////////////////////////////////
@@ -104,8 +120,13 @@ class _MyOrderViewState extends State<MyOrderView> {
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        // handle back logic if there is order added
+                        if (checkoutPressed == true) {
+                          
+                        } else {
+                          Navigator.pop(context);
+                        }
                       },
                       icon: Image.asset("assets/img/btn_back.png",
                           width: 20, height: 20),

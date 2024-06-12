@@ -36,6 +36,7 @@ class _UserProfileViewState extends State<UserProfileView> {
   GlobalKey<FormState> formState = GlobalKey();
   String? username;
   int? id;
+  int? points;
 
   String? initialFirstName;
   String? initialLastName;
@@ -107,6 +108,20 @@ class _UserProfileViewState extends State<UserProfileView> {
     }
   }
 
+  Future<void> getPoints() async {
+    await _loadUserId();
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-points?id=$id'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        points = jsonDecode(response.body)['points'];
+      });
+    } else {
+      print(response.statusCode);
+      throw Exception('Failed to load points');
+    }
+  }
+
   Future<void> signOut(BuildContext context) async {
     await SharedPreferencesService.clearSharedPreferences();
     Navigator.of(context).pushAndRemoveUntil(
@@ -122,6 +137,7 @@ class _UserProfileViewState extends State<UserProfileView> {
     _initDataFuture = _loadUserData();
     _loadUserName();
     _loadUserId();
+    getPoints();
     txtFirstName.addListener(_checkDataChanged);
     txtLastName.addListener(_checkDataChanged);
     txtMobile.addListener(_checkDataChanged);
@@ -217,7 +233,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "Your Points",
+                      "${points} points",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
