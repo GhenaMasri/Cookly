@@ -172,9 +172,9 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Column(
             children: [
-              const SizedBox(
-                height: 46,
-              ),
+              /* const SizedBox(
+                height: 20,
+              ), */
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(

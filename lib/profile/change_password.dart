@@ -97,9 +97,9 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Column(
                 children: [
-                  const SizedBox(
+                  /* const SizedBox(
                     height: 46,
-                  ),
+                  ), */
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(

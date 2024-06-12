@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: "Cookly",
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           fontFamily: "Metropolis",
           visualDensity: VisualDensity.adaptivePlatformDensity,

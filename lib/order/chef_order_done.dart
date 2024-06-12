@@ -51,7 +51,8 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
     await fetchOrders();
   }
 
-  Future<void> _navigateToOrderDetails(BuildContext context, int orderId) async {
+  Future<void> _navigateToOrderDetails(
+      BuildContext context, int orderId) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -186,7 +187,12 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
                                           color: TColor.primary, fontSize: 20),
                                     ),
                                     SizedBox(width: 5.0),
-                                    Text(order['total_price'].toString()),
+                                    Text(
+                                      (order['delivery'] == 'yes'
+                                          ? (order['total_price'] - 10)
+                                              .toString()
+                                          : order['total_price'].toString()),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -262,7 +268,7 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
                     right: 10,
                     child: IconButton(
                       onPressed: () {
-                      _navigateToOrderDetails(context, order['id']);
+                        _navigateToOrderDetails(context, order['id']);
                         /* Navigator.push(
                           context,
                           MaterialPageRoute(

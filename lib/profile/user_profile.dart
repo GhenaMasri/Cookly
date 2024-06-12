@@ -161,203 +161,212 @@ class _UserProfileViewState extends State<UserProfileView> {
 
   Widget buildContent() {
     return Scaffold(
-      backgroundColor: TColor.white,
+        backgroundColor: TColor.white,
         body: SingleChildScrollView(
             child: Form(
-      key: formState,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          const SizedBox(
-            height: 46,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    "Profile",
+          key: formState,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+    /*               const SizedBox(
+                    height: 20,
+                  ), */
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Profile",
+                            style: TextStyle(
+                                color: TColor.primaryText,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            pushReplacementWithAnimation(
+                                context, NotificationsView());
+                          },
+                          icon: Image.asset(
+                            "assets/img/notification.png",
+                            width: 25,
+                            height: 25,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    username != null
+                        ? "Welcome to your profile $username!"
+                        : "Welcome to your profile!",
                     style: TextStyle(
                         color: TColor.primaryText,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700),
                   ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    pushReplacementWithAnimation(
-                            context, NotificationsView());
-                  },
-                  icon: Image.asset(
-                    "assets/img/notification.png",
-                    width: 25,
-                    height: 25,
+                  SizedBox(
+                    height: 10,
                   ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            username != null
-                ? "Welcome to your profile $username!"
-                : "Welcome to your profile!",
-            style: TextStyle(
-                color: TColor.primaryText,
-                fontSize: 16,
-                fontWeight: FontWeight.w700),
-          ),
-          SizedBox(height: 10,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.crown,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Your Points",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.crown,
+                        color: Colors.amber,
                       ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Your Points",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      signOut(context);
+                    },
+                    child: Text(
+                      "Sign Out",
+                      style: TextStyle(
+                          color: TColor.secondaryText,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500),
                     ),
-                  ],
-                ),
-          TextButton(
-            onPressed: () {
-              signOut(context);
-            },
-            child: Text(
-              "Sign Out",
-              style: TextStyle(
-                  color: TColor.secondaryText,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "First Name",
-              hintText: "Enter First Name",
-              controller: txtFirstName,
-              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Last Name",
-              hintText: "Enter Last Name",
-              controller: txtLastName,
-              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Email",
-              hintText: "Enter Email",
-              keyboardType: TextInputType.emailAddress,
-              controller: txtEmail,
-              readOnly: true,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Mobile No",
-              hintText: "Enter Mobile No",
-              controller: txtMobile,
-              keyboardType: TextInputType.phone,
-              validator: _validatePhoneNumber,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: RoundButton(
-                title: "Change Password",
-                type: RoundButtonType.textPrimary,
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => ChangePasswordView()));
-                }),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: RoundButton(
-              title: "Save",
-              isEnabled: isDataChanged,
-              onPressed: isDataChanged
-                  ? () async {
-                      if (formState.currentState!.validate()) {
-                        Map<String, dynamic> updates = {};
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "First Name",
+                      hintText: "Enter First Name",
+                      controller: txtFirstName,
+                      validator: (value) =>
+                          value!.isEmpty ? "Couldn't be empty" : null,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Last Name",
+                      hintText: "Enter Last Name",
+                      controller: txtLastName,
+                      validator: (value) =>
+                          value!.isEmpty ? "Couldn't be empty" : null,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Email",
+                      hintText: "Enter Email",
+                      keyboardType: TextInputType.emailAddress,
+                      controller: txtEmail,
+                      readOnly: true,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Mobile No",
+                      hintText: "Enter Mobile No",
+                      controller: txtMobile,
+                      keyboardType: TextInputType.phone,
+                      validator: _validatePhoneNumber,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: RoundButton(
+                        title: "Change Password",
+                        type: RoundButtonType.textPrimary,
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ChangePasswordView()));
+                        }),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: RoundButton(
+                      title: "Save",
+                      isEnabled: isDataChanged,
+                      onPressed: isDataChanged
+                          ? () async {
+                              if (formState.currentState!.validate()) {
+                                Map<String, dynamic> updates = {};
 
-                        if (txtFirstName.text != initialFirstName)
-                          updates['first_name'] = txtFirstName.text;
-                        if (txtLastName.text != initialLastName)
-                          updates['last_name'] = txtLastName.text;
-                        if (txtMobile.text != initialMobileNum)
-                          updates['phone'] = txtMobile.text;
+                                if (txtFirstName.text != initialFirstName)
+                                  updates['first_name'] = txtFirstName.text;
+                                if (txtLastName.text != initialLastName)
+                                  updates['last_name'] = txtLastName.text;
+                                if (txtMobile.text != initialMobileNum)
+                                  updates['phone'] = txtMobile.text;
 
-                        Map<String, dynamic> result =
-                            await editUser(id!, updates);
-                        bool success = result['success'];
-                        String message = result['message'];
-                        print(message);
-                        if (success) {
-                          // save new user data to shared preferences
-                          _saveDataToSharedPreferences();
-                          // add success indicator
-                          setState(() {
-                            errorFlag = false;
-                            errorMessage = "";
-                          });
-                          QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            text: 'Profile Edited Successfully!',
-                            confirmBtnColor: Colors.green,
-                            onConfirmBtnTap: () {
-                              FocusScope.of(context).unfocus();
-                              Navigator.of(context).pop();
-                              //Navigator.of(context).pop();
-                            },
-                          );
-                        } else {
-                          setState(() {
-                            errorFlag = true;
-                            errorMessage = message;
-                          });
-                        }
-                      }
-                    }
-                  : null,
-            ),
+                                Map<String, dynamic> result =
+                                    await editUser(id!, updates);
+                                bool success = result['success'];
+                                String message = result['message'];
+                                print(message);
+                                if (success) {
+                                  // save new user data to shared preferences
+                                  _saveDataToSharedPreferences();
+                                  // add success indicator
+                                  setState(() {
+                                    errorFlag = false;
+                                    errorMessage = "";
+                                  });
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    text: 'Profile Edited Successfully!',
+                                    confirmBtnColor: Colors.green,
+                                    onConfirmBtnTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      Navigator.of(context).pop();
+                                      //Navigator.of(context).pop();
+                                    },
+                                  );
+                                } else {
+                                  setState(() {
+                                    errorFlag = true;
+                                    errorMessage = message;
+                                  });
+                                }
+                              }
+                            }
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Visibility(
+                    visible: errorFlag,
+                    child: Text(errorMessage,
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 230, 81, 0),
+                          fontSize: 16,
+                        )),
+                  ),
+                  Visibility(visible: errorFlag, child: SizedBox(height: 8)),
+                ]),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          Visibility(
-            visible: errorFlag,
-            child: Text(errorMessage,
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 230, 81, 0),
-                  fontSize: 16,
-                )),
-          ),
-          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
-        ]),
-      ),
-    )));
+        )));
   }
 }

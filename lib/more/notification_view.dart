@@ -15,7 +15,7 @@ class NotificationsView extends StatefulWidget {
 }
 
 class _NotificationsViewState extends State<NotificationsView> {
-  List<dynamic>? notifications;
+  List<dynamic>? notifications = [];
   String? type;
   int? id;
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
@@ -27,8 +27,8 @@ class _NotificationsViewState extends State<NotificationsView> {
     } else {
       id = await _loadUserId();
     }
-    final String url = '${SharedPreferencesService.url}get-notifications?id=$id&destination=$type';
-
+    final String url =
+        '${SharedPreferencesService.url}get-notifications?id=$id&destination=$type';
 
     final Uri uri = Uri.parse(url);
 
@@ -127,91 +127,102 @@ class _NotificationsViewState extends State<NotificationsView> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                itemCount: notifications!.length,
-                separatorBuilder: ((context, index) => Divider(
-                      //indent: 25,
-                      //endIndent: 25,
-                      color: TColor.secondaryText.withOpacity(0.4),
-                      height: 1,
-                    )),
-                itemBuilder: ((context, index) {
-                  var cObj = notifications![index] as Map? ?? {};
-                  return InkWell(
-                      onTap: () async {
-                        if (cObj['is_read'] == 0) {
-                          Map<String, dynamic> result = await updateNotification(cObj['id']);
-                        }
-                        if (type == 'chef') {
-                          pushReplacementWithAnimation(
-                              context,
-                              OrderDetailsPage(
-                                  orderId: cObj['order_id']));
-                        } else if (type == 'normal') {
-                          pushReplacementWithAnimation(
-                              context,
-                              FinalOrderView(
-                                  orderId: cObj['order_id']));
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: cObj['is_read'] == 1
-                                ? TColor.white
-                                : Colors.deepOrange[100]),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 25),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 4),
-                              width: 8,
-                              height: 8,
+          child: notifications!.isEmpty
+              ? Center(
+                  child: Text('No Notifications Yet'),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListView.separated(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      itemCount: notifications!.length,
+                      separatorBuilder: ((context, index) => Divider(
+                            //indent: 25,
+                            //endIndent: 25,
+                            color: TColor.secondaryText.withOpacity(0.4),
+                            height: 1,
+                          )),
+                      itemBuilder: ((context, index) {
+                        var cObj = notifications![index] as Map? ?? {};
+                      Color? cardColor = cObj['is_read'] == 1
+                                      ? TColor.white
+                                      : Colors.deepOrange[100];
+                        return InkWell(
+                            onTap: () async {
+                              if (cObj['is_read'] == 0) {
+                                Map<String, dynamic> result =
+                                    await updateNotification(cObj['id']);
+                                    if (result['success']) {
+                                setState(() {
+                                  cObj['is_read'] = 1;
+                                });
+                              }
+                              }
+                              if (type == 'chef') {
+                                pushReplacementWithAnimation(
+                                    context,
+                                    OrderDetailsPage(
+                                        orderId: cObj['order_id']));
+                              } else if (type == 'normal') {
+                                pushReplacementWithAnimation(context,
+                                    FinalOrderView(orderId: cObj['order_id']));
+                              }
+                              setState(() {});
+                            },
+                            child: Container(
                               decoration: BoxDecoration(
-                                  color: TColor.primary,
-                                  borderRadius: BorderRadius.circular(4)),
-                            ),
-                            const SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: Column(
+                                  color: cardColor),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 25),
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    cObj["message"].toString(),
-                                    style: TextStyle(
-                                        color: TColor.primaryText,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                        color: TColor.primary,
+                                        borderRadius: BorderRadius.circular(4)),
                                   ),
                                   const SizedBox(
-                                    height: 4,
+                                    width: 15,
                                   ),
-                                  Text(
-                                    cObj["time"].toString(),
-                                    style: TextStyle(
-                                        color: TColor.secondaryText,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          cObj["message"].toString(),
+                                          style: TextStyle(
+                                              color: TColor.primaryText,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        const SizedBox(
+                                          height: 4,
+                                        ),
+                                        Text(
+                                          cObj["time"].toString(),
+                                          style: TextStyle(
+                                              color: TColor.secondaryText,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ));
-                }),
-              ),
-            ],
-          ),
+                            ));
+                      }),
+                    ),
+                  ],
+                ),
         ),
       ),
     );

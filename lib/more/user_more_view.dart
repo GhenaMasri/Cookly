@@ -59,9 +59,9 @@ class _UserMoreViewState extends State<UserMoreView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(
-                height: 46,
-              ),
+      /*         const SizedBox(
+                height: 20,
+              ), */
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
