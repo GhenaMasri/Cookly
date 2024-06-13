@@ -173,21 +173,6 @@ class _DeliveryProfileViewState extends State<DeliveryProfileView> {
             ),
           ),
           backgroundColor: Colors.white,
-          actions: [
-            IconButton(
-              onPressed: () {
-                pushReplacementWithAnimation(context, NotificationsView());
-              },
-              icon: Image.asset(
-                "assets/img/notification.png",
-                width: 25,
-                height: 25,
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-          ],
         ),
         body: SingleChildScrollView(
             child: Form(

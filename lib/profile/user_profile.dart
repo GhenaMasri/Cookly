@@ -110,7 +110,8 @@ class _UserProfileViewState extends State<UserProfileView> {
 
   Future<void> getPoints() async {
     await _loadUserId();
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-points?id=$id'));
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}get-points?id=$id'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -186,7 +187,7 @@ class _UserProfileViewState extends State<UserProfileView> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-    /*               const SizedBox(
+                  /*               const SizedBox(
                     height: 20,
                   ), */
                   Padding(
@@ -200,17 +201,6 @@ class _UserProfileViewState extends State<UserProfileView> {
                                 color: TColor.primaryText,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            pushReplacementWithAnimation(
-                                context, NotificationsView());
-                          },
-                          icon: Image.asset(
-                            "assets/img/notification.png",
-                            width: 25,
-                            height: 25,
                           ),
                         ),
                       ],
@@ -237,9 +227,9 @@ class _UserProfileViewState extends State<UserProfileView> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        "Your Points",
+                        points.toString(),
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

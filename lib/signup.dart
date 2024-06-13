@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:untitled/chef_signup.dart';
 import 'package:untitled/common_widget/customformfield.dart';
@@ -118,6 +117,7 @@ class _Signup extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
           width: double.infinity,
@@ -363,10 +363,11 @@ class _Signup extends State<Signup> {
                                             builder: (context) =>
                                                 const Signin()));
                                   } else {
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                 ChefSignup(email: _email,)));
+                                    Navigator.of(context)
+                                        .pushReplacement(MaterialPageRoute(
+                                            builder: (context) => ChefSignup(
+                                                  email: _email,
+                                                )));
                                   }
                                 } else {
                                   setState(() {

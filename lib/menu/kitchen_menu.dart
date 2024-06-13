@@ -111,11 +111,8 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
     const url = '${SharedPreferencesService.url}empty-cart';
     try {
       final body = jsonEncode({'items': cartItems});
-      final response = await http.delete(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'}, 
-        body: body
-      );
+      final response = await http.delete(Uri.parse(url),
+          headers: {'Content-Type': 'application/json'}, body: body);
       if (response.statusCode == 200) {
         return {'success': true, 'message': response.body};
       } else {
@@ -166,187 +163,161 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
 
   Widget buildContent() {
     return Scaffold(
-      backgroundColor: TColor.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            children: [
-              /* const SizedBox(
+        backgroundColor: TColor.white,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              children: [
+                /* const SizedBox(
                 height: 20,
               ), */
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () async {
-                        /////////////////// BACKEND SECTION /////////////////////
-                        await getCartItems();
-                        if (cartItems.isEmpty) {
-                          Navigator.pop(context);
-                        } else {
-                          //show alert
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  backgroundColor: TColor.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  title:
-                                      Text('Are you sure you want to leave?'),
-                                  content: Text(
-                                      'If you leave, the items in the cart will be deleted.'),
-                                  actions: <Widget>[
-                                    TextButton(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          /////////////////// BACKEND SECTION /////////////////////
+                          await getCartItems();
+                          if (cartItems.isEmpty) {
+                            Navigator.pop(context);
+                          } else {
+                            //show alert
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: TColor.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    title:
+                                        Text('Are you sure you want to leave?'),
+                                    content: Text(
+                                        'If you leave, the items in the cart will be deleted.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          child: Text(
+                                            'Leave',
+                                            style: TextStyle(
+                                                color: TColor.primary),
+                                          ),
+                                          onPressed: () async {
+                                            Map<String, dynamic> result =
+                                                await emptyCart();
+                                            bool success = result['success'];
+                                            print(success);
+                                            if (success) {
+                                              Navigator.of(context).pop();
+                                              Navigator.of(context).pop();
+                                            } else {
+                                              print(
+                                                  "there is an error, success is false");
+                                            }
+                                          }),
+                                      TextButton(
                                         child: Text(
-                                          'Leave',
+                                          'Proceed with order',
                                           style:
                                               TextStyle(color: TColor.primary),
                                         ),
-                                        onPressed: () async {
-                                          Map<String, dynamic> result = await emptyCart();
-                                          bool success = result['success'];
-                                          print(success);
-                                          if (success) {
-                                            Navigator.of(context).pop();
-                                            Navigator.of(context).pop();
-                                          } else {
-                                            print("there is an error, success is false");
-                                          }
-                                        }),
-                                    TextButton(
-                                      child: Text(
-                                        'Proceed with order',
-                                        style: TextStyle(color: TColor.primary),
+                                        onPressed: () {
+                                          pushReplacementWithAnimation(
+                                              context,
+                                              MyOrderView(
+                                                  items: cartItems,
+                                                  kitchen: widget.mObj,
+                                                  userId: userId!));
+                                        },
                                       ),
-                                      onPressed: () {
-                                        pushReplacementWithAnimation(
-                                            context,
-                                            MyOrderView(
-                                                items: cartItems,
-                                                kitchen: widget.mObj,
-                                                userId: userId!));
-                                      },
-                                    ),
-                                  ],
-                                );
-                              });
-                        }
-                        /////////////////////////////////////////////////////////
-                      },
-                      icon: Image.asset("assets/img/btn_back.png",
-                          width: 20, height: 20),
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ),
-                    Expanded(
-                      child: Text(
-                        "Kitchen: ${widget.mObj["kitchen_name"].toString()}",
-                        style: TextStyle(
-                            color: TColor.primaryText,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800),
+                                    ],
+                                  );
+                                });
+                          }
+                          /////////////////////////////////////////////////////////
+                        },
+                        icon: Image.asset("assets/img/btn_back.png",
+                            width: 20, height: 20),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        pushReplacementWithAnimation(
-                            context, CartPage(kitchen: widget.mObj));
-                        /* Navigator.push(
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Kitchen: ${widget.mObj["kitchen_name"].toString()}",
+                          style: TextStyle(
+                              color: TColor.primaryText,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          pushReplacementWithAnimation(
+                              context, CartPage(kitchen: widget.mObj));
+                          /* Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CartPage(kitchen:widget.mObj),
                           ),
                         ); */
-                      },
-                      icon: Image.asset(
-                        "assets/img/shopping_cart.png",
-                        width: 25,
-                        height: 25,
+                        },
+                        icon: Image.asset(
+                          "assets/img/shopping_cart.png",
+                          width: 25,
+                          height: 25,
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        pushReplacementWithAnimation(
-                            context, NotificationsView());
-                      },
-                      icon: Image.asset(
-                        "assets/img/notification.png",
-                        width: 25,
-                        height: 25,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: RoundTextfield(
-                  hintText: "Search for item",
-                  controller: txtSearch,
-                  left: Container(
-                    alignment: Alignment.center,
-                    width: 30,
-                    child: Image.asset(
-                      "assets/img/search.png",
-                      width: 20,
-                      height: 20,
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: RoundTextfield(
+                    hintText: "Search for item",
+                    controller: txtSearch,
+                    left: Container(
+                      alignment: Alignment.center,
+                      width: 30,
+                      child: Image.asset(
+                        "assets/img/search.png",
+                        width: 20,
+                        height: 20,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                itemCount: menuArr.length,
-                itemBuilder: ((context, index) {
-                  var mObj1 = menuArr[index];
-                  return MenuItemRow(
-                    mObj: mObj1,
-                    onTap: () {
-                      pushReplacementWithAnimation(context,
-                          ItemDetailsView(item: mObj1, kitchen: widget.mObj));
-                      /*  Navigator.push(
+                const SizedBox(
+                  height: 15,
+                ),
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: menuArr.length,
+                  itemBuilder: ((context, index) {
+                    var mObj1 = menuArr[index];
+                    return MenuItemRow(
+                      mObj: mObj1,
+                      onTap: () {
+                        pushReplacementWithAnimation(context,
+                            ItemDetailsView(item: mObj1, kitchen: widget.mObj));
+                        /*  Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const ItemDetailsView()),
                       ); */
-                    },
-                  );
-                }),
-              ),
-            ],
+                      },
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        shape: const CircleBorder(),
-        onPressed: () {
-          showModalBottomSheet(
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              context: context,
-              builder: (context) {
-                return const RateItemView();
-              });
-        },
-        child: Icon(
-          Icons.star,
-          color: TColor.white,
-        ),
-        backgroundColor: TColor.primary,
-      ),
-    );
+        ));
   }
 }

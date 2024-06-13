@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:untitled/common/color_extension.dart';
-import 'package:untitled/common_widget/round_button.dart'; // Import RatingBar widget
+import 'package:untitled/common_widget/round_button.dart';
 
 class RateItemView extends StatefulWidget {
-  const RateItemView({Key? key}) : super(key: key);
+  final int kitchenId;
+  final Function(double) onRatingSubmit;
+
+  const RateItemView({Key? key, required this.kitchenId, required this.onRatingSubmit}) : super(key: key);
 
   @override
   State<RateItemView> createState() => _RateItemViewState();
 }
 
 class _RateItemViewState extends State<RateItemView> {
-  double _rating = 3; // Variable to store the rating value
+  double _rating = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +80,7 @@ class _RateItemViewState extends State<RateItemView> {
           RoundButton(
             title: 'Done',
             onPressed: () {
-              print("Rating: $_rating");
+              widget.onRatingSubmit(_rating);
               Navigator.pop(context); // Close the rating dialog
             },
           ),

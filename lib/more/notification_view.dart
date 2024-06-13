@@ -18,6 +18,7 @@ class _NotificationsViewState extends State<NotificationsView> {
   List<dynamic> notifications = [] = [];
   String? type;
   int? id;
+  int unread = 0;
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
 
   Future<void> fetchNotifications() async {
@@ -126,6 +127,14 @@ class _NotificationsViewState extends State<NotificationsView> {
               fontSize: 20,
               fontWeight: FontWeight.w800),
         ),
+         leading:
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+               Navigator.pop(context, unread);
+            },
+          ),
+       
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -153,6 +162,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                       Color? cardColor = cObj['is_read'] == 1
                                       ? TColor.white
                                       : Colors.deepOrange[100];
+                        if(cObj['is_read'] == 0) unread++;
                         return InkWell(
                             onTap: () async {
                               if (cObj['is_read'] == 0) {
@@ -161,6 +171,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                     if (result['success']) {
                                 setState(() {
                                   cObj['is_read'] = 1;
+                                  unread -- ;
                                 });
                               }
                               }

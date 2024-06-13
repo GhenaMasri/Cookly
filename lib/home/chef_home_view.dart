@@ -33,7 +33,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   bool? isActive;
   late Future<void> _initDataFuture;
   List<Map<String, dynamic>> categories = [];
-  bool? statusBool; 
+  bool? statusBool;
   String? status;
   int? unreadCount;
 
@@ -64,6 +64,12 @@ class _ChefHomeViewState extends State<ChefHomeView> {
         }
       });
     }
+  }
+
+  void updateUnreadCountFromNotifications(int newCount) {
+    setState(() {
+      unreadCount = newCount;
+    });
   }
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
@@ -173,7 +179,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<bool> checkSubscription() async {
-    final url = Uri.parse('${SharedPreferencesService.url}check-subscription?id=$kitchenId');
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}check-subscription?id=$kitchenId');
 
     try {
       final response = await http.get(url);
@@ -192,7 +199,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<String> fetchKitchenStatus() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-kitchen-status?id=$kitchenId'));
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}get-kitchen-status?id=$kitchenId'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['status'];
@@ -202,7 +210,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<int> unreadNotificationsCount() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}unread-notifications?id=$kitchenId&destination=chef'));
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}unread-notifications?id=$kitchenId&destination=chef'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['count'];
@@ -235,7 +244,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       statusBool = false;
     }
     unreadCount = await unreadNotificationsCount();
-     if (!isActive!) {
+    if (!isActive!) {
       _showSubscriptionAlert();
     }
     try {
@@ -245,7 +254,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
-    void _showSubscriptionAlert() {
+  void _showSubscriptionAlert() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -255,13 +264,15 @@ class _ChefHomeViewState extends State<ChefHomeView> {
           content: Text('Activate your kitchen by subscribing now.'),
           actions: <Widget>[
             TextButton(
-              child: Text('Subscribe Now', style: TextStyle(color: TColor.primary),),
+              child: Text(
+                'Subscribe Now',
+                style: TextStyle(color: TColor.primary),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
-                pushReplacementWithAnimation(context,SubscriptionPage());
+                pushReplacementWithAnimation(context, SubscriptionPage());
               },
             ),
-         
           ],
         );
       },
@@ -321,16 +332,49 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      pushReplacementWithAnimation(
-                          context, NotificationsView());
-                    },
-                    icon: Image.asset(
-                      "assets/img/notification.png",
-                      width: 25,
-                      height: 25,
-                    ),
+                  Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          int newCount = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NotificationsView(),
+                            ),
+                          );
+
+                          updateUnreadCountFromNotifications(newCount);
+                        },
+                        icon: Image.asset(
+                          "assets/img/notification.png",
+                          width: 25,
+                          height: 25,
+                        ),
+                      ),
+                      if (unreadCount != null && unreadCount! > 0)
+                        Positioned(
+                          right: 0,
+                          child: Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 20,
+                              minHeight: 20,
+                            ),
+                            child: Text(
+                              '$unreadCount',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -343,7 +387,9 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       Text(
                         "Status",
                         style: TextStyle(

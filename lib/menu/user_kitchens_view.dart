@@ -171,14 +171,6 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                                 ),
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                pushReplacementWithAnimation(
-                                    context, NotificationsView());
-                              },
-                              icon: Image.asset("assets/img/notification.png",
-                                  width: 25, height: 25),
-                            ),
                           ],
                         ),
                       ),

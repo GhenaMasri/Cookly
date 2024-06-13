@@ -126,21 +126,6 @@ class _CartPageState extends State<CartPage> {
             fontWeight: FontWeight.w800,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              pushReplacementWithAnimation(context, NotificationsView());
-            },
-            icon: Image.asset(
-              "assets/img/notification.png",
-              width: 25,
-              height: 25,
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-        ],
       ),
       body: cartItems.isEmpty
           ? Center(
@@ -194,13 +179,46 @@ class _CartPageState extends State<CartPage> {
                       padding: EdgeInsets.all(10),
                       child: RoundButton(
                         title: "Order Now",
-                        onPressed: () {
-                          pushReplacementWithAnimation(
+                        onPressed: () async {
+                          /*         final result = pushReplacementWithAnimation(
                               context,
                               MyOrderView(
                                   items: cartItems,
                                   kitchen: widget.kitchen,
-                                  userId: userId!));
+                                  userId: userId!)); */
+
+                          final result = await Navigator.of(context).push(
+                            PageRouteBuilder(
+                              transitionDuration: Duration(milliseconds: 700),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                var begin = Offset(1.0, 0.0);
+                                var end = Offset.zero;
+                                var curve = Curves.ease;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return MyOrderView(
+                                  items: cartItems,
+                                  kitchen: widget.kitchen,
+                                  userId: userId!,
+                                );
+                              },
+                            ),
+                          );
+                          if (result == false) {
+                            cartItems.clear();
+                            setState(() {});
+                          }
                         },
                       ),
                     )),

@@ -1,8 +1,10 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/menu/rating_page.dart';
 import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/order/user_final_order_view.dart';
 import 'dart:convert';
@@ -21,7 +23,8 @@ class _UserOrdersState extends State<UserOrders> {
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrders() async {
     await _loadUserId();
-    final String apiUrl = '${SharedPreferencesService.url}get-user-orders?userId=$id';
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-user-orders?userId=$id';
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -41,18 +44,16 @@ class _UserOrdersState extends State<UserOrders> {
     });
   }
 
-  Future<Map<String, dynamic>> rateKitchen(int id, Float rate) async {
-    final url = Uri.parse('${SharedPreferencesService.url}rate-kitchen?id=$id'); 
-    
-    final response = await http.put(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'rate': rate,
-      })
-    );
+  Future<Map<String, dynamic>> rateKitchen(int id, double rate) async {
+    final url = Uri.parse('${SharedPreferencesService.url}rate-kitchen?id=$id');
+
+    final response = await http.put(url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'rate': rate,
+        }));
 
     if (response.statusCode == 200) {
       return {'success': true};
@@ -60,6 +61,7 @@ class _UserOrdersState extends State<UserOrders> {
       return {'success': false};
     }
   }
+
   /////////////////////////////////////////////////////////////////////////////////
   late Future<void> _initDataFuture;
   @override
@@ -104,21 +106,6 @@ class _UserOrdersState extends State<UserOrders> {
             fontWeight: FontWeight.w800,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              pushReplacementWithAnimation(context, NotificationsView());
-            },
-            icon: Image.asset(
-              "assets/img/notification.png",
-              width: 25,
-              height: 25,
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-        ],
       ),
       backgroundColor: TColor.white,
       body: Padding(
@@ -197,7 +184,8 @@ class _UserOrdersState extends State<UserOrders> {
                                                   vertical: 8, horizontal: 20),
                                               decoration: BoxDecoration(
                                                 color: order['status'] == 'done'
-                                                    ? Color.fromARGB(255, 142, 231, 143)
+                                                    ? Color.fromARGB(
+                                                        255, 142, 231, 143)
                                                     : order['status'] ==
                                                             'delivered'
                                                         ? Colors.green
@@ -232,6 +220,70 @@ class _UserOrdersState extends State<UserOrders> {
                             ),
                           ),
                         ),
+                        if (order['status'] == 'delivered')
+                          Positioned(
+                            right: 1,
+                            top: 2,
+                            child:
+                              IconButton(
+                                icon: Container(
+                                  width: 35,
+                                  height: 35,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(17.5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    Icons.star,
+                                    color: TColor.primary,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    context: context,
+                                    builder: (context) {
+                                      return RateItemView(
+                                        kitchenId: order['kitchen_id'],
+                                        onRatingSubmit: (rating) async {
+                                          final result = await rateKitchen(
+                                              order['kitchen_id'], rating);
+                                          if (result['success']) {
+                                            IconSnackBar.show(context,
+                                                snackBarType: SnackBarType.success,
+                                                label: 'Kitchen Rated Successfully',
+                                                snackBarStyle: SnackBarStyle(
+                                                    backgroundColor: TColor.primary,
+                                                    labelTextStyle: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 18)));
+                                          } else {
+                                            IconSnackBar.show(context,
+                                                snackBarType: SnackBarType.fail,
+                                                label: 'Something Went Wrong',
+                                                snackBarStyle: SnackBarStyle(
+                                                    backgroundColor: TColor.primary,
+                                                    labelTextStyle: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 18)));
+                                          }
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            
+                          ),
                         IconButton(
                           onPressed: () {
                             pushReplacementWithAnimation(
@@ -239,12 +291,6 @@ class _UserOrdersState extends State<UserOrders> {
                                 FinalOrderView(
                                   orderId: order['id'],
                                 ));
-                            /* Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailsPage(order: order),
-                        ),
-                      ); */
                           },
                           icon: Container(
                             width: 35,
