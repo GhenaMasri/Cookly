@@ -281,8 +281,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         ),
-                      const SizedBox(height: 5),
-                      if (!item["item_notes"].toString().isEmpty)
+                       if (!item["item_notes"].toString().isEmpty) const SizedBox(height: 5),
+                    
                         Text(
                           "Sub-Quantity: ${item["sub_quantity"]}",
                           style: TextStyle(

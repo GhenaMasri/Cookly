@@ -187,7 +187,12 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
                                           color: TColor.primary, fontSize: 20),
                                     ),
                                     SizedBox(width: 5.0),
-                                    Text(order['total_price'].toString()),
+                                    Text(
+                                      (order['delivery'] == 'yes'
+                                          ? (order['total_price'] - 10)
+                                              .toString()
+                                          : order['total_price'].toString()),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -198,68 +203,7 @@ class _ChefOrderInprogressState extends State<ChefOrderInprogress> {
                     ),
                   ),
                   Positioned(
-                    top: 10,
-                    right: 10,
-                    child: IconButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              title: Text('Report User'),
-                              content: Text('Do you want to report this user?'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text(
-                                    'No',
-                                    style: TextStyle(color: TColor.primary),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: Text(
-                                    'Yes',
-                                    style: TextStyle(color: TColor.primary),
-                                  ),
-                                  onPressed: () {
-                                    // Report Logic
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      icon: Container(
-                        width: 35,
-                        height: 35,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(17.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: Icon(
-                          Icons.report,
-                          color: TColor.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 10,
+                    bottom: 70,
                     right: 10,
                     child: IconButton(
                       onPressed: () {

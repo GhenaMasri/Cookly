@@ -112,9 +112,9 @@ class _MyOrderViewState extends State<MyOrderView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 46,
-              ),
+  /*             const SizedBox(
+                height: 20,
+              ), */
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
@@ -267,13 +267,14 @@ class _MyOrderViewState extends State<MyOrderView> {
                               ),
                             ],
                           ),
-                           const SizedBox(
+                          const SizedBox(
                             height: 4,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Icon(Icons.phone, color: TColor.primary,size: 13),
+                              Icon(Icons.phone,
+                                  color: TColor.primary, size: 13),
                               const SizedBox(
                                 width: 4,
                               ),
@@ -554,39 +555,34 @@ class _MyOrderViewState extends State<MyOrderView> {
                           /////////////////// BACKEND SECTION /////////////////////////
                           if (checkoutPressed == false) {
                             Map<String, dynamic> result = await addOrderItems(
-                              widget.userId,
-                              widget.kitchen['id'],
-                              cartId,
-                              widget.items
-                            );
+                                widget.userId,
+                                widget.kitchen['id'],
+                                cartId,
+                                widget.items);
                             bool success = result['success'];
                             print(success);
                             if (success) {
                               checkoutPressed = true;
                               pushReplacementWithAnimation(
-                                context,
-                                CheckoutView(
-                                  totalPrice: totalPrice!,
-                                  deliveryCost: deliveryCost,
-                                  orderId: orderId!,
-                                  kitchen: widget.kitchen,
-                                  notes: txtNotes.text,
-                                  delivery: deliver
-                                )
-                              );
+                                  context,
+                                  CheckoutView(
+                                      totalPrice: totalPrice!,
+                                      deliveryCost: deliveryCost,
+                                      orderId: orderId!,
+                                      kitchen: widget.kitchen,
+                                      notes: txtNotes.text,
+                                      delivery: deliver));
                             }
                           } else {
                             pushReplacementWithAnimation(
-                              context,
-                              CheckoutView(
-                                totalPrice: totalPrice!,
-                                deliveryCost: deliveryCost,
-                                orderId: orderId!,
-                                kitchen: widget.kitchen,
-                                notes: txtNotes.text,
-                                delivery: deliver
-                              )
-                            );
+                                context,
+                                CheckoutView(
+                                    totalPrice: totalPrice!,
+                                    deliveryCost: deliveryCost,
+                                    orderId: orderId!,
+                                    kitchen: widget.kitchen,
+                                    notes: txtNotes.text,
+                                    delivery: deliver));
                           }
                           /* Navigator.push(
                             context,

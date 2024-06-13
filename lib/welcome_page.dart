@@ -19,7 +19,12 @@ class _WelcomeViewState extends State<WelcomeView> {
 
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            var media = MediaQuery.of(context).size;
+            var isLargeScreen = constraints.maxWidth > 600;
+
+            return  Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Stack with two images
@@ -29,18 +34,19 @@ class _WelcomeViewState extends State<WelcomeView> {
                 Image.asset(
                   "assets/img/welcome_top_shape.png",
                   width: media.width,
+                   height: isLargeScreen ? media.height * 0.0: media.height * 0.65,
                   fit: BoxFit.fitWidth,
                 ),
                 Image.asset(
                   "assets/img/app_cookly.png",
-                  width: media.width * 0.53,
-                  height: media.width * 0.53,
+                  width: isLargeScreen ? media.width * 0.3 : media.width * 0.53,
+                      height: isLargeScreen ? media.width * 0.3 : media.width * 0.53,
                   fit: BoxFit.contain,
                 ),
               ],
             ),
             SizedBox(
-              height: MediaQuery.of(context).size.width * 0.1,
+              height: isLargeScreen ? media.width * 0.05 : media.width * 0.1,
             ),
             Text(
               "Discover the best and most delicious\n home made food with fast delivery to your\ndoorstep",
@@ -51,7 +57,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   fontWeight: FontWeight.w500),
             ),
             SizedBox(
-              height: MediaQuery.of(context).size.width * 0.1,
+              height: isLargeScreen ? media.width * 0.05 : media.width * 0.1,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -89,7 +95,7 @@ class _WelcomeViewState extends State<WelcomeView> {
               height: 20,
             ),
           ],
-        ),
+        );}),
       ),
     );
   }

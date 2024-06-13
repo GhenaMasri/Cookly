@@ -91,9 +91,9 @@ class _FinalOrderViewState extends State<FinalOrderView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
+         /*      const SizedBox(
                 height: 25,
-              ),
+              ), */
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(

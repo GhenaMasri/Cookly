@@ -532,7 +532,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                   left: 10,
                                                   right: 20),
                                               width: media.width - 80,
-                                              height: 120,
+                                              height: 130,
                                               decoration: const BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
