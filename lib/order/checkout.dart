@@ -44,6 +44,7 @@ class _CheckoutViewState extends State<CheckoutView> {
   TextEditingController txtNumber = TextEditingController();
   String? pickupTime;
   String? payment = "cash";
+  int? points;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> placeOrder() async {
@@ -95,6 +96,32 @@ class _CheckoutViewState extends State<CheckoutView> {
   Future<int> _loadUserId() async {
     int? id = await SharedPreferencesService.getId();
     return id!;
+  }
+
+  Future<void> getPoints() async {
+    int userId = await _loadUserId();
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-points?id=$userId'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        points = jsonDecode(response.body)['points'];
+      });
+    } else {
+      print(response.statusCode);
+      throw Exception('Failed to load points');
+    }
+  }
+
+  Future<void> deletePoints() async {
+    int userId = await _loadUserId();
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}delete-points?id=$userId'));
+
+    if (response.statusCode == 200) {
+      print(response.body);
+    } else {
+      print(response.statusCode);
+      throw Exception('Failed to load points');
+    }
   }
   /////////////////////////////////////////////////////////////////////////////////
   GlobalKey<FormState> formState = GlobalKey();

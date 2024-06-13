@@ -40,7 +40,7 @@ class _AddCardViewState extends State<AddCardView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Add Credit/Debit Card",
+                  "Add Credit/Debit Card Details",
                   style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 14,

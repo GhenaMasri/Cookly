@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
@@ -19,8 +21,7 @@ class _UserOrdersState extends State<UserOrders> {
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrders() async {
     await _loadUserId();
-    final String apiUrl =
-        '${SharedPreferencesService.url}get-user-orders?userId=$id';
+    final String apiUrl = '${SharedPreferencesService.url}get-user-orders?userId=$id';
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -40,6 +41,25 @@ class _UserOrdersState extends State<UserOrders> {
     });
   }
 
+  Future<Map<String, dynamic>> rateKitchen(int id, Float rate) async {
+    final url = Uri.parse('${SharedPreferencesService.url}rate-kitchen?id=$id'); 
+    
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'rate': rate,
+      })
+    );
+
+    if (response.statusCode == 200) {
+      return {'success': true};
+    } else {
+      return {'success': false};
+    }
+  }
   /////////////////////////////////////////////////////////////////////////////////
   late Future<void> _initDataFuture;
   @override

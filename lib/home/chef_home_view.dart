@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
@@ -31,8 +33,9 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   bool? isActive;
   late Future<void> _initDataFuture;
   List<Map<String, dynamic>> categories = [];
-  bool? statusBool; //open
+  bool? statusBool; 
   String? status;
+  int? unreadCount;
 
   late List<MenuItem> menuArr = [];
   void addItemToList(MenuItem item) {
@@ -197,6 +200,16 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       throw Exception('Failed to load status');
     }
   }
+
+  Future<int> unreadNotificationsCount() async {
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}unread-notifications?id=$kitchenId&destination=chef'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['count'];
+    } else {
+      throw Exception('Failed to load unread notification count');
+    }
+  }
   //////////////////////////////////////////////////////////////////////////////////
 
   String getCategoryName(int? categoryId) {
@@ -221,6 +234,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     } else {
       statusBool = false;
     }
+    unreadCount = await unreadNotificationsCount();
      if (!isActive!) {
       _showSubscriptionAlert();
     }
