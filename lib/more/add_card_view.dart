@@ -48,7 +48,7 @@ class _AddCardViewState extends State<AddCardView> {
                 ),
                 IconButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context, false);
                   },
                   icon: Icon(
                     Icons.close,
@@ -100,7 +100,8 @@ class _AddCardViewState extends State<AddCardView> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Field Required';
-                      } else if (!RegExp(r'^(0[1-9]|1[0-2])$').hasMatch(value)) {
+                      } else if (!RegExp(r'^(0[1-9]|1[0-2])$')
+                          .hasMatch(value)) {
                         return 'Syntax: MM';
                       }
                       return null;
@@ -117,7 +118,8 @@ class _AddCardViewState extends State<AddCardView> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Field Required';
-                      } else if (!RegExp(r'^[0-9]{4}$').hasMatch(value) || int.parse(value) < DateTime.now().year) {
+                      } else if (!RegExp(r'^[0-9]{4}$').hasMatch(value) ||
+                          int.parse(value) < DateTime.now().year) {
                         return 'Syntax: YYYY';
                       }
                       return null;
@@ -179,8 +181,7 @@ class _AddCardViewState extends State<AddCardView> {
                 fontWeight: FontWeight.w600,
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Process the card addition
-                    Navigator.pop(context);
+                    Navigator.pop(context, true);
                   }
                 }),
             const SizedBox(

@@ -75,17 +75,6 @@ class _UserMoreViewState extends State<UserMoreView> {
                           fontSize: 20,
                           fontWeight: FontWeight.w800),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        pushReplacementWithAnimation(
-                            context, NotificationsView());
-                      },
-                      icon: Image.asset(
-                        "assets/img/notification.png",
-                        width: 25,
-                        height: 25,
-                      ),
-                    ),
                   ],
                 ),
               ),

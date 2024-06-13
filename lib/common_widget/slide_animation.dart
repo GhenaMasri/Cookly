@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-void pushReplacementWithAnimation(BuildContext context, Widget destination) {
-  Navigator.of(context).push(
+Future<T?> pushReplacementWithAnimation<T, TO>(
+    BuildContext context, Widget destination) {
+  return Navigator.of(context).push(
     PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 700), 
+      transitionDuration: Duration(milliseconds: 700),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(1.0, 0.0);
         var end = Offset.zero;

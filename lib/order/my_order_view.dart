@@ -41,7 +41,8 @@ class _MyOrderViewState extends State<MyOrderView> {
   }
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
-  Future<Map<String, dynamic>> addOrderItems(userId, kitchenId, cartId, cartItems) async {
+  Future<Map<String, dynamic>> addOrderItems(
+      userId, kitchenId, cartId, cartItems) async {
     const String apiUrl = '${SharedPreferencesService.url}add-order-items';
 
     final Map<String, dynamic> requestBody = {
@@ -75,7 +76,7 @@ class _MyOrderViewState extends State<MyOrderView> {
   }
 
   Future<Map<String, dynamic>> deleteOrder() async {
-    final url ='${SharedPreferencesService.url}delete-order?orderId=$orderId';
+    final url = '${SharedPreferencesService.url}delete-order?orderId=$orderId';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -90,7 +91,44 @@ class _MyOrderViewState extends State<MyOrderView> {
       return {'success': false, 'message': '$error'};
     }
   }
+
 /////////////////////////////////////////////////////////////////////////////////
+  void _showAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: TColor.white,
+          content: Text('Do you want to discard your order?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Yes',
+                style: TextStyle(color: TColor.primary),
+              ),
+              onPressed: () async {
+                Map<String, dynamic> result = await deleteOrder();
+                bool success = result['success'];
+                if (success == true) {
+                  Navigator.pop(context);
+                  Navigator.pop(context, false);
+                }
+              },
+            ),
+            TextButton(
+              child: Text(
+                'No',
+                style: TextStyle(color: TColor.primary),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -112,9 +150,9 @@ class _MyOrderViewState extends State<MyOrderView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-  /*             const SizedBox(
+              const SizedBox(
                 height: 20,
-              ), */
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
@@ -123,9 +161,9 @@ class _MyOrderViewState extends State<MyOrderView> {
                       onPressed: () async {
                         // handle back logic if there is order added
                         if (checkoutPressed == true) {
-                          
+                          _showAlert();
                         } else {
-                          Navigator.pop(context);
+                          Navigator.pop(context, true);
                         }
                       },
                       icon: Image.asset("assets/img/btn_back.png",

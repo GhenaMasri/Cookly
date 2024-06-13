@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
@@ -45,6 +46,8 @@ class _CheckoutViewState extends State<CheckoutView> {
   String? pickupTime;
   String? payment = "cash";
   int? points;
+  bool usePointsForDiscount = false;
+  bool isValid = true;
 
   //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<Map<String, dynamic>> placeOrder() async {
@@ -100,11 +103,13 @@ class _CheckoutViewState extends State<CheckoutView> {
 
   Future<void> getPoints() async {
     int userId = await _loadUserId();
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-points?id=$userId'));
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}get-points?id=$userId'));
 
     if (response.statusCode == 200) {
       setState(() {
         points = jsonDecode(response.body)['points'];
+        calculateDiscount();
       });
     } else {
       print(response.statusCode);
@@ -112,9 +117,26 @@ class _CheckoutViewState extends State<CheckoutView> {
     }
   }
 
+  void calculateDiscount() {
+    if (points != null) {
+      discount = (points! / 20.0);
+      calculateTotalPrice();
+    }
+  }
+
+  void calculateTotalPrice() {
+    if (usePointsForDiscount && points != null) {
+      checkoutPrice = widget.totalPrice + widget.deliveryCost - discount!;
+    } else {
+      checkoutPrice = widget.totalPrice + widget.deliveryCost;
+    }
+    setState(() {});
+  }
+
   Future<void> deletePoints() async {
     int userId = await _loadUserId();
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}delete-points?id=$userId'));
+    final response = await http.get(
+        Uri.parse('${SharedPreferencesService.url}delete-points?id=$userId'));
 
     if (response.statusCode == 200) {
       print(response.body);
@@ -123,6 +145,7 @@ class _CheckoutViewState extends State<CheckoutView> {
       throw Exception('Failed to load points');
     }
   }
+
   /////////////////////////////////////////////////////////////////////////////////
   GlobalKey<FormState> formState = GlobalKey();
   @override
@@ -238,7 +261,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                     ),
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Container(
                     decoration: BoxDecoration(color: TColor.textfield),
@@ -302,19 +325,23 @@ class _CheckoutViewState extends State<CheckoutView> {
 
                                     InkWell(
                                       onTap: () {
-                                        setState(() {
+                                        setState(() async {
                                           selectMethod = index;
                                           if (selectMethod == 1) {
+                                            isValid = false;
                                             payment = 'card';
-                                            showModalBottomSheet(
-                                                isScrollControlled: true,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                context: context,
-                                                builder: (context) {
-                                                  return const AddCardView();
-                                                });
-                                          } else payment = 'cash';
+                                            isValid =
+                                                await showModalBottomSheet(
+                                                    isDismissible: false,
+                                                    isScrollControlled: true,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return const AddCardView();
+                                                    });
+                                          } else
+                                            payment = 'cash';
                                         });
                                       },
                                       child: Icon(
@@ -400,17 +427,17 @@ class _CheckoutViewState extends State<CheckoutView> {
                               "Discount",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: TColor.primaryText,
+                                  color: Colors.black,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              discount.toString() + "₪",
+                              "${discount?.toStringAsFixed(2) ?? '0.00'}₪",
                               style: TextStyle(
-                                  color: TColor.primaryText,
+                                  color: Colors.black,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700),
-                            )
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -453,6 +480,28 @@ class _CheckoutViewState extends State<CheckoutView> {
                     decoration: BoxDecoration(color: TColor.textfield),
                     height: 8,
                   ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: RoundButton(
+                      title: usePointsForDiscount
+                          ? "Unuse points"
+                          : "Use points to get discount",
+                      onPressed: () {
+                        setState(() {
+                          usePointsForDiscount = !usePointsForDiscount;
+                        });
+                        if (usePointsForDiscount) {
+                          getPoints();
+                        } else {
+                          discount = 0.0;
+                          calculateTotalPrice();
+                        }
+                      },
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 20, horizontal: 25),
@@ -460,21 +509,31 @@ class _CheckoutViewState extends State<CheckoutView> {
                         title: "Send Order",
                         onPressed: () async {
                           bool valid = true;
-                          if (widget.delivery =='yes')
+                          if (widget.delivery == 'yes')
                             valid = formState.currentState!.validate();
-                          if (valid) {
-                            Map<String, dynamic> result = await placeOrder();
-                            bool success = result['success'];
-                            String message = result['message'];
-                            print(message);
-                            if (success) {
-                              showModalBottomSheet(
-                                  context: context,
-                                  backgroundColor: Colors.transparent,
-                                  isScrollControlled: true,
-                                  builder: (context) {
-                                    return const CheckoutMessageView();
-                                  });
+                          if (selectMethod == 1 && isValid == false) {
+                            IconSnackBar.show(context,
+                                snackBarType: SnackBarType.fail,
+                                label: 'Fill All Visa Card Details',
+                                snackBarStyle: SnackBarStyle(
+                                    labelTextStyle: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18)));
+                          } else {
+                            if (valid) {
+                              Map<String, dynamic> result = await placeOrder();
+                              bool success = result['success'];
+                              String message = result['message'];
+                              print(message);
+                              if (success) {
+                                showModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    isScrollControlled: true,
+                                    builder: (context) {
+                                      return const CheckoutMessageView();
+                                    });
+                              }
                             }
                           }
                         }),

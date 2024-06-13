@@ -25,7 +25,7 @@ class _HomeViewState extends State<HomeView> {
   String? username;
   int? selectedCategoryId;
   List<Map<String, dynamic>> menuArr = [];
-
+  int? unreadCount;
   @override
   void initState() {
     super.initState();
@@ -56,6 +56,12 @@ class _HomeViewState extends State<HomeView> {
     } catch (error) {
       print(error);
     }
+  }
+
+  void updateUnreadCountFromNotifications(int newCount) {
+    setState(() {
+      unreadCount = newCount;
+    });
   }
 
 //////////////////////////////////// BACKEND SECTION //////////////////////////////////////
@@ -132,6 +138,7 @@ class _HomeViewState extends State<HomeView> {
       throw Exception('Failed to load kitchen categories');
     }
   }
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 
   List<Map<String, dynamic>> categories = [];
@@ -194,16 +201,49 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        pushReplacementWithAnimation(
-                            context, NotificationsView());
-                      },
-                      icon: Image.asset(
-                        "assets/img/notification.png",
-                        width: 25,
-                        height: 25,
-                      ),
+                    Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            int newCount = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NotificationsView(),
+                              ),
+                            );
+
+                            updateUnreadCountFromNotifications(newCount);
+                          },
+                          icon: Image.asset(
+                            "assets/img/notification.png",
+                            width: 25,
+                            height: 25,
+                          ),
+                        ),
+                        if (unreadCount != null && unreadCount! > 0)
+                          Positioned(
+                            right: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: BoxConstraints(
+                                minWidth: 20,
+                                minHeight: 20,
+                              ),
+                              child: Text(
+                                '$unreadCount',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),
