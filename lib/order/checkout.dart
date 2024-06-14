@@ -323,25 +323,31 @@ class _CheckoutViewState extends State<CheckoutView> {
                                     ),
 
                                     InkWell(
-                                      onTap: () {
-                                        setState(() async {
+                                      onTap: () async {
+                                        setState(() {
                                           selectMethod = index;
-                                          if (selectMethod == 1) {
-                                            isValid = false;
-                                            payment = 'card';
-                                            isValid =
-                                                await showModalBottomSheet(
-                                                    isDismissible: false,
-                                                    isScrollControlled: true,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return const AddCardView();
-                                                    });
-                                          } else
-                                            payment = 'cash';
                                         });
+
+                                        if (selectMethod == 1) {
+                                          isValid =
+                                              (await showModalBottomSheet<bool>(
+                                            isDismissible: false,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            context: context,
+                                            builder: (context) {
+                                              return const AddCardView();
+                                            },
+                                          ))!;
+
+                                          setState(() {
+                                            payment = 'card';
+                                          });
+                                        } else {
+                                          setState(() {
+                                            payment = 'cash';
+                                          });
+                                        }
                                       },
                                       child: Icon(
                                         selectMethod == index
@@ -426,14 +432,14 @@ class _CheckoutViewState extends State<CheckoutView> {
                               "Discount",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: Colors.black,
+                                  color: TColor.primaryText,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
                               "${discount?.toStringAsFixed(2) ?? '0.00'}₪",
                               style: TextStyle(
-                                  color: Colors.black,
+                                  color: TColor.primaryText,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700),
                             ),

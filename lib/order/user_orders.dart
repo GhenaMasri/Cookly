@@ -172,7 +172,7 @@ class _UserOrdersState extends State<UserOrders> {
                                                 fontSize: 20),
                                           ),
                                           SizedBox(width: 5.0),
-                                          Text(order['total_price'].toString()),
+                                          Text(order['total_price'].toStringAsFixed(2)),
                                         ],
                                       ),
                                       SizedBox(height: 5.0),

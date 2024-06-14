@@ -513,7 +513,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          totalPrice.toString() + "₪",
+                          totalPrice!.toStringAsFixed(2) + "₪",
                           style: TextStyle(
                               color: TColor.primary,
                               fontSize: 22,
