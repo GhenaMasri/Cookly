@@ -20,6 +20,59 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
   List<Map<String, dynamic>> categories = [];
   List<String> categoriesList = [];
   String? category;
+  List<dynamic> adminKitchens = [];
+
+//////////////////////////////////////// BACKEND SECTION //////////////////////////////////////////
+  Future<List<Map<String, dynamic>>> getKitchenCategories() async {
+    final response = await http
+        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      final List<dynamic> categoryList = data['categories'];
+      final List<Map<String, dynamic>> categories =
+          categoryList.map((category) {
+        return {'id': category['id'], 'category': category['category']};
+      }).toList();
+      return categories;
+    } else {
+      throw Exception('Failed to load kitchen categories');
+    }
+  }
+
+  Future<List<dynamic>> getKitchens({required String city, int? categoryId}) async {
+    final Uri uri = Uri.parse('${SharedPreferencesService.url}get-kitchens')
+        .replace(queryParameters: {
+      'city': city,
+      if (categoryId != null) 'category_id': categoryId.toString()
+    });
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      return data['kitchens'];
+    } else {
+      throw Exception('Failed to load kitchens');
+    }
+  }
+
+  Future<void> _updateAdminKitchensArray() async {
+    try {
+      List<dynamic> result = [];
+      String city = selectedCity;
+      int? categoryId = selectedCategoryId;
+
+      result = await getKitchens(city: city, categoryId: categoryId);
+
+      setState(() {
+        print(result);
+        adminKitchens = result;
+      });
+    } catch (error) {
+      print('Error loading menu items: $error');
+    }
+  }
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
   @override
   void initState() {
@@ -28,6 +81,7 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
   }
 
   Future<void> _initData() async {
+    _updateAdminKitchensArray();
     try {
       var fetchedCategories = await getKitchenCategories();
       if (mounted) {
@@ -43,22 +97,6 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
       }
     } catch (error) {
       print(error);
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> getKitchenCategories() async {
-    final response = await http
-        .get(Uri.parse('${SharedPreferencesService.url}kitchen-categories'));
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      final List<dynamic> categoryList = data['categories'];
-      final List<Map<String, dynamic>> categories =
-          categoryList.map((category) {
-        return {'id': category['id'], 'category': category['category']};
-      }).toList();
-      return categories;
-    } else {
-      throw Exception('Failed to load kitchen categories');
     }
   }
 
@@ -140,7 +178,7 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
                           onChanged: (newValue) {
                             setState(() {
                               selectedCity = newValue!;
-                              //_updateMenuArr();
+                              _updateAdminKitchensArray();
                             });
                           },
                         ),
@@ -174,7 +212,7 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
                                 orElse: () => {},
                               );
                               selectedCategoryId = selectedItem['id'];
-                              //_updateMenuArr();
+                              _updateAdminKitchensArray();
                             });
                           },
                         ),

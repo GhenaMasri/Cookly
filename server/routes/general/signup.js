@@ -4,11 +4,11 @@ const bcrypt = require("bcrypt");
 const pool = require("../../db");
 
 router.post("/", async (req, res) => {
-  var { firstName, lastName, email, password, phone, userType } = req.body;
+  var { firstName, lastName, email, password, phone, userType, city } = req.body;
 
   if (userType == "Normal") {
     userType = "normal";
-  } else {
+  } else if (userType == "Chef") {
     userType = "chef";
   }
 
@@ -37,7 +37,26 @@ router.post("/", async (req, res) => {
                 res.status(500).send("Error inserting values");
                 return;
               }
-              res.status(200).send("Sign up successful");
+              
+              const userId = results.insertId;
+
+              if (userType === "delivery") {
+                const deliveryQuery = `
+                  INSERT INTO delivery (user_id, city)
+                  VALUES (?, ?)
+                `;
+                pool.execute(deliveryQuery, [userId, city], (error, results, fields) => {
+                  if (error) {
+                    console.error("Error inserting into delivery table:", error);
+                    res.status(500).send("Error inserting into delivery table");
+                    return;
+                  }
+  
+                  res.status(200).send("Sign up successful and delivery user added");
+                });
+              } else {
+                res.status(200).send("Sign up successful");
+              }
             }
           );
         }
