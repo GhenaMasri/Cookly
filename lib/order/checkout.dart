@@ -427,14 +427,14 @@ class _CheckoutViewState extends State<CheckoutView> {
                               "Discount",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: Colors.black,
+                                  color: TColor.primaryText,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
                               "${discount?.toStringAsFixed(2) ?? '0.00'}₪",
                               style: TextStyle(
-                                  color: Colors.black,
+                                  color: TColor.primaryText,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700),
                             ),

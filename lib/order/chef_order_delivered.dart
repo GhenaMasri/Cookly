@@ -177,8 +177,8 @@ class _ChefOrderDelieveredState extends State<ChefOrderDelievered> {
                                     Text(
                                       (order['delivery'] == 'yes'
                                           ? (order['total_price'] - 10)
-                                              .toString()
-                                          : order['total_price'].toString()),
+                                              .toStringAsFixed(2)
+                                          : order['total_price'].toStringAsFixed(2)),
                                     ),
                                   ],
                                 ),
