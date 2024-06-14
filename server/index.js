@@ -156,7 +156,31 @@ app.use("/delete-points", deletePointsRoute);
 const deleteOrderRoute = require("./routes/user/delete_order");
 app.use("/delete-order", deleteOrderRoute);
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////// ADMIN ROUTES ///////////////////////////////////////////
+
+const kitchensPercentageRoute = require("./routes/admin/kitchens_percentage");
+app.use("/kitchens-percentage", kitchensPercentageRoute);
+
+const usersCountRoute = require("./routes/admin/users_count");
+app.use("/users-count", usersCountRoute);
+
+const topKitchenRoute = require("./routes/admin/top_kitchen");
+app.use("/top-kitchen", topKitchenRoute);
+
+const getKitchensRoute = require("./routes/admin/get_kitchens");
+app.use("/get-kitchens", getKitchensRoute);
+
+const getDeliveryRoute = require("./routes/admin/get_delivery");
+app.use("/get-delivery", getDeliveryRoute);
+
+const deleteDeliveryRoute = require("./routes/admin/delete_delivery");
+app.use("/delete-delivery", deleteDeliveryRoute);
+
+const getKitchenDetailsRoute = require("./routes/admin/get_kitchen_details");
+app.use("/get-kitchen-details", getKitchenDetailsRoute);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

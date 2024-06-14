@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_button.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class AddDeliveryView extends StatefulWidget {
   const AddDeliveryView({super.key});
@@ -17,12 +20,39 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   String? _selectedLocation;
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<Map<String, dynamic>> addDelivery() async {
+    const url = '${SharedPreferencesService.url}signup';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'firstName': _firstNameController.text,
+          'lastName': _lastNameController.text,
+          'email': _emailController.text,
+          'password': _passwordController.text,
+          'phone': _phoneController.text,
+          'userType': "delivery",
+          'city': _selectedLocation
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+//////////////////////////////////////////////////////////////////////////////////
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -279,10 +309,17 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
               SizedBox(height: 25),
               RoundButton(
                 title: "Add",
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     // Process the data
-                    IconSnackBar.show(context,
+                    /////////////////////// BACKEND SECTION /////////////////////////
+                    Map<String, dynamic> result = await addDelivery();
+                    bool success = result['success'];
+                    String message = result['message'];
+                    print(message);
+                    ////////////////////////////////////////////////////////////////
+                    if(success) {
+                      IconSnackBar.show(context,
                         snackBarType: SnackBarType.success,
                         label: 'Delivery Man Added Successfully',
                         snackBarStyle: SnackBarStyle(
@@ -297,6 +334,7 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
                     _phoneController.clear();
                     _emailController.clear();
                     _selectedLocation = null;
+                    }
                   }
                 },
               ),

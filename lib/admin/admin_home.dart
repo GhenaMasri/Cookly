@@ -5,6 +5,8 @@ import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:untitled/welcome_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AdminHomeView extends StatefulWidget {
   const AdminHomeView({super.key});
@@ -24,8 +26,56 @@ class AdminHomeView extends StatefulWidget {
 class _AdminHomeViewState extends State<AdminHomeView> {
   int touchedIndex = -1;
   String selectedLocation = 'Nablus';
+  List<dynamic> percentages = [];
+  Map<String, dynamic>? usersCount;
+  Map<String, dynamic>? topKitchen;
 
-  
+//////////////////////////////////////// BACKEND SECTION //////////////////////////////////////////
+  Future<void> kitchensPercentage() async {
+    const String apiUrl = '${SharedPreferencesService.url}kitchens-percentage';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        percentages = data['percentages'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+
+  Future<void> getUsersCount() async {
+    const String apiUrl = '${SharedPreferencesService.url}users-count';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        usersCount = data['counts'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+
+  Future<void> getTopKitchen(String city) async {
+    String apiUrl = '${SharedPreferencesService.url}top-kitchen?city=$city';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        topKitchen = data['topKitchen'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Static data for top kitchens and delivery men
   final Map<String, Map<String, String>> locationData = {
