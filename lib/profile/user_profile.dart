@@ -227,7 +227,7 @@ class _UserProfileViewState extends State<UserProfileView> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        points.toString(),
+                        "${points.toString()} points",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,

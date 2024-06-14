@@ -94,7 +94,7 @@ class CustomListTile extends StatelessWidget {
                       Icon(Icons.star, color: TColor.primary),
                       SizedBox(width: 6),
                       Text(
-                        mObj["rate"].toString(),
+                        mObj["rate"].toStringAsFixed(2),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: TColor.secondaryText,

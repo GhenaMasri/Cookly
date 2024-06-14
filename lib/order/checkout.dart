@@ -135,8 +135,7 @@ class _CheckoutViewState extends State<CheckoutView> {
 
   Future<void> deletePoints() async {
     int userId = await _loadUserId();
-    final response = await http.get(
-        Uri.parse('${SharedPreferencesService.url}delete-points?id=$userId'));
+    final response = await http.put(Uri.parse('${SharedPreferencesService.url}delete-points?id=$userId'));
 
     if (response.statusCode == 200) {
       print(response.body);
@@ -526,6 +525,9 @@ class _CheckoutViewState extends State<CheckoutView> {
                               String message = result['message'];
                               print(message);
                               if (success) {
+                                if (usePointsForDiscount == true) {
+                                  await deletePoints();
+                                }
                                 showModalBottomSheet(
                                     context: context,
                                     backgroundColor: Colors.transparent,

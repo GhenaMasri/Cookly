@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -140,6 +141,16 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
       }
     } catch (error) {
       return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<Float> fetchKitchenRate() async {
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-kitchen-rate?id=$kitchenId'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['rate'];
+    } else {
+      throw Exception('Failed to load kitchen rate');
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
