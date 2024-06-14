@@ -40,6 +40,7 @@ class _HomeViewState extends State<HomeView> {
   Future<void> _initData() async {
     await _loadUserName();
     await _updateMenuArr();
+    unreadCount = await unreadNotificationsCount();
     try {
       var fetchedCategories = await getKitchenCategories();
       if (mounted) {
@@ -136,6 +137,23 @@ class _HomeViewState extends State<HomeView> {
       return categories;
     } else {
       throw Exception('Failed to load kitchen categories');
+    }
+  }
+
+  Future<int> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    return id!;
+  }
+
+  Future<int> unreadNotificationsCount() async {
+    int id = await _loadUserId();
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}unread-notifications?id=$id&destination=user'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['count'];
+    } else {
+      throw Exception('Failed to load unread notification count');
     }
   }
 

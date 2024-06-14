@@ -240,7 +240,7 @@ class _MyOrderViewState extends State<MyOrderView> {
                                 width: 4,
                               ),
                               Text(
-                                widget.kitchen['rate'].toString(),
+                                widget.kitchen['rate'].toStringAsFixed(2),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.primary, fontSize: 12),

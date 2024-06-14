@@ -179,7 +179,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                                 width: 4,
                               ),
                               Text(
-                                orderInfo!['rate'].toString(),
+                                orderInfo!['rate'].toStringAsFixed(2),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.primary, fontSize: 12),
