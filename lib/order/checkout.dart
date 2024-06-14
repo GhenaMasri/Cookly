@@ -324,25 +324,31 @@ class _CheckoutViewState extends State<CheckoutView> {
                                     ),
 
                                     InkWell(
-                                      onTap: () {
-                                        setState(() async {
+                                      onTap: () async {
+                                        setState(() {
                                           selectMethod = index;
-                                          if (selectMethod == 1) {
-                                            isValid = false;
-                                            payment = 'card';
-                                            isValid =
-                                                await showModalBottomSheet(
-                                                    isDismissible: false,
-                                                    isScrollControlled: true,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return const AddCardView();
-                                                    });
-                                          } else
-                                            payment = 'cash';
                                         });
+
+                                        if (selectMethod == 1) {
+                                          isValid =
+                                              (await showModalBottomSheet<bool>(
+                                            isDismissible: false,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            context: context,
+                                            builder: (context) {
+                                              return const AddCardView();
+                                            },
+                                          ))!;
+
+                                          setState(() {
+                                            payment = 'card';
+                                          });
+                                        } else {
+                                          setState(() {
+                                            payment = 'cash';
+                                          });
+                                        }
                                       },
                                       child: Icon(
                                         selectMethod == index
