@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:quickalert/quickalert.dart'; // Ensure you've added the correct package for QuickAlert
@@ -18,9 +17,9 @@ class _DeliveryManagerState extends State<DeliveryManager> {
   String selectedCity = 'Nablus';
   List<dynamic> deliveryMen = [];
 
+////////////////////////////////////// BACKEND SECTION ///////////////////////////////////////
   Future<void> fetchDeliveryMen(String city) async {
-    final response = await http.get(
-        Uri.parse('${SharedPreferencesService.url}get-delivery?city=$city'));
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-delivery?city=$city'));
     if (response.statusCode == 200) {
       setState(() {
         deliveryMen = json.decode(response.body)['delivery'];
@@ -30,8 +29,9 @@ class _DeliveryManagerState extends State<DeliveryManager> {
     }
   }
 
-  void deleteDeliveryMan() async {
-    final response = await http.delete(Uri.parse(''));
+  Future<void> deleteDeliveryMan(int userId, int deliveryId) async {
+    final response = await http.delete(Uri.parse('${SharedPreferencesService.url}delete-delivery?userId=$userId&deliveryId=$deliveryId'));
+
     if (response.statusCode == 200) {
       QuickAlert.show(
         context: context,
@@ -40,11 +40,14 @@ class _DeliveryManagerState extends State<DeliveryManager> {
         confirmBtnColor: Colors.green,
         onConfirmBtnTap: () {
           Navigator.of(context).pop();
-          fetchDeliveryMen(selectedCity); // Refresh the list
+          fetchDeliveryMen(selectedCity); 
         },
       );
+    } else {
+      throw Exception('Failed to delete delivery man');
     }
   }
+///////////////////////////////////////////////////////////////////////////////////////////////
 
   late Future<void> _initDataFuture;
 
@@ -124,7 +127,7 @@ class _DeliveryManagerState extends State<DeliveryManager> {
                                         style:
                                             TextStyle(color: TColor.primary)),
                                     onPressed: () {
-                                      deleteDeliveryMan(); //fix it
+                                      deleteDeliveryMan(deliveryMan['user_id'], deliveryMan['delivery_id']); 
                                       Navigator.of(context).pop();
                                     },
                                   ),
