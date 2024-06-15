@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/admin/add_delivery.dart';
 import 'package:untitled/admin/admin_home.dart';
 import 'package:untitled/admin/admin_kitchens.dart';
+import 'package:untitled/admin/delivery_tab.dart';
 import 'package:untitled/common/color_extension.dart';
 import '../../common_widget/tab_button.dart';
 
@@ -48,12 +49,12 @@ class _AdminMainViewState extends State<AdminMainView> {
                 isSelected: selectTab == 0,
               ),
               TabButton(
-                title: "Add Delivery",
-                icon: "assets/img/add_person.png",
+                title: "Delivery",
+                icon: "assets/img/delivery.png",
                 onTap: () {
                   if (selectTab != 1) {
                     selectTab = 1;
-                    selectPageView = AddDeliveryView();
+                    selectPageView = DeliveryTabBar();
                   }
                   setState(() {});
                 },

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/admin/add_delivery.dart';
+import 'package:untitled/admin/manage_delivery.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/more/notification_view.dart';
-import 'package:untitled/order/chef_order_delivered.dart';
-import 'package:untitled/order/chef_order_done.dart';
-import 'package:untitled/order/chef_order_inprogress.dart';
-import 'package:untitled/order/chef_order_pending.dart';
+import 'package:untitled/profile/kitchen_profile.dart';
+import 'package:untitled/profile/profile.dart';
 
-class OrdersTabBar extends StatelessWidget {
-  const OrdersTabBar({super.key});
+class DeliveryTabBar extends StatelessWidget {
+  const DeliveryTabBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: 0,
-      length: 4,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: TColor.white,
+          backgroundColor: Colors.white,
           title: Text(
             "Cookly",
             style: TextStyle(color: TColor.primary, fontSize: 30),
@@ -25,27 +25,18 @@ class OrdersTabBar extends StatelessWidget {
           centerTitle: true,
           automaticallyImplyLeading: false,
           bottom: const TabBar(
-            tabAlignment: TabAlignment.center,
-            isScrollable: true,
             tabs: <Widget>[
               Tab(
-                text: 'Pending',
+                text: 'Add Delivery',
               ),
-              Tab(text: 'In Progress'),
-              Tab(text: 'Done'),
-              Tab(text: 'Delivered'),
+              Tab(text: 'Manage Delivery'),
             ],
             indicatorColor: Color.fromARGB(255, 230, 81, 0),
             labelColor: Color.fromARGB(255, 230, 81, 0),
           ),
         ),
-        body: TabBarView(
-          children: <Widget>[
-            ChefOrderPending(),
-            ChefOrderInprogress(),
-            ChefOrderDone(),
-            ChefOrderDelievered(),
-          ],
+        body: const TabBarView(
+          children: <Widget>[AddDeliveryView(), DeliveryManager()],
         ),
       ),
     );

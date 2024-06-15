@@ -22,21 +22,6 @@ class ProfileTabBar extends StatelessWidget {
           ),
           centerTitle: true,
           automaticallyImplyLeading: false,
-          actions: [
-            InkWell(
-              onTap: () {
-                pushReplacementWithAnimation(context, NotificationsView());
-              },
-              child: Image.asset(
-                "assets/img/notification.png",
-                width: 25,
-                height: 25,
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            )
-          ],
           bottom: const TabBar(
             tabs: <Widget>[
               Tab(

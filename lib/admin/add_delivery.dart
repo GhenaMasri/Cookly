@@ -20,7 +20,8 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   String? _selectedLocation;
 
   bool _obscurePassword = true;
@@ -101,24 +102,13 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Add Delivery Man',
-          style: TextStyle(
-            color: TColor.primaryText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.white,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
+              SizedBox(height: 10),
               TextFormField(
                 controller: _firstNameController,
                 decoration: InputDecoration(
@@ -127,7 +117,6 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
                   labelStyle: TextStyle(
                     color: Colors.grey,
                   ),
-                 
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -225,7 +214,7 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
                       _obscurePassword
                           ? Icons.visibility_off
                           : Icons.visibility,
-                      color: TColor.primary,
+                      color: TColor.placeholder,
                     ),
                     onPressed: () {
                       setState(() {
@@ -257,7 +246,7 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
                       _obscureConfirmPassword
                           ? Icons.visibility_off
                           : Icons.visibility,
-                      color: TColor.primary,
+                      color: TColor.placeholder,
                     ),
                     onPressed: () {
                       setState(() {
@@ -277,7 +266,7 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
                   focusColor: TColor.primary,
                   labelText: 'Location',
                   labelStyle: TextStyle(
-                    color:Colors.grey,
+                    color: Colors.grey,
                   ),
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
@@ -318,22 +307,29 @@ class _AddDeliveryViewState extends State<AddDeliveryView> {
                     String message = result['message'];
                     print(message);
                     ////////////////////////////////////////////////////////////////
-                    if(success) {
+                    if (success) {
                       IconSnackBar.show(context,
-                        snackBarType: SnackBarType.success,
-                        label: 'Delivery Man Added Successfully',
-                        snackBarStyle: SnackBarStyle(
-                            backgroundColor: TColor.primary,
-                            labelTextStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18)));
-                    // clear the form
-                    _passwordController.clear();
-                    _confirmPasswordController.clear();
-                    _firstNameController.clear();
-                    _lastNameController.clear();
-                    _phoneController.clear();
-                    _emailController.clear();
-                    _selectedLocation = null;
+                          snackBarType: SnackBarType.success,
+                          label: 'Delivery Man Added Successfully',
+                          snackBarStyle: SnackBarStyle(
+                              backgroundColor: TColor.primary,
+                              labelTextStyle: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18)));
+                      // clear the form
+                      _passwordController.clear();
+                      _confirmPasswordController.clear();
+                      _firstNameController.clear();
+                      _lastNameController.clear();
+                      _phoneController.clear();
+                      _emailController.clear();
+                      _selectedLocation = null;
+                    } else {
+                      IconSnackBar.show(context,
+                          snackBarType: SnackBarType.fail,
+                          label: message,
+                          snackBarStyle: SnackBarStyle(
+                              labelTextStyle: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18)));
                     }
                   }
                 },
