@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/dropdownfield.dart';
@@ -29,6 +30,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   File? _image;
   String errorMessage = '';
   bool errorFlag = false;
+  double? rate;
 
   TextEditingController txtName = TextEditingController();
   String? location;
@@ -144,8 +146,9 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
     }
   }
 
-  Future<Float> fetchKitchenRate() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-kitchen-rate?id=$kitchenId'));
+  Future<double> fetchKitchenRate() async {
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}get-kitchen-rate?id=$kitchenId'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['rate'];
@@ -169,6 +172,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
     await _loadKitchenId();
     if (kitchenId != null) {
       final result = await getKitchenData(kitchenId!);
+       rate = await fetchKitchenRate();
       if (result != null && result['success'] == true) {
         setState(() {
           kitchenData = result['kitchen'] ?? " ";
@@ -228,7 +232,8 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
       future: _initDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: TColor.primary));
+          return Center(
+              child: CircularProgressIndicator(color: TColor.primary));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error loading data'));
         } else {
@@ -240,301 +245,347 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
 
   Widget buildContent() {
     return Scaffold(
-      backgroundColor: TColor.white,
+        backgroundColor: TColor.white,
         body: SingleChildScrollView(
             child: Form(
-      key: formState,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: TColor.placeholder,
-                borderRadius: BorderRadius.circular(50),
-              ),
-              alignment: Alignment.center,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl!,
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    width: 100,
-                    height: 100,
-                    color: Colors.grey[300],
-                    child: Center(
-                      child: CircularProgressIndicator(color: TColor.primary),
+          key: formState,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: TColor.placeholder,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      alignment: Alignment.center,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl!,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            width: 100,
+                            height: 100,
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                  color: TColor.primary),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      )),
+                  TextButton.icon(
+                    onPressed: () async {
+                      pickedFile =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      String uniqueFileName =
+                          DateTime.now().millisecondsSinceEpoch.toString();
+                      setState(() {
+                        if (pickedFile != null) {
+                          _image = File(pickedFile!.path);
+                        } else {
+                          print('No image selected.');
+                        }
+                      });
+                      Reference referenceRoot = FirebaseStorage.instance.ref();
+                      Reference referenceDirectory =
+                          referenceRoot.child('images');
+                      Reference referenceImageToUpload =
+                          referenceDirectory.child(uniqueFileName);
+
+                      try {
+                        //Store the file
+                        await referenceImageToUpload
+                            .putFile(File(pickedFile!.path));
+                        //Success: get the download URL
+                        imageUrl =
+                            await referenceImageToUpload.getDownloadURL();
+                        _checkDataChanged();
+                      } catch (error) {
+                        //Some error occurred
+                      }
+                      setState(() {});
+                    },
+                    icon: Icon(
+                      Icons.edit,
+                      color: TColor.primary,
+                      size: 12,
+                    ),
+                    label: Text(
+                      "Edit Logo",
+                      style: TextStyle(color: TColor.primary, fontSize: 12),
                     ),
                   ),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                ),
-              )),
-          TextButton.icon(
-            onPressed: () async {
-              pickedFile = await picker.pickImage(source: ImageSource.gallery);
-              String uniqueFileName =
-                  DateTime.now().millisecondsSinceEpoch.toString();
-              setState(() {
-                if (pickedFile != null) {
-                  _image = File(pickedFile!.path);
-                } else {
-                  print('No image selected.');
-                }
-              });
-              Reference referenceRoot = FirebaseStorage.instance.ref();
-              Reference referenceDirectory = referenceRoot.child('images');
-              Reference referenceImageToUpload =
-                  referenceDirectory.child(uniqueFileName);
-
-              try {
-                //Store the file
-                await referenceImageToUpload.putFile(File(pickedFile!.path));
-                //Success: get the download URL
-                imageUrl = await referenceImageToUpload.getDownloadURL();
-                _checkDataChanged();
-              } catch (error) {
-                //Some error occurred
-              }
-              setState(() {});
-            },
-            icon: Icon(
-              Icons.edit,
-              color: TColor.primary,
-              size: 12,
-            ),
-            label: Text(
-              "Edit Logo",
-              style: TextStyle(color: TColor.primary, fontSize: 12),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Kitchen Name",
-              hintText: "Enter Name",
-              controller: txtName,
-              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundDropdown(
-                value: location, // Initial value
-                hintText: 'Select City',
-                header: 'City',
-                items: ['Nablus', 'Jenin', 'Ramallah', 'Tulkarm'],
-                validator: (value) =>
-                    value!.isEmpty ? "Couldn't be empty" : null,
-                onChanged: (String? value) {
-                  setState(() {
-                    location = value;
-                    _checkDataChanged();
-                  });
-                }),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Street",
-              hintText: "Street",
-              controller: txtStreet,
-              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Contact Number",
-              hintText: "Enter Contact Number",
-              controller: txtNumber,
-              keyboardType: TextInputType.number,
-              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundTitleTextfield(
-              title: "Description",
-              hintText: "Description",
-              controller: txtDescription,
-              maxLines: 2,
-              validator: (value) => value!.isEmpty ? "Couldn't be empty" : null,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundDropdown(
-                value: category, // Initial value
-                hintText: 'Select Category',
-                header: 'Category',
-                items: categoriesList, //this should be categoriesList
-                validator: (value) =>
-                    value!.isEmpty ? "Couldn't be empty" : null,
-                onChanged: (String? value) {
-                  setState(() {
-                    category = value;
-                    if (value != null) {
-                      var selectedItem = categories.firstWhere(
-                          (element) => element['category'] == value,
-                          orElse: () => {});
-                      selectedCategory = selectedItem['id'];
-                    }
-                    _checkDataChanged();
-                  });
-                }),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: RoundDropdown(
-                value: orderingSystem, // Initial value
-                header: 'Ordering System',
-                hintText: 'Ordering System',
-                validator: (value) =>
-                    value!.isEmpty ? "Couldn't be empty" : null,
-                items: ['Order in the same day', 'Order the day before'],
-                onChanged: (String? value) {
-                  setState(() {
-                    orderingSystem = value;
-                    if (orderingSystem == 'Order the day before') {
-                      OrdersDb = 0;
-                    } else {
-                      OrdersDb = 1;
-                    }
-                    _checkDataChanged();
-                  });
-                }),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: Row(
-              children: [
-                Text("Special Orders:", style: TextStyle(fontSize: 16)),
-                SizedBox(width: 10),
-                Flexible(
-                  child: Row(
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Radio(
-                        activeColor: Color.fromARGB(255, 239, 108, 0),
-                        value: "Yes",
-                        groupValue: specialOrders,
-                        onChanged: (value) {
-                          setState(() {
-                            specialOrders = value;
-                            _checkDataChanged();
-                          });
-                        },
+                      Icon(
+                        Icons.star,
+                        color: TColor.primary,
                       ),
-                      Text("Yes", style: TextStyle(fontSize: 16)),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${rate!.toStringAsFixed(2)}",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                Flexible(
-                  child: Row(
-                    children: [
-                      Radio(
-                        activeColor: Color.fromARGB(255, 239, 108, 0),
-                        value: "No",
-                        groupValue: specialOrders,
-                        onChanged: (value) {
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Kitchen Name",
+                      hintText: "Enter Name",
+                      controller: txtName,
+                      validator: (value) =>
+                          value!.isEmpty ? "Couldn't be empty" : null,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundDropdown(
+                        value: location, // Initial value
+                        hintText: 'Select City',
+                        header: 'City',
+                        items: ['Nablus', 'Jenin', 'Ramallah', 'Tulkarm'],
+                        validator: (value) =>
+                            value!.isEmpty ? "Couldn't be empty" : null,
+                        onChanged: (String? value) {
                           setState(() {
-                            specialOrders = value;
+                            location = value;
                             _checkDataChanged();
                           });
-                        },
-                      ),
-                      Text("No", style: TextStyle(fontSize: 16)),
-                    ],
+                        }),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: RoundButton(
-              title: "Save",
-              isEnabled: isDataChanged,
-              onPressed: isDataChanged
-                  ? () async {
-                      if (formState.currentState!.validate()) {
-                        Map<String, dynamic> updates = {};
-
-                        if (txtName.text != initialName)
-                          updates['name'] = txtName.text;
-                        if (txtStreet.text != initialStreet)
-                          updates['street'] = txtStreet.text;
-                        if (txtNumber.text != initialNumber)
-                          updates['contact'] = txtNumber.text;
-                        if (txtDescription.text != initialDescription)
-                          updates['description'] = txtDescription.text;
-                        if (imageUrl != initialImage)
-                          updates['logo'] = imageUrl;
-                        if (location != initialLocation)
-                          updates['city'] = location;
-                        if (category != initialCategory)
-                          updates['category_id'] = selectedCategory;
-                        if (orderingSystem != initialOrderingSystem)
-                          updates['order_system'] = OrdersDb;
-                        if (specialOrders != initialSpecialOrders)
-                          updates['special_orders'] =
-                              specialOrders!.toLowerCase();
-
-                        Map<String, dynamic> result =
-                            await editKitchen(kitchenId!, updates);
-                        bool success = result['success'];
-                        String message = result['message'];
-                        print(message);
-                        if (success) {
-                          // save kitchen name to shared preferences
-                          _saveKitchenNameToSharedPreferences();
-                          // add success indicator
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Street",
+                      hintText: "Street",
+                      controller: txtStreet,
+                      validator: (value) =>
+                          value!.isEmpty ? "Couldn't be empty" : null,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Contact Number",
+                      hintText: "Enter Contact Number",
+                      controller: txtNumber,
+                      keyboardType: TextInputType.number,
+                      validator: (value) =>
+                          value!.isEmpty ? "Couldn't be empty" : null,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundTitleTextfield(
+                      title: "Description",
+                      hintText: "Description",
+                      controller: txtDescription,
+                      maxLines: 2,
+                      validator: (value) =>
+                          value!.isEmpty ? "Couldn't be empty" : null,
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundDropdown(
+                        value: category, // Initial value
+                        hintText: 'Select Category',
+                        header: 'Category',
+                        items: categoriesList, //this should be categoriesList
+                        validator: (value) =>
+                            value!.isEmpty ? "Couldn't be empty" : null,
+                        onChanged: (String? value) {
                           setState(() {
-                            errorFlag = false;
-                            errorMessage = "";
+                            category = value;
+                            if (value != null) {
+                              var selectedItem = categories.firstWhere(
+                                  (element) => element['category'] == value,
+                                  orElse: () => {});
+                              selectedCategory = selectedItem['id'];
+                            }
+                            _checkDataChanged();
                           });
-                          QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            text: 'Profile Edited Successfully!',
-                            confirmBtnColor: Colors.green,
-                            onConfirmBtnTap: () {
-                              FocusScope.of(context).unfocus();
-                              Navigator.of(context).pop();
-                              //Navigator.of(context).pop();
-                            },
-                          );
-                        } else {
+                        }),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: RoundDropdown(
+                        value: orderingSystem, // Initial value
+                        header: 'Ordering System',
+                        hintText: 'Ordering System',
+                        validator: (value) =>
+                            value!.isEmpty ? "Couldn't be empty" : null,
+                        items: [
+                          'Order in the same day',
+                          'Order the day before'
+                        ],
+                        onChanged: (String? value) {
                           setState(() {
-                            errorFlag = true;
-                            errorMessage = message;
+                            orderingSystem = value;
+                            if (orderingSystem == 'Order the day before') {
+                              OrdersDb = 0;
+                            } else {
+                              OrdersDb = 1;
+                            }
+                            _checkDataChanged();
                           });
-                        }
-                      }
-                    }
-                  : null,
-            ),
+                        }),
+                  ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                    child: Row(
+                      children: [
+                        Text("Special Orders:", style: TextStyle(fontSize: 16)),
+                        SizedBox(width: 10),
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Radio(
+                                activeColor: Color.fromARGB(255, 239, 108, 0),
+                                value: "Yes",
+                                groupValue: specialOrders,
+                                onChanged: (value) {
+                                  setState(() {
+                                    specialOrders = value;
+                                    _checkDataChanged();
+                                  });
+                                },
+                              ),
+                              Text("Yes", style: TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                        ),
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Radio(
+                                activeColor: Color.fromARGB(255, 239, 108, 0),
+                                value: "No",
+                                groupValue: specialOrders,
+                                onChanged: (value) {
+                                  setState(() {
+                                    specialOrders = value;
+                                    _checkDataChanged();
+                                  });
+                                },
+                              ),
+                              Text("No", style: TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: RoundButton(
+                      title: "Save",
+                      isEnabled: isDataChanged,
+                      onPressed: isDataChanged
+                          ? () async {
+                              if (formState.currentState!.validate()) {
+                                Map<String, dynamic> updates = {};
+
+                                if (txtName.text != initialName)
+                                  updates['name'] = txtName.text;
+                                if (txtStreet.text != initialStreet)
+                                  updates['street'] = txtStreet.text;
+                                if (txtNumber.text != initialNumber)
+                                  updates['contact'] = txtNumber.text;
+                                if (txtDescription.text != initialDescription)
+                                  updates['description'] = txtDescription.text;
+                                if (imageUrl != initialImage)
+                                  updates['logo'] = imageUrl;
+                                if (location != initialLocation)
+                                  updates['city'] = location;
+                                if (category != initialCategory)
+                                  updates['category_id'] = selectedCategory;
+                                if (orderingSystem != initialOrderingSystem)
+                                  updates['order_system'] = OrdersDb;
+                                if (specialOrders != initialSpecialOrders)
+                                  updates['special_orders'] =
+                                      specialOrders!.toLowerCase();
+
+                                Map<String, dynamic> result =
+                                    await editKitchen(kitchenId!, updates);
+                                bool success = result['success'];
+                                String message = result['message'];
+                                print(message);
+                                if (success) {
+                                  // save kitchen name to shared preferences
+                                  _saveKitchenNameToSharedPreferences();
+                                  // add success indicator
+                                  setState(() {
+                                    errorFlag = false;
+                                    errorMessage = "";
+                                  });
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    text: 'Profile Edited Successfully!',
+                                    confirmBtnColor: Colors.green,
+                                    onConfirmBtnTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      Navigator.of(context).pop();
+                                      //Navigator.of(context).pop();
+                                    },
+                                  );
+                                } else {
+                                  setState(() {
+                                    errorFlag = true;
+                                    errorMessage = message;
+                                  });
+                                }
+                              }
+                            }
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Visibility(
+                    visible: errorFlag,
+                    child: Text(errorMessage,
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 230, 81, 0),
+                          fontSize: 16,
+                        )),
+                  ),
+                  Visibility(visible: errorFlag, child: SizedBox(height: 8)),
+                ]),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          Visibility(
-            visible: errorFlag,
-            child: Text(errorMessage,
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 230, 81, 0),
-                  fontSize: 16,
-                )),
-          ),
-          Visibility(visible: errorFlag, child: SizedBox(height: 8)),
-        ]),
-      ),
-    )));
+        )));
   }
 }

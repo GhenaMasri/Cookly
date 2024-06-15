@@ -31,8 +31,8 @@ class _NotificationsViewState extends State<NotificationsView> {
       id = await _loadUserId();
       tempType = "user";
     }
-    final String url = '${SharedPreferencesService.url}get-notifications?id=$id&destination=$tempType';
-
+    final String url =
+        '${SharedPreferencesService.url}get-notifications?id=$id&destination=$tempType';
 
     final Uri uri = Uri.parse(url);
 
@@ -127,23 +127,24 @@ class _NotificationsViewState extends State<NotificationsView> {
               fontSize: 20,
               fontWeight: FontWeight.w800),
         ),
-         leading:
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-               Navigator.pop(context, unread);
-            },
-          ),
-       
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, unread);
+          },
+        ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: notifications!.isEmpty
-              ? Center(
-                  child: Text('No Notifications Yet'),
-                )
-              : Column(
+      body: notifications!.isEmpty
+          ? Center(
+              child: Text(
+                'No Notifications Yet',
+                textAlign: TextAlign.center,
+              ),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ListView.separated(
@@ -159,21 +160,21 @@ class _NotificationsViewState extends State<NotificationsView> {
                           )),
                       itemBuilder: ((context, index) {
                         var cObj = notifications![index] as Map? ?? {};
-                      Color? cardColor = cObj['is_read'] == 1
-                                      ? TColor.white
-                                      : Colors.deepOrange[100];
-                        if(cObj['is_read'] == 0) unread++;
+                        Color? cardColor = cObj['is_read'] == 1
+                            ? TColor.white
+                            : Colors.deepOrange[100];
+                        if (cObj['is_read'] == 0) unread++;
                         return InkWell(
                             onTap: () async {
                               if (cObj['is_read'] == 0) {
                                 Map<String, dynamic> result =
                                     await updateNotification(cObj['id']);
-                                    if (result['success']) {
-                                setState(() {
-                                  cObj['is_read'] = 1;
-                                  unread -- ;
-                                });
-                              }
+                                if (result['success']) {
+                                  setState(() {
+                                    cObj['is_read'] = 1;
+                                    unread--;
+                                  });
+                                }
                               }
                               if (type == 'chef') {
                                 pushReplacementWithAnimation(
@@ -187,8 +188,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                               setState(() {});
                             },
                             child: Container(
-                              decoration: BoxDecoration(
-                                  color: cardColor),
+                              decoration: BoxDecoration(color: cardColor),
                               padding: const EdgeInsets.symmetric(
                                   vertical: 15, horizontal: 25),
                               child: Row(
@@ -237,8 +237,8 @@ class _NotificationsViewState extends State<NotificationsView> {
                     ),
                   ],
                 ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 }

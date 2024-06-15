@@ -1,12 +1,15 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:untitled/admin/kitchen_details.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/cart_drop_down.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:http/http.dart' as http;
+import 'package:untitled/common_widget/slide_animation.dart';
 
 class AdminKitchensPage extends StatefulWidget {
   @override
@@ -14,7 +17,7 @@ class AdminKitchensPage extends StatefulWidget {
 }
 
 class _AdminKitchensPageState extends State<AdminKitchensPage> {
-  String selectedCity = 'Nablus';
+  String? selectedCity = 'Nablus';
   int? selectedCategoryId;
   late Future<void> _initDataFuture;
   List<Map<String, dynamic>> categories = [];
@@ -39,7 +42,8 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
     }
   }
 
-  Future<List<dynamic>> getKitchens({required String city, int? categoryId}) async {
+  Future<List<dynamic>> getKitchens(
+      {required String? city, int? categoryId}) async {
     final Uri uri = Uri.parse('${SharedPreferencesService.url}get-kitchens')
         .replace(queryParameters: {
       'city': city,
@@ -59,7 +63,7 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
   Future<void> _updateAdminKitchensArray() async {
     try {
       List<dynamic> result = [];
-      String city = selectedCity;
+      String? city = selectedCity;
       int? categoryId = selectedCategoryId;
 
       result = await getKitchens(city: city, categoryId: categoryId);
@@ -100,25 +104,6 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
     }
   }
 
-  final Map<String, List<Kitchen>> kitchens = {
-    'Nablus': [
-      Kitchen('Kitchen 1', 'Active', 4.5, '123-456-7890'),
-      Kitchen('Kitchen 2', 'Expired', 3.8, '123-456-7891'),
-    ],
-    'Ramallah': [
-      Kitchen('Kitchen 3', 'Active', 4.2, '123-456-7892'),
-      Kitchen('Kitchen 4', 'Expired', 3.5, '123-456-7893'),
-    ],
-    'Jenin': [
-      Kitchen('Kitchen 5', 'Active', 4.0, '123-456-7894'),
-      Kitchen('Kitchen 6', 'Expired', 3.7, '123-456-7895'),
-    ],
-    'Tulkarm': [
-      Kitchen('Kitchen 7', 'Active', 4.1, '123-456-7896'),
-      Kitchen('Kitchen 8', 'Expired', 3.9, '123-456-7897'),
-    ],
-  };
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
@@ -152,7 +137,7 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
         backgroundColor: Colors.white,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -185,8 +170,7 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                      width: 10),
+                  const SizedBox(width: 10),
                   // Category Dropdown
                   Expanded(
                     child: Column(
@@ -225,90 +209,100 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
             SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
-                itemCount: kitchens[selectedCity]!.length,
+                itemCount: adminKitchens.length,
                 itemBuilder: (context, index) {
-                  final kitchen = kitchens[selectedCity]![index];
-                  return Card(
-                    color: TColor.white,
-                    elevation: 5,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ListTile(
-                      leading: FaIcon(
-                        FontAwesomeIcons.utensils,
-                        color: Colors.teal,
-                        size: 30,
-                      ),
-                      title: Text(
-                        kitchen.name,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  final kitchen = adminKitchens[index];
+                  String status =
+                      kitchen['is_active'] == 1 ? 'Active' : 'Expired';
+                  return InkWell(
+                      onTap: () {
+                        pushReplacementWithAnimation(
+                            context, KitchenDetailsPage(kitchenId: kitchen['id']));
+                      },
+                      child: Card(
+                        color: TColor.white,
+                        elevation: 5,
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 5),
-                          Row(
+                        child: ListTile(
+                          leading: ClipOval(
+                            child: CachedNetworkImage(
+                              imageUrl: kitchen["logo"],
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          title: Text(
+                            kitchen['kitchen_name'],
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                kitchen.status == 'Active'
-                                    ? Icons.check_circle
-                                    : Icons.cancel,
-                                color: kitchen.status == 'Active'
-                                    ? Colors.green
-                                    : Colors.red,
+                              SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  Icon(
+                                    kitchen['is_active'] == 1
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color: kitchen['is_active'] == 1
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    status,
+                                    style: TextStyle(
+                                      color: kitchen['is_active'] == 1
+                                          ? Colors.green
+                                          : Colors.red,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(width: 5),
-                              Text(
-                                kitchen.status,
-                                style: TextStyle(
-                                  color: kitchen.status == 'Active'
-                                      ? Colors.green
-                                      : Colors.red,
-                                ),
+                              SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    color: TColor.primary,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    '${kitchen['rate'].toStringAsFixed(2)} / 5',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.phone,
+                                    color: Colors.blue,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    kitchen['contact'],
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          SizedBox(height: 5),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                              ),
-                              SizedBox(width: 5),
-                              Text(
-                                '${kitchen.rate} / 5',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 5),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.phone,
-                                color: Colors.blue,
-                              ),
-                              SizedBox(width: 5),
-                              Text(
-                                kitchen.contact,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                        ),
+                      ));
                 },
               ),
             ),

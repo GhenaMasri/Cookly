@@ -66,9 +66,10 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
-  void updateUnreadCountFromNotifications(int newCount) {
+  Future<void> updateUnreadCountFromNotifications(int newCount) async{
+    unreadCount = await unreadNotificationsCount();
     setState(() {
-      unreadCount = newCount;
+      //unreadCount = newCount;
     });
   }
 
@@ -343,7 +344,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
                             ),
                           );
 
-                          updateUnreadCountFromNotifications(newCount);
+                          await updateUnreadCountFromNotifications(newCount);
                         },
                         icon: Image.asset(
                           "assets/img/notification.png",

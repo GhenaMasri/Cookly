@@ -59,9 +59,10 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  void updateUnreadCountFromNotifications(int newCount) {
+ Future<void> updateUnreadCountFromNotifications(int newCount) async{
+    unreadCount = await unreadNotificationsCount();
     setState(() {
-      unreadCount = newCount;
+      //unreadCount = newCount;
     });
   }
 
@@ -230,7 +231,7 @@ class _HomeViewState extends State<HomeView> {
                               ),
                             );
 
-                            updateUnreadCountFromNotifications(newCount);
+                            await updateUnreadCountFromNotifications(newCount);
                           },
                           icon: Image.asset(
                             "assets/img/notification.png",

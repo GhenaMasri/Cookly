@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/dropdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/welcome_page.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -15,13 +17,13 @@ class AdminHomeView extends StatefulWidget {
   State<AdminHomeView> createState() => _AdminHomeViewState();
 }
 
-  Future<void> signOut(BuildContext context) async {
-    await SharedPreferencesService.clearSharedPreferences();
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => WelcomeView()),
-      (Route<dynamic> route) => false,
-    );
-  }
+Future<void> signOut(BuildContext context) async {
+  await SharedPreferencesService.clearSharedPreferences();
+  Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(builder: (context) => WelcomeView()),
+    (Route<dynamic> route) => false,
+  );
+}
 
 class _AdminHomeViewState extends State<AdminHomeView> {
   int touchedIndex = -1;
@@ -29,6 +31,14 @@ class _AdminHomeViewState extends State<AdminHomeView> {
   List<dynamic> percentages = [];
   Map<String, dynamic>? usersCount;
   Map<String, dynamic>? topKitchen;
+  int? unreadCount;
+
+  Future<void> updateUnreadCountFromNotifications(int newCount) async {
+    unreadCount = await unreadNotificationsCount();
+    setState(() {
+      //unreadCount = newCount;
+    });
+  }
 
 //////////////////////////////////////// BACKEND SECTION //////////////////////////////////////////
   Future<void> kitchensPercentage() async {
@@ -75,27 +85,59 @@ class _AdminHomeViewState extends State<AdminHomeView> {
       print('Error: ${response.statusCode}, ${response.body}');
     }
   }
+
+  Future<int> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    return id!;
+  }
+
+  Future<int> unreadNotificationsCount() async {
+    int id = await _loadUserId();
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}unread-notifications?id=$id&destination=admin'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['count'];
+    } else {
+      throw Exception('Failed to load unread notification count');
+    }
+  }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // Static data for top kitchens and delivery men
-  final Map<String, Map<String, String>> locationData = {
-    'Nablus': {'kitchen': 'Kitchen Nablus', 'delivery': 'Delivery Nablus'},
-    'Ramallah': {
-      'kitchen': 'Kitchen Ramallah',
-      'delivery': 'Delivery Ramallah'
-    },
-    'Jenin': {'kitchen': 'Kitchen Jenin', 'delivery': 'Delivery Jenin'},
-    'Tulkarm': {'kitchen': 'Kitchen Tulkarm', 'delivery': 'Delivery Tulkarm'},
-  };
+  late Future<void> _initDataFuture;
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
 
-  // Static totals
-  final int totalKitchens = 120;
-  final int totalUsers = 4500;
-  final int totalDeliveryMen = 75;
+  Future<void> _initData() async {
+    await kitchensPercentage();
+    await getTopKitchen('Nablus');
+    await getUsersCount();
+  }
 
   @override
   Widget build(BuildContext context) {
-    
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(
+            color: TColor.primary,
+          ));
+        } else if (snapshot.hasError) {
+          print(snapshot.error);
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -110,9 +152,53 @@ class _AdminHomeViewState extends State<AdminHomeView> {
         ),
         backgroundColor: Colors.white,
         actions: [
+          Stack(
+            children: [
+              IconButton(
+                onPressed: () async {
+                  int newCount = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotificationsView(),
+                    ),
+                  );
+
+                  await updateUnreadCountFromNotifications(newCount);
+                },
+                icon: Image.asset(
+                  "assets/img/notification.png",
+                  width: 25,
+                  height: 25,
+                ),
+              ),
+              if (unreadCount != null && unreadCount! > 0)
+                Positioned(
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 20,
+                      minHeight: 20,
+                    ),
+                    child: Text(
+                      '$unreadCount',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
           IconButton(
             onPressed: () async {
-             signOut(context);
+              signOut(context);
             },
             icon: Image.asset(
               "assets/img/more_logout.png",
@@ -128,295 +214,329 @@ class _AdminHomeViewState extends State<AdminHomeView> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Kitchens In Cities',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              'Kitchens In Cities',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              AspectRatio(
-                aspectRatio: 1.3,
-                child: Row(
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 18,
-                    ),
-                    Expanded(
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: PieChart(
-                          PieChartData(
-                            pieTouchData: PieTouchData(
-                              touchCallback:
-                                  (FlTouchEvent event, pieTouchResponse) {
-                                setState(() {
-                                  if (!event.isInterestedForInteractions ||
-                                      pieTouchResponse == null ||
-                                      pieTouchResponse.touchedSection == null) {
-                                    touchedIndex = -1;
-                                    return;
-                                  }
-                                  touchedIndex = pieTouchResponse
-                                      .touchedSection!.touchedSectionIndex;
-                                });
-                              },
-                            ),
-                            borderData: FlBorderData(
-                              show: false,
-                            ),
-                            sectionsSpace: 0,
-                            centerSpaceRadius: 40,
-                            sections: showingSections(),
+            ),
+            AspectRatio(
+              aspectRatio: 1.3,
+              child: Row(
+                children: <Widget>[
+                  const SizedBox(
+                    height: 18,
+                  ),
+                  Expanded(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: PieChart(
+                        PieChartData(
+                          pieTouchData: PieTouchData(
+                            touchCallback:
+                                (FlTouchEvent event, pieTouchResponse) {
+                              setState(() {
+                                if (!event.isInterestedForInteractions ||
+                                    pieTouchResponse == null ||
+                                    pieTouchResponse.touchedSection == null) {
+                                  touchedIndex = -1;
+                                  return;
+                                }
+                                touchedIndex = pieTouchResponse
+                                    .touchedSection!.touchedSectionIndex;
+                              });
+                            },
                           ),
+                          borderData: FlBorderData(
+                            show: false,
+                          ),
+                          sectionsSpace: 0,
+                          centerSpaceRadius: 40,
+                          sections: showingSections(),
                         ),
                       ),
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Indicator(
-                          color: Colors.purple,
-                          text: 'Nablus',
-                          isSquare: true,
-                        ),
-                        SizedBox(
-                          height: 4,
-                        ),
-                        Indicator(
-                          color: Colors.yellow,
-                          text: 'Tulkarem',
-                          isSquare: true,
-                        ),
-                        SizedBox(
-                          height: 4,
-                        ),
-                        Indicator(
-                          color: Colors.orange,
-                          text: 'Ramallah',
-                          isSquare: true,
-                        ),
-                        SizedBox(
-                          height: 4,
-                        ),
-                        Indicator(
-                          color: Colors.green,
-                          text: 'Jenin',
-                          isSquare: true,
-                        ),
-                        SizedBox(
-                          height: 18,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 28,
-                    ),
-                  ],
-                ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: buildIndicators(),
+                  ),
+                  const SizedBox(
+                    width: 28,
+                  ),
+                ],
               ),
-              Divider(),
-              SizedBox(height: 8,),
-              Text(
-                "Top Kitchen & Delivery of The Month",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            Divider(),
+            SizedBox(
+              height: 8,
+            ),
+            Text(
+              "Top Kitchen",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 1),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: MyDropdownMenu(
-                  value: selectedLocation,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedLocation = newValue!;
-                    });
-                  },
-                ),
+            ),
+            const SizedBox(height: 1),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: MyDropdownMenu(
+                value: selectedLocation,
+                onChanged: (newValue) async {
+                  setState(() {
+                    selectedLocation = newValue!;
+                  });
+                  await getTopKitchen(selectedLocation);
+                  setState(() {});
+                },
               ),
-              const SizedBox(height: 5),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.crown,
-                      color: Colors.amber,
+            ),
+            const SizedBox(height: 5),
+            buildTopKitchenCard(),
+/*             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: [
+                  Icon(
+                    FontAwesomeIcons.crown,
+                    color: Colors.amber,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Top Delivery Man: ${locationData[selectedLocation]!['delivery']}",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      decoration: TextDecoration.underline,
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Top Kitchen: ${locationData[selectedLocation]!['kitchen']}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.crown,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Top Delivery Man: ${locationData[selectedLocation]!['delivery']}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 8,),
-              Divider(),
-              SizedBox(height: 8,),
-              Text(
-                "Total Numbers",
+            ), */
+            SizedBox(
+              height: 8,
+            ),
+            Divider(),
+            SizedBox(
+              height: 8,
+            ),
+            Text("Total Numbers",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 )),
-                 SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.kitchen,
-                        color: Colors.teal,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Total Number of Kitchens: $totalKitchens",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.kitchen,
+                    color: Colors.teal,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.people,
-                        color: Colors.blue,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Total Number of Users: $totalUsers",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(width: 8),
+                  Text(
+                    "Total Number of Kitchens: " +
+                        usersCount!['chef'].toString(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delivery_dining,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Total Number of Delivery Men: $totalDeliveryMen",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.people,
+                    color: Colors.blue,
                   ),
-                ),
-                const SizedBox(height: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Total Number of Users: " +
+                        usersCount!['normal'].toString(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.delivery_dining,
+                    color: Colors.red,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Total Number of Delivery Men: " +
+                        usersCount!['delivery'].toString(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
           ]),
         ),
       ),
     );
   }
 
+  Widget buildTopKitchenCard() {
+    if (topKitchen == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    return Card(
+      elevation: 4,
+      color: TColor.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(
+              FontAwesomeIcons.crown,
+              color: Colors.amber,
+              size: 25,
+            ),
+            const SizedBox(width: 16),
+            Stack(
+              children: <Widget>[
+                Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: TColor.primary,
+                          width: 2,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: CachedNetworkImageProvider(
+                          topKitchen!["logo"],
+                        ),
+                      ),
+                    )),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  topKitchen!['name'],
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.star,
+                      color: TColor.primary,
+                    ),
+                    SizedBox(width: 5,),
+                    Text(
+                      '${topKitchen!['kitchen_rate'].toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> buildIndicators() {
+    List<Color> colors = [
+      Colors.purple,
+      Colors.yellow,
+      Colors.orange,
+      Colors.green,
+      Colors.blue
+    ];
+    return List.generate(percentages.length, (i) {
+      final city = percentages[i]['city'];
+      final color = colors[i % colors.length];
+      return Indicator(
+        color: color,
+        text: city,
+        isSquare: true,
+      );
+    });
+  }
+
   List<PieChartSectionData> showingSections() {
-    return List.generate(4, (i) {
+    return List.generate(percentages.length, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
       final radius = isTouched ? 60.0 : 50.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+
+      final percentage = double.parse(percentages[i]['percentage']);
+      final city = percentages[i]['city'];
+
+      Color color;
       switch (i) {
         case 0:
-          return PieChartSectionData(
-            color: Colors.purple,
-            value: 35,
-            title: '35%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              shadows: shadows,
-            ),
-          );
+          color = Colors.purple;
+          break;
         case 1:
-          return PieChartSectionData(
-            color: Colors.yellow,
-            value: 20,
-            title: '20%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              shadows: shadows,
-            ),
-          );
+          color = Colors.yellow;
+          break;
         case 2:
-          return PieChartSectionData(
-            color: Colors.orange,
-            value: 25,
-            title: '25%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              shadows: shadows,
-            ),
-          );
+          color = Colors.orange;
+          break;
         case 3:
-          return PieChartSectionData(
-            color: Colors.green,
-            value: 20,
-            title: '20%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              shadows: shadows,
-            ),
-          );
+          color = Colors.green;
+          break;
         default:
-          throw Error();
+          color = Colors.blue; // Default color if more than 4 cities
       }
+
+      return PieChartSectionData(
+        color: color,
+        value: percentage,
+        title: '$percentage%',
+        radius: radius,
+        titleStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+          shadows: shadows,
+        ),
+      );
     });
   }
 }
