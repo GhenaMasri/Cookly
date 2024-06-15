@@ -21,7 +21,8 @@ router.get("/", async (req, res) => {
         o.pickup_time,
         o.payment,
         TIME_FORMAT(o.created_at, '%H:%i') AS order_time,
-        CONCAT(u.first_name, ' ', u.last_name) AS full_name
+        CONCAT(u.first_name, ' ', u.last_name) AS full_name,
+        o.assigned
       FROM orders o
       INNER JOIN user u ON u.id = o.user_id
       WHERE o.id = ?`;

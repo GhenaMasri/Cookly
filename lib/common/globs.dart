@@ -33,6 +33,11 @@ class SharedPreferencesService {
     return prefs.getInt('kitchen_id');
   }
 
+  static Future<int?> getDeliveryId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('delivery_id');
+  }
+
   static Future<List<String?>> getUserProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? firstName = prefs.getString('first_name');

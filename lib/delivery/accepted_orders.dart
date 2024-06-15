@@ -4,6 +4,9 @@ import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/delivery/order.dart';
 import 'package:untitled/more/notification_view.dart';
+import 'package:untitled/common/globs.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DeliveryAcceptedOrders extends StatefulWidget {
   @override
@@ -14,6 +17,49 @@ class _DeliveryAcceptedOrdersState extends State<DeliveryAcceptedOrders> {
   List<Order> orders = [
     Order('Kitchen A', '123456', 'John Doe', '987654', '123 Elm St, City'),
   ];
+  int? id;
+  List<dynamic> acceptedOrders = [];
+
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<void> getDeliveryOrders() async {
+    final String apiUrl = '${SharedPreferencesService.url}get-delivery-orders?id=$id&status=pending';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        acceptedOrders = data['orders'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> updateOrderStatus(int id) async {
+    final String apiUrl = '${SharedPreferencesService.url}update-order-status?orderId=$id';
+    try {
+      final response = await http.put(Uri.parse(apiUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({"status": "delivered"}));
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (e) {
+      return {'success': false, 'message': '$e'};
+    }
+  }
+
+  Future<void> _loadDeliveryId() async {
+    int? id = await SharedPreferencesService.getDeliveryId();
+    setState(() {
+      this.id = id;
+    });
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
   void removeOrder(int index) async {
     setState(() {

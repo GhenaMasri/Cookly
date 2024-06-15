@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:untitled/common/color_extension.dart';
@@ -7,6 +6,9 @@ import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/delivery/accepted_orders.dart';
 import 'package:untitled/delivery/order.dart';
 import 'package:untitled/more/notification_view.dart';
+import 'package:untitled/common/globs.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DeliveryOrdersPage extends StatefulWidget {
   @override
@@ -18,10 +20,89 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
   List<Order> orders = [
     Order('Kitchen A', '123456', 'John Doe', '987654', '123 Elm St, City'),
     Order('Kitchen B', '234567', 'Jane Smith', '876543', '456 Oak St, City'),
-    Order(
-        'Kitchen C', '345678', 'Alice Johnson', '765432', '789 Pine St, City'),
+    Order('Kitchen C', '345678', 'Alice Johnson', '765432', '789 Pine St, City'),
   ];
   List<Order> acceptedOrders = [];
+  int? id;
+  List<dynamic> pendingOrders = [];
+  
+//////////////////////////////// BACKEND SECTION ////////////////////////////////
+  Future<String> fetchDeliveryStatus() async {
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}get-delivery-status?id=$id'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['status'];
+    } else {
+      throw Exception('Failed to load status');
+    }
+  }
+
+  Future<Map<String, dynamic>> changeDeliveryStatus(String status) async {
+    final url = Uri.parse('${SharedPreferencesService.url}change-delivery-status?id=$id');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> getDeliveryOrders() async {
+    final String apiUrl = '${SharedPreferencesService.url}get-delivery-orders?id=$id&status=pending';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        pendingOrders = data['orders'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> acceptDeclineOrder(String status) async {
+    final url = Uri.parse('${SharedPreferencesService.url}accept-decline-order?id=$id');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<void> _loadDeliveryId() async {
+    int? id = await SharedPreferencesService.getDeliveryId();
+    setState(() {
+      this.id = id;
+    });
+  }
+/////////////////////////////////////////////////////////////////////////////////
 
   void _updateStatus(String newStatus) {
     setState(() {
