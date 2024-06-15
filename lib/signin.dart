@@ -56,6 +56,10 @@ class _Signin extends State<Signin> {
           //store kitchen name in shared preferences
           String kitchenName = await getKitchenName(chefId);
           await prefs.setString('kitchen_name', kitchenName);
+        } else if (userData['type'] == "delivery") {
+          //store delivery id in shared preferences
+          int deliveryId = await getDeliveryId(userData['id']);
+          await prefs.setInt('delivery_id', deliveryId);
         }
         return {'success': true, 'message': response.body};
       } else {
@@ -63,6 +67,19 @@ class _Signin extends State<Signin> {
       }
     } catch (error) {
       return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<int> getDeliveryId(int userId) async {
+    final response = await http.get(
+      Uri.parse('${SharedPreferencesService.url}get-delivery-id?id=$userId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data['delieryId'];
+    } else {
+      throw Exception('Failed to load delivery id');
     }
   }
 

@@ -20,6 +20,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   late String _currentStatus;
   Map<String, dynamic>? orderInfo;
   List<dynamic> orderItems = [];
+  List<dynamic> deliveryMen = [];
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
 
@@ -56,6 +57,48 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     } catch (e) {
       return {'success': false, 'message': '$e'};
     }
+  }
+
+  Future<void> fetchAvailableDelivery() async {
+    int kitchenId = await _loadKitchenId();
+    String apiUrl = '${SharedPreferencesService.url}get-available-delivery?id=$kitchenId';
+
+    final response = await http.get(Uri.parse(apiUrl));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      setState(() {
+        deliveryMen = data['deliveryMen'];
+      });
+    } else {
+      print('Error: ${response.statusCode}, ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> assignDelivery(int deliveryId) async {
+    const url = '${SharedPreferencesService.url}assign-delivery';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'orderId': widget.orderId,
+          'deliveryId': deliveryId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        return { 'success': true, 'message': response.body };
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<int> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
+    return kitchenid!;
   }
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -157,7 +200,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: RoundButton(
             title: "Assign to Delivery",
-            onPressed: () {
+            onPressed: () async {
+              await fetchAvailableDelivery();
               showModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,

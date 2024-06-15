@@ -54,6 +54,12 @@ app.use("/get-kitchen-status", getKitchenStatusRoute);
 const getKitchenRateRoute = require("./routes/chef/get_kitchen_rate");
 app.use("/get-kitchen-rate", getKitchenRateRoute);
 
+const getAvailableDeliveryRoute = require("./routes/chef/get_available_delivery");
+app.use("/get-available-delivery", getAvailableDeliveryRoute);
+
+const assignDeliveryRoute = require("./routes/chef/assign_delivery");
+app.use("/assign-delivery", assignDeliveryRoute);
+
 //////////////////////////////////////////// GENERAL ROUTES //////////////////////////////////////
 
 const foodCategoriesRoute = require("./routes/general/food_categories");
@@ -179,7 +185,24 @@ app.use("/delete-delivery", deleteDeliveryRoute);
 const getKitchenDetailsRoute = require("./routes/admin/get_kitchen_details");
 app.use("/get-kitchen-details", getKitchenDetailsRoute);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////// DELIVERY ROUTES ///////////////////////////////////////////
+
+const getDeliveryIdRoute = require("./routes/delivery/get_delivery_id");
+app.use("/get-delivery-id", getDeliveryIdRoute);
+
+const getDeliveryStatusRoute = require("./routes/delivery/get_delivery_status");
+app.use("/get-delivery-status", getDeliveryStatusRoute);
+
+const changeDeliveryStatusRoute = require("./routes/delivery/change_delivery_status");
+app.use("/change-delivery-status", changeDeliveryStatusRoute);
+
+const getDeliveryOrdersRoute = require("./routes/delivery/get_delivery_orders");
+app.use("/get-delivery-orders", getDeliveryOrdersRoute);
+
+const acceptDeclineOrderRoute = require("./routes/delivery/accept_decline_order");
+app.use("/accept-decline-order", acceptDeclineOrderRoute);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const port = 3000;
 app.listen(port, () => {
