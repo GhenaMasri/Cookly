@@ -1,25 +1,25 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'package:untitled/common/globs.dart';
 import 'package:untitled/common_widget/round_icon_button.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
+import 'package:http/http.dart' as http;
 
 class AssignDeliveryView extends StatefulWidget {
-  const AssignDeliveryView({Key? key}) : super(key: key);
+  final List<dynamic> deliveryMen;
+  final int orderId;
+  const AssignDeliveryView(
+      {Key? key, required this.deliveryMen, required this.orderId})
+      : super(key: key);
 
   @override
   State<AssignDeliveryView> createState() => _AssignDeliveryViewState();
 }
 
 class _AssignDeliveryViewState extends State<AssignDeliveryView> {
-  final List<DeliveryMan> deliveryMen = [
-    DeliveryMan('John Doe', '123-456-7890'),
-    DeliveryMan('Jane Smith', '234-567-8901'),
-    DeliveryMan('Alice Johnson', '345-678-9012'),
-    DeliveryMan('Bob Brown', '456-789-0123'),
-  ];
-
-
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -32,8 +32,7 @@ class _AssignDeliveryViewState extends State<AssignDeliveryView> {
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
       child: SingleChildScrollView(
         child: Column(
-          mainAxisSize: MainAxisSize
-              .min, 
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,9 +68,12 @@ class _AssignDeliveryViewState extends State<AssignDeliveryView> {
                   true, // Important: This ensures the ListView doesn't take up more space than necessary
               physics:
                   NeverScrollableScrollPhysics(), // Disable scrolling for the ListView
-              itemCount: deliveryMen.length,
+              itemCount: widget.deliveryMen.length,
               itemBuilder: (context, index) {
-                return DeliveryManCard(deliveryMan: deliveryMen[index]);
+                return DeliveryManCard(
+                  deliveryMan: widget.deliveryMen[index],
+                  orderId: widget.orderId,
+                );
               },
             ),
           ],
@@ -81,18 +83,33 @@ class _AssignDeliveryViewState extends State<AssignDeliveryView> {
   }
 }
 
-class DeliveryMan {
-  final String name;
-  final String contactNumber;
-
-  DeliveryMan(this.name, this.contactNumber);
-}
-
 class DeliveryManCard extends StatelessWidget {
-  final DeliveryMan deliveryMan;
-
-  const DeliveryManCard({Key? key, required this.deliveryMan})
+  final deliveryMan;
+  final int orderId;
+  const DeliveryManCard(
+      {Key? key, required this.deliveryMan, required this.orderId})
       : super(key: key);
+
+  Future<Map<String, dynamic>> assignDelivery(int deliveryId) async {
+    const url = '${SharedPreferencesService.url}assign-delivery';
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'orderId': orderId,
+          'deliveryId': deliveryId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,11 +133,11 @@ class DeliveryManCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(deliveryMan.name,
+                    Text(deliveryMan['full_name'],
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     SizedBox(height: 4),
-                    Text(deliveryMan.contactNumber,
+                    Text(deliveryMan['phone'],
                         style: TextStyle(color: TColor.secondaryText)),
                   ],
                 ),
@@ -128,16 +145,21 @@ class DeliveryManCard extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.assignment_turned_in, color: TColor.primary),
-              onPressed: () {
-                IconSnackBar.show(context,
-                    snackBarType: SnackBarType.success,
-                    label: 'Order Assigned',
-                    snackBarStyle: SnackBarStyle(
-                        backgroundColor: TColor.primary,
-                        labelTextStyle: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18)));
+              onPressed: () async {
+                Map<String, dynamic> result =
+                    await assignDelivery(deliveryMan['id']);
+                bool success = result['success'];
+                if (success) {
+                  IconSnackBar.show(context,
+                      snackBarType: SnackBarType.success,
+                      label: 'Order Assigned, Waiting Response',
+                      snackBarStyle: SnackBarStyle(
+                          backgroundColor: TColor.primary,
+                          labelTextStyle: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 12)));
 
-                            Navigator.pop(context);
+                  Navigator.pop(context, 1);
+                }
               },
             ),
           ],

@@ -61,7 +61,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
   Future<void> fetchAvailableDelivery() async {
     int kitchenId = await _loadKitchenId();
-    String apiUrl = '${SharedPreferencesService.url}get-available-delivery?id=$kitchenId';
+    String apiUrl =
+        '${SharedPreferencesService.url}get-available-delivery?id=$kitchenId';
 
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -72,27 +73,6 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
       });
     } else {
       print('Error: ${response.statusCode}, ${response.body}');
-    }
-  }
-
-  Future<Map<String, dynamic>> assignDelivery(int deliveryId) async {
-    const url = '${SharedPreferencesService.url}assign-delivery';
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'orderId': widget.orderId,
-          'deliveryId': deliveryId,
-        }),
-      );
-      if (response.statusCode == 200) {
-        return { 'success': true, 'message': response.body };
-      } else {
-        return {'success': false, 'message': response.body};
-      }
-    } catch (error) {
-      return {'success': false, 'message': '$error'};
     }
   }
 
@@ -199,16 +179,23 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: RoundButton(
-            title: "Assign to Delivery",
+            title: orderInfo!['assigned'] == 0
+                ? "Assign to Delivery"
+                : orderInfo!['assigned'] == 1
+                    ? "Assigned and Waiting Response"
+                    : "Order Assigned to Delivery",
+            isEnabled: orderInfo!['assigned'] == 0 ? true : false,
             onPressed: () async {
               await fetchAvailableDelivery();
-              showModalBottomSheet(
+              orderInfo!['assigned'] = await showModalBottomSheet(
                   context: context,
                   backgroundColor: Colors.transparent,
                   isScrollControlled: true,
                   builder: (context) {
-                    return const AssignDeliveryView();
+                    return AssignDeliveryView(
+                        deliveryMen: deliveryMen, orderId: widget.orderId);
                   });
+              setState(() {});
             }));
   }
 
@@ -219,14 +206,14 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             title: "Picked Up",
             onPressed: () async {
               await updateOrderStatus('delivered');
-               IconSnackBar.show(context,
-                        snackBarType: SnackBarType.success,
-                        label: 'Order Delivered',
-                        snackBarStyle: SnackBarStyle(
-                            backgroundColor: TColor.primary,
-                            labelTextStyle: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18)));
-                                Navigator.pop(context,true);
+              IconSnackBar.show(context,
+                  snackBarType: SnackBarType.success,
+                  label: 'Order Delivered',
+                  snackBarStyle: SnackBarStyle(
+                      backgroundColor: TColor.primary,
+                      labelTextStyle: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18)));
+              Navigator.pop(context, true);
             }));
   }
 
@@ -325,16 +312,16 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                               fontSize: 12,
                               fontWeight: FontWeight.w400),
                         ),
-                       if (!item["item_notes"].toString().isEmpty) const SizedBox(height: 5),
-                    
-                        Text(
-                          "Sub-Quantity: ${item["sub_quantity"]}",
-                          style: TextStyle(
-                            color: TColor.primaryText,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
+                      if (!item["item_notes"].toString().isEmpty)
+                        const SizedBox(height: 5),
+                      Text(
+                        "Sub-Quantity: ${item["sub_quantity"]}",
+                        style: TextStyle(
+                          color: TColor.primaryText,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
                         ),
+                      ),
                     ],
                   ),
                 ),

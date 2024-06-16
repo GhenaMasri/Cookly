@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
-import 'package:untitled/delivery/order.dart';
 import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:http/http.dart' as http;
@@ -14,15 +13,13 @@ class DeliveryAcceptedOrders extends StatefulWidget {
 }
 
 class _DeliveryAcceptedOrdersState extends State<DeliveryAcceptedOrders> {
-  List<Order> orders = [
-    Order('Kitchen A', '123456', 'John Doe', '987654', '123 Elm St, City'),
-  ];
   int? id;
   List<dynamic> acceptedOrders = [];
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> getDeliveryOrders() async {
-    final String apiUrl = '${SharedPreferencesService.url}get-delivery-orders?id=$id&status=pending';
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-delivery-orders?id=$id&status=accepted';
 
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -37,7 +34,8 @@ class _DeliveryAcceptedOrdersState extends State<DeliveryAcceptedOrders> {
   }
 
   Future<Map<String, dynamic>> updateOrderStatus(int id) async {
-    final String apiUrl = '${SharedPreferencesService.url}update-order-status?orderId=$id';
+    final String apiUrl =
+        '${SharedPreferencesService.url}update-order-status?orderId=$id';
     try {
       final response = await http.put(Uri.parse(apiUrl),
           headers: {'Content-Type': 'application/json'},
@@ -59,24 +57,82 @@ class _DeliveryAcceptedOrdersState extends State<DeliveryAcceptedOrders> {
       this.id = id;
     });
   }
+
+  Future<Map<String, dynamic>> changeDeliveryStatus(String status) async {
+    final url = Uri.parse(
+        '${SharedPreferencesService.url}change-delivery-status?id=$id');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
 /////////////////////////////////////////////////////////////////////////////////
 
-  void removeOrder(int index) async {
-    setState(() {
-      IconSnackBar.show(context,
-          snackBarType: SnackBarType.success,
-          label: 'Order Delivered',
-          snackBarStyle: SnackBarStyle(
-              labelTextStyle:
-                  TextStyle(fontWeight: FontWeight.bold, fontSize: 18)));
-    });
-    await Future.delayed(const Duration(seconds: 2));
-    orders.removeAt(index);
-    setState(() {});
+  void deliverOrder(int index) async {
+    Map<String, dynamic> result =
+        await updateOrderStatus(acceptedOrders[index]['id']);
+    bool success = result['success'];
+    if (success) {
+      await changeDeliveryStatus('available');
+      setState(() {
+        acceptedOrders[index]['status'] = 'delivered';
+        IconSnackBar.show(context,
+            snackBarType: SnackBarType.success,
+            label: 'Order Delivered',
+            snackBarStyle: SnackBarStyle(
+                labelTextStyle:
+                    TextStyle(fontWeight: FontWeight.bold, fontSize: 18)));
+      });
+    }
+  }
+
+  late Future<void> _initDataFuture;
+  @override
+  void initState() {
+    super.initState();
+    _initDataFuture = _initData();
+  }
+
+  Future<void> _initData() async {
+    await _loadDeliveryId();
+    await getDeliveryOrders();
   }
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+              child: CircularProgressIndicator(
+            color: TColor.primary,
+          ));
+        } else if (snapshot.hasError) {
+          print(snapshot.error);
+          return Center(child: Text('Error loading data'));
+        } else {
+          return buildContent();
+        }
+      },
+    );
+  }
+
+  Widget buildContent() {
     return Scaffold(
       backgroundColor: TColor.white,
       appBar: AppBar(
@@ -90,27 +146,14 @@ class _DeliveryAcceptedOrdersState extends State<DeliveryAcceptedOrders> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              pushReplacementWithAnimation(context, NotificationsView());
-            },
-            icon: Image.asset(
-              "assets/img/notification.png",
-              width: 25,
-              height: 25,
-            ),
-          ),
-          SizedBox(width: 10),
-        ],
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(10.0),
-        itemCount: orders.length,
+        itemCount: acceptedOrders.length,
         itemBuilder: (context, index) {
           return OrderCard(
-            order: orders[index],
-            onRemove: () => removeOrder(index),
+            order: acceptedOrders[index],
+            onRemove: () => deliverOrder(index),
           );
         },
       ),
@@ -119,7 +162,7 @@ class _DeliveryAcceptedOrdersState extends State<DeliveryAcceptedOrders> {
 }
 
 class OrderCard extends StatelessWidget {
-  final Order order;
+  final order;
   final VoidCallback onRemove;
 
   OrderCard({required this.order, required this.onRemove});
@@ -143,7 +186,7 @@ class OrderCard extends StatelessWidget {
                 Icon(Icons.local_dining, color: Colors.blue, size: 20),
                 SizedBox(width: 8),
                 Text(
-                  'Kitchen: ${order.kitchenName}',
+                  'Kitchen: ${order['kitchen_name']}',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -153,7 +196,7 @@ class OrderCard extends StatelessWidget {
               children: [
                 Icon(Icons.phone, color: Colors.green, size: 20),
                 SizedBox(width: 8),
-                Text('Kitchen Number: ${order.kitchenNumber}',
+                Text('Kitchen Number: ${order['kitchen_number']}',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
@@ -162,7 +205,7 @@ class OrderCard extends StatelessWidget {
               children: [
                 Icon(Icons.person, color: Colors.orange, size: 20),
                 SizedBox(width: 8),
-                Text('Customer: ${order.customerName}',
+                Text('Customer: ${order['user_name']}',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
@@ -171,7 +214,7 @@ class OrderCard extends StatelessWidget {
               children: [
                 Icon(Icons.phone_android, color: Colors.red, size: 20),
                 SizedBox(width: 8),
-                Text('Customer Number: ${order.customerNumber}',
+                Text('Customer Number: ${order['user_number']}',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
@@ -180,26 +223,50 @@ class OrderCard extends StatelessWidget {
               children: [
                 Icon(Icons.location_on, color: Colors.purple, size: 20),
                 SizedBox(width: 8),
-                Text('Delivery Address: ${order.deliveryAddress}',
+                Text('Delivery Address: ${order['address']}',
                     style: TextStyle(fontSize: 16)),
               ],
             ),
-            SizedBox(height: 15),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {
-                  onRemove(); // Call the callback to remove the order
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Background color
-                ),
-                child: Text(
-                  'Delivered',
-                  style: TextStyle(color: TColor.white, fontSize: 14),
-                ),
+            if (order['payment'] == 'cash') SizedBox(height: 10),
+            if (order['payment'] == 'cash')
+              Text('User Will Pay Upon Delivery',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            if (order['payment'] == 'cash')
+              SizedBox(
+                height: 10,
               ),
-            ),
+            if (order['payment'] == 'cash')
+              Row(
+                children: [
+                  Icon(Icons.price_change, color: TColor.primary, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                      'Total Price: ${order['total_price'].toStringAsFixed(2)}₪',
+                      style: TextStyle(fontSize: 16)),
+                ],
+              ),
+            SizedBox(height: 15),
+            order['status'] != 'delivered'
+                ? Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        onRemove();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Background color
+                      ),
+                      child: Text(
+                        'Delivered',
+                        style: TextStyle(color: TColor.white, fontSize: 14),
+                      ),
+                    ),
+                  )
+                : Align(
+                    alignment: Alignment.center,
+                    child: Text('Delivered Successfully',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w700, color:Colors.green))),
           ],
         ),
       ),

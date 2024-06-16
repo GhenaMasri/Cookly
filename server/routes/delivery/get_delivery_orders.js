@@ -10,6 +10,7 @@ router.get("/", async (req, res) => {
   }
 
   const query = `SELECT 
+    do.id AS delivery_order_id,
     o.id,
     k.name AS kitchen_name,
     CONCAT(u.first_name, ' ', u.last_name) AS user_name,
