@@ -133,6 +133,7 @@ class _AdminHomeViewState extends State<AdminHomeView> {
   }
 
   Widget buildContent() {
+    bool isWeb = MediaQuery.of(context).size.width > 600;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -218,54 +219,96 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            AspectRatio(
-              aspectRatio: 1.3,
-              child: Row(
-                children: <Widget>[
-                  const SizedBox(
-                    height: 18,
-                  ),
-                  Expanded(
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: PieChart(
-                        PieChartData(
-                          pieTouchData: PieTouchData(
-                            touchCallback:
-                                (FlTouchEvent event, pieTouchResponse) {
-                              setState(() {
-                                if (!event.isInterestedForInteractions ||
-                                    pieTouchResponse == null ||
-                                    pieTouchResponse.touchedSection == null) {
-                                  touchedIndex = -1;
-                                  return;
-                                }
-                                touchedIndex = pieTouchResponse
-                                    .touchedSection!.touchedSectionIndex;
-                              });
-                            },
+            if (isWeb)
+              AspectRatio(
+                aspectRatio: 7, // Adjust as needed for web
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: PieChart(
+                          PieChartData(
+                            pieTouchData: PieTouchData(
+                              touchCallback:
+                                  (FlTouchEvent event, pieTouchResponse) {
+                                setState(() {
+                                  if (!event.isInterestedForInteractions ||
+                                      pieTouchResponse == null ||
+                                      pieTouchResponse.touchedSection == null) {
+                                    touchedIndex = -1;
+                                    return;
+                                  }
+                                  touchedIndex = pieTouchResponse
+                                      .touchedSection!.touchedSectionIndex;
+                                });
+                              },
+                            ),
+                            borderData: FlBorderData(show: false),
+                            sectionsSpace: 0,
+                            centerSpaceRadius: 40,
+                            sections: showingSections(),
                           ),
-                          borderData: FlBorderData(
-                            show: false,
-                          ),
-                          sectionsSpace: 0,
-                          centerSpaceRadius: 40,
-                          sections: showingSections(),
                         ),
                       ),
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: buildIndicators(),
-                  ),
-                  const SizedBox(
-                    width: 28,
-                  ),
-                ],
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: buildIndicators(),
+                    ),
+                  ],
+                ),
+              )
+            else
+              AspectRatio(
+                aspectRatio: 1.3,
+                child: Row(
+                  children: <Widget>[
+                    const SizedBox(
+                      height: 18,
+                    ),
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: PieChart(
+                          PieChartData(
+                            pieTouchData: PieTouchData(
+                              touchCallback:
+                                  (FlTouchEvent event, pieTouchResponse) {
+                                setState(() {
+                                  if (!event.isInterestedForInteractions ||
+                                      pieTouchResponse == null ||
+                                      pieTouchResponse.touchedSection == null) {
+                                    touchedIndex = -1;
+                                    return;
+                                  }
+                                  touchedIndex = pieTouchResponse
+                                      .touchedSection!.touchedSectionIndex;
+                                });
+                              },
+                            ),
+                            borderData: FlBorderData(
+                              show: false,
+                            ),
+                            sectionsSpace: 0,
+                            centerSpaceRadius: 40,
+                            sections: showingSections(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: buildIndicators(),
+                    ),
+                    const SizedBox(
+                      width: 28,
+                    ),
+                  ],
+                ),
               ),
-            ),
             Divider(),
             SizedBox(
               height: 8,
@@ -455,7 +498,9 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                       Icons.star,
                       color: TColor.primary,
                     ),
-                    SizedBox(width: 5,),
+                    SizedBox(
+                      width: 5,
+                    ),
                     Text(
                       '${topKitchen!['kitchen_rate'].toStringAsFixed(2)}',
                       style: TextStyle(
