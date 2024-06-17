@@ -86,15 +86,9 @@ class _AdminHomeViewState extends State<AdminHomeView> {
     }
   }
 
-  Future<int> _loadUserId() async {
-    int? id = await SharedPreferencesService.getId();
-    return id!;
-  }
-
   Future<int> unreadNotificationsCount() async {
-    int id = await _loadUserId();
     final response = await http.get(Uri.parse(
-        '${SharedPreferencesService.url}unread-notifications?id=$id&destination=admin'));
+        '${SharedPreferencesService.url}unread-notifications?destination=admin'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['count'];
@@ -115,6 +109,7 @@ class _AdminHomeViewState extends State<AdminHomeView> {
     await kitchensPercentage();
     await getTopKitchen('Nablus');
     await getUsersCount();
+    unreadCount = await unreadNotificationsCount();
   }
 
   @override

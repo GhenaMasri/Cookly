@@ -211,8 +211,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<int> unreadNotificationsCount() async {
-    final response = await http.get(Uri.parse(
-        '${SharedPreferencesService.url}unread-notifications?id=$kitchenId&destination=chef'));
+    final response = await http.get(Uri.parse('${SharedPreferencesService.url}unread-notifications?destination=chef&id=$kitchenId'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['count'];

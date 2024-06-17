@@ -28,31 +28,44 @@ router.put("/", async (req, res) => {
 
     const currentSubscription = rows[0];
 
-    if (currentSubscription.is_active === 0 || currentSubscription.subscription_expiry === null) {
+    if (
+      currentSubscription.is_active === 0 ||
+      currentSubscription.subscription_expiry === null
+    ) {
       // Case 1: First time subscription or expired subscription
       if (type === "monthly") {
         if (currentDate.getMonth() == 12) {
           expiryDate = new Date(currentDate.setMonth(1));
         } else {
-          expiryDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+          expiryDate = new Date(
+            currentDate.setMonth(currentDate.getMonth() + 1)
+          );
         }
       } else if (type === "annually") {
-        expiryDate = new Date(currentDate.setFullYear(currentDate.getFullYear() + 1));
+        expiryDate = new Date(
+          currentDate.setFullYear(currentDate.getFullYear() + 1)
+        );
       } else {
         return res.status(400).send("Invalid subscription type");
       }
     } else {
       // Case 2: Renewing an active subscription
-      const previousExpiryDate = new Date(currentSubscription.subscription_expiry);
+      const previousExpiryDate = new Date(
+        currentSubscription.subscription_expiry
+      );
 
       if (type === "monthly") {
         if (currentDate.getMonth() == 12) {
           expiryDate = new Date(previousExpiryDate.setMonth(1));
         } else {
-          expiryDate = new Date(previousExpiryDate.setMonth(previousExpiryDate.getMonth() + 1));
+          expiryDate = new Date(
+            previousExpiryDate.setMonth(previousExpiryDate.getMonth() + 1)
+          );
         }
       } else if (type === "annually") {
-        expiryDate = new Date(previousExpiryDate.setFullYear(previousExpiryDate.getFullYear() + 1));
+        expiryDate = new Date(
+          previousExpiryDate.setFullYear(previousExpiryDate.getFullYear() + 1)
+        );
       } else {
         return res.status(400).send("Invalid subscription type");
       }
@@ -66,13 +79,28 @@ router.put("/", async (req, res) => {
       SET subscription_type = ?, subscription_expiry = ?, is_active = ?
       WHERE id = ?
     `;
-    const [result] = await pool.promise().execute(query, [type, expiryDate, isActive, id]);
+    const [result] = await pool
+      .promise()
+      .execute(query, [type, expiryDate, isActive, id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).send("Kitchen not found");
     }
 
-    res.status(200).send({ message: "Kitchen subscription updated successfully!" });
+    // send notification to admin
+    const insertNotificationQuery = `
+      INSERT INTO \`notification\` (kitchen_id, message, destination)
+      VALUES (?, ?, ?);
+    `;
+
+    const notificationMessage = `New kitchen subscription. Press to see kitchen information`;
+    const destColumn = "admin";
+    await pool.promise().execute(insertNotificationQuery, [
+        id,
+        notificationMessage,
+        destColumn,
+    ]);
+    res.status(200).send({ message: "Kitchen subscription updated successfully and notification sent" });
   } catch (error) {
     console.error("Error updating values:", error);
     res.status(500).send("Internal server error");

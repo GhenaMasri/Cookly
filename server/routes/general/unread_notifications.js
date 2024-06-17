@@ -3,30 +3,33 @@ const router = express.Router();
 const pool = require("../../db");
 
 router.get("/", async (req, res) => {
-  const { id, destination } = req.query;
+  const { destination, id } = req.query;
 
-  if (!id || !destination) {
-    return res.status(400).send("All parameters are required");
+  if (!destination) {
+    return res.status(400).send("destination parameter is required");
   }
 
-  let condition = '';
-  let params = [];
+  let condition = 'AND is_read = 0';
+  let params = [destination];
 
-  if (destination === "chef") {
-    condition = 'kitchen_id = ?';
-    params = [id];
-  } else if (destination === "user") {
-    condition = 'user_id = ?';
-    params = [id];
-  } else {
-    return res.status(400).send("Invalid destination");
+  if (destination === "chef" && id) {
+    condition = ' AND kitchen_id = ?';
+    params.push(id);
+  } else if (destination === "user" && id) {
+    condition = ' AND user_id = ?';
+    params.push(id);
+  } else if (destination === "delivery" && id) {
+    condition = ' AND delivery_id = ?';
+    params.push(id);
+  } else if (destination !== "admin") {
+    return res.status(400).send("Invalid destination or missing id");
   }
 
   const query = `SELECT COUNT(*) as count
     FROM \`notification\`
-    WHERE destination = ? AND is_read = 0 AND ${condition}`;
+    WHERE destination = ? ${condition}`;
 
-  pool.execute(query, [destination, ...params], async (error, results, fields) => {
+  pool.execute(query, params, async (error, results, fields) => {
     if (error) {
       console.error("Error executing query:", error);
       res.status(500).send("Internal server error");

@@ -31,15 +31,30 @@ router.put("/", async (req, res) => {
 
     // Step 3: Insert the notification
     const insertNotificationQuery = `
-      INSERT INTO \`notification\` (user_id, kitchen_id, order_id, message, destination)
-      VALUES (?, ?, ?, ?, ?);
+      INSERT INTO \`notification\` (user_id, order_id, message, destination)
+      VALUES (?, ?, ?, ?);
     `;
-    const notificationMessage = `Your order (${orderId}) status changed to ${status}`;
+    const notificationMessage = `Your order status changed to ${status}. Press to see details `;
     const destColumn = "user";
 
-    await pool.promise().execute(insertNotificationQuery, [userId, kitchenId, orderId, notificationMessage, destColumn]);
+    await pool.promise().execute(insertNotificationQuery, [userId, orderId, notificationMessage, destColumn]);
 
-    res.status(200).send("Order updated successfully and notification sent");
+    // send notification to chef when the status changed to delivered
+    if (status == "delivered") {
+      const insertChefNotificationQuery = `
+      INSERT INTO \`notification\` (kitchen_id, order_id, message, destination)
+      VALUES (?, ?, ?, ?);
+    `;
+      const chefNotificationMessage = `The order delivered successfully to the user! `;
+      const chefDestColumn = "chef";
+
+      await pool.promise().execute(insertChefNotificationQuery, [kitchenId, orderId, chefNotificationMessage, chefDestColumn]);
+
+      res.status(200).send("Order updated successfully and notifications sent");
+    } 
+    else {
+      res.status(200).send("Order updated successfully and notification sent");
+    }
   } catch (err) {
     console.error("Error:", err);
     res.status(500).send("Internal server error");
