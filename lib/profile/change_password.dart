@@ -90,6 +90,7 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: TColor.white,
       body: SingleChildScrollView(
         child: Form(
             key: formState,

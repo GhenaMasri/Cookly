@@ -306,7 +306,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     children: [
                       if (!item["item_notes"].toString().isEmpty)
                         Text(
-                          "Notes: ${item["notes"]}",
+                          "Notes: ${item["item_notes"]}",
                           style: TextStyle(
                               color: TColor.primaryText,
                               fontSize: 12,
