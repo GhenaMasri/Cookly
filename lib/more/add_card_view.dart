@@ -30,7 +30,7 @@ class _AddCardViewState extends State<AddCardView> {
           color: TColor.white,
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      child: Form(
+      child: SingleChildScrollView( child: Form(
         key: _formKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -190,6 +190,6 @@ class _AddCardViewState extends State<AddCardView> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
