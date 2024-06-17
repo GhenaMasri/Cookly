@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
+const admin = require('firebase-admin');
 
 router.put("/", async (req, res) => {
   const { orderId } = req.query;
@@ -39,6 +40,27 @@ router.put("/", async (req, res) => {
 
     await pool.promise().execute(insertNotificationQuery, [userId, orderId, notificationMessage, destColumn]);
 
+    ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+    const getTokenQuery = "SELECT fcm_token FROM user WHERE id = ?";
+    const [tokenResult] = await pool.promise().execute(getTokenQuery, [userId]);
+    const registrationToken = tokenResult[0].fcm_token;
+    const message = {
+      notification: {
+        title: 'Order status update',
+        body: `Your order status changed to ${status}`
+      },
+      token: registrationToken
+    };
+
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+    });
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     // send notification to chef when the status changed to delivered
     if (status == "delivered") {
       const insertChefNotificationQuery = `
@@ -49,6 +71,27 @@ router.put("/", async (req, res) => {
       const chefDestColumn = "chef";
 
       await pool.promise().execute(insertChefNotificationQuery, [kitchenId, orderId, chefNotificationMessage, chefDestColumn]);
+
+      ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+      const getTokenQuery = "SELECT fcm_token FROM user WHERE id = (SELECT user_id FROM kitchen WHERE id = ?)";
+      const [tokenResult] = await pool.promise().execute(getTokenQuery, [kitchenId]);
+      const registrationToken = tokenResult[0].fcm_token;
+      const message = {
+        notification: {
+          title: 'Order status update',
+          body: chefNotificationMessage
+        },
+        token: registrationToken
+      };
+
+      admin.messaging().send(message)
+        .then((response) => {
+          console.log('Successfully sent message:', response);
+        })
+        .catch((error) => {
+          console.log('Error sending message:', error);
+      });
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       res.status(200).send("Order updated successfully and notifications sent");
     } 

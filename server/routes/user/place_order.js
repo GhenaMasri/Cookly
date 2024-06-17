@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
 
+const admin = require('firebase-admin');
+
 router.put("/", async (req, res) => {
   const {orderId, totalPrice, status, userNumber, kitchenNumber, city, address, notes, pickupTime, payment, delivery, kitchenId, userId,} = req.body;
 
@@ -82,6 +84,26 @@ router.put("/", async (req, res) => {
     const updateUserPointsQuery = "UPDATE user SET points = ? WHERE id = ?";
     await pool.promise().execute(updateUserPointsQuery, [newPoints, userId]);
 
+    ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+    const getTokenQuery = "SELECT fcm_token FROM user WHERE id = (SELECT user_id FROM kitchen WHERE id = ?)";
+    const [tokenResult] = await pool.promise().execute(getTokenQuery, [kitchenId]);
+    const registrationToken = tokenResult[0].fcm_token;
+    const message = {
+      notification: {
+        title: 'New order',
+        body: 'A user placed a new order, check it in pending orders'
+      },
+      token: registrationToken
+    };
+
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+    });
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     res.status(200).send("Order placed successfully");
   } catch (error) {
     console.error("Error inserting/updating order data:", error);

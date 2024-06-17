@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
+const admin = require('firebase-admin');
 
 router.put("/", async (req, res) => {
   const { id } = req.query;
@@ -46,6 +47,26 @@ router.put("/", async (req, res) => {
             const notificationMessage = `${orderQueryResult[0].delivery_name} accepted the order. Will pick up the order soon`;
             const destColumn = "chef";
             await pool.promise().execute(insertNotificationQuery, [orderQueryResult[0].kitchen_id, orderQueryResult[0].order_id, notificationMessage, destColumn]);
+            ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+            const getTokenQuery = "SELECT fcm_token FROM user WHERE id = (SELECT user_id FROM kitchen WHERE id = ?)";
+            const [tokenResult] = await pool.promise().execute(getTokenQuery, [orderQueryResult[0].kitchen_id]);
+            const registrationToken = tokenResult[0].fcm_token;
+            const message = {
+              notification: {
+                title: 'Delivery update',
+                body: notificationMessage
+              },
+              token: registrationToken
+            };
+
+            admin.messaging().send(message)
+              .then((response) => {
+                console.log('Successfully sent message:', response);
+              })
+              .catch((error) => {
+                console.log('Error sending message:', error);
+            });
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // send notification to user
             const insertUserNotificationQuery = `
                 INSERT INTO \`notification\` (user_id, order_id, message, destination)
@@ -54,6 +75,26 @@ router.put("/", async (req, res) => {
             const UserNotificationMessage = `${orderQueryResult[0].delivery_name} in his way to deliver your order`;
             const destinationColumn = "user";
             await pool.promise().execute(insertUserNotificationQuery, [orderQueryResult[0].user_id, orderQueryResult[0].order_id, UserNotificationMessage, destinationColumn]);
+            ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+            const getUserTokenQuery = "SELECT fcm_token FROM user WHERE id = ?";
+            const [userTokenResult] = await pool.promise().execute(getUserTokenQuery, [orderQueryResult[0].user_id]);
+            const userToken = userTokenResult[0].fcm_token;
+            const userMessage = {
+              notification: {
+                title: 'Delivery update',
+                body: UserNotificationMessage
+              },
+              token: userToken
+            };
+
+            admin.messaging().send(userMessage)
+              .then((response) => {
+                console.log('Successfully sent message:', response);
+              })
+              .catch((error) => {
+                console.log('Error sending message:', error);
+            });
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             res.status(200).send("delivery order accepted, assigned flag updated and notifications sent");
           }
         } else {
@@ -76,6 +117,26 @@ router.put("/", async (req, res) => {
             const notificationMessage = `${orderQueryResult[0].delivery_name} declined the order. Reassign it to another delivery`;
             const destColumn = "chef";
             await pool.promise().execute(insertNotificationQuery, [orderQueryResult[0].kitchen_id, orderQueryResult[0].order_id, notificationMessage, destColumn]);
+            ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+            const getTokenQuery = "SELECT fcm_token FROM user WHERE id = (SELECT user_id FROM kitchen WHERE id = ?)";
+            const [tokenResult] = await pool.promise().execute(getTokenQuery, [orderQueryResult[0].kitchen_id]);
+            const registrationToken = tokenResult[0].fcm_token;
+            const message = {
+              notification: {
+                title: 'Delivery update',
+                body: notificationMessage
+              },
+              token: registrationToken
+            };
+
+            admin.messaging().send(message)
+              .then((response) => {
+                console.log('Successfully sent message:', response);
+              })
+              .catch((error) => {
+                console.log('Error sending message:', error);
+            });
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             res.status(200).send("delivery order declined, assigned flag updated and notification sent");
           }
         } else {
