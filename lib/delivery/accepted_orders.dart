@@ -147,16 +147,18 @@ class _DeliveryAcceptedOrdersState extends State<DeliveryAcceptedOrders> {
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(10.0),
-        itemCount: acceptedOrders.length,
-        itemBuilder: (context, index) {
-          return OrderCard(
-            order: acceptedOrders[index],
-            onRemove: () => deliverOrder(index),
-          );
-        },
-      ),
+      body: acceptedOrders.isEmpty
+          ? Center(child: Text("No Orders Assigned To You"))
+          : ListView.builder(
+              padding: EdgeInsets.all(10.0),
+              itemCount: acceptedOrders.length,
+              itemBuilder: (context, index) {
+                return OrderCard(
+                  order: acceptedOrders[index],
+                  onRemove: () => deliverOrder(index),
+                );
+              },
+            ),
     );
   }
 }
@@ -219,12 +221,35 @@ class OrderCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 10),
-            Row(
+            Wrap(
+              alignment: WrapAlignment.start,
+              spacing: 0.0, // Add space between the elements
+              runSpacing: 4.0, // Add space between the lines
               children: [
-                Icon(Icons.location_on, color: Colors.purple, size: 20),
-                SizedBox(width: 8),
-                Text('Delivery Address: ${order['address']}',
-                    style: TextStyle(fontSize: 16)),
+                Row(
+                  children: [
+                    Icon(Icons.location_on, color: Colors.purple, size: 20),
+                    SizedBox(width: 8),
+                    // Using Flexible to allow the text to wrap
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Delivery Address:',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            '${order['address']}',
+                            style: TextStyle(fontSize: 16),
+                            softWrap:
+                                true, 
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
             if (order['payment'] == 'cash') SizedBox(height: 10),
@@ -266,7 +291,9 @@ class OrderCard extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text('Delivered Successfully',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w700, color:Colors.green))),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.green))),
           ],
         ),
       ),

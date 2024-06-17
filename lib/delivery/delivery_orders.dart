@@ -20,7 +20,7 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
   List<dynamic> pendingOrders = [];
   int? unreadCount;
   Future<void> updateUnreadCountFromNotifications(int newCount) async {
-    unreadCount = await unreadNotificationsCount();
+    unreadCount = 0; /*await unreadNotificationsCount();*/
     setState(() {});
   }
 
@@ -75,17 +75,6 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
     }
   }
 
-  Future<int> unreadNotificationsCount() async {
-    final response = await http.get(Uri.parse(
-        '${SharedPreferencesService.url}unread-notifications?destination=delivery&id=$id'));
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body)['count'];
-    } else {
-      throw Exception('Failed to load unread notification count');
-    }
-  }
-
   Future<void> _loadDeliveryId() async {
     int? id = await SharedPreferencesService.getDeliveryId();
     setState(() {
@@ -99,7 +88,8 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
       _status = newStatus;
     });
 
-    Map<String, dynamic> result = await changeDeliveryStatus(_status.toLowerCase());
+    Map<String, dynamic> result =
+        await changeDeliveryStatus(_status.toLowerCase());
     bool success = result['success'];
   }
 
@@ -127,7 +117,6 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
     await _loadDeliveryId();
     _status = await fetchDeliveryStatus();
     await getDeliveryOrders();
-    unreadCount = await unreadNotificationsCount();
   }
 
   @override
@@ -236,31 +225,33 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
                 ],
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(10.0),
-                itemCount: pendingOrders.length,
-                itemBuilder: (context, index) {
-                  return OrderCard(
-                      order: pendingOrders[index],
-                      onUpdateStatus: (newStatus) =>
-                          _acceptOrder(pendingOrders[index]),
-                      onCancel: () {
-                        setState(() {
-                          pendingOrders.removeAt(index);
+            pendingOrders.isEmpty
+                ? Align(alignment: Alignment.center,child: Text("No Orders Assigned To You"))
+                : Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.all(10.0),
+                      itemCount: pendingOrders.length,
+                      itemBuilder: (context, index) {
+                        return OrderCard(
+                            order: pendingOrders[index],
+                            onUpdateStatus: (newStatus) =>
+                                _acceptOrder(pendingOrders[index]),
+                            onCancel: () {
+                              setState(() {
+                                pendingOrders.removeAt(index);
 
-                          IconSnackBar.show(context,
-                              snackBarType: SnackBarType.fail,
-                              label: 'Order Declined',
-                              snackBarStyle: SnackBarStyle(
-                                  labelTextStyle: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18)));
-                        });
-                      });
-                },
-              ),
-            ),
+                                IconSnackBar.show(context,
+                                    snackBarType: SnackBarType.fail,
+                                    label: 'Order Declined',
+                                    snackBarStyle: SnackBarStyle(
+                                        labelTextStyle: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18)));
+                              });
+                            });
+                      },
+                    ),
+                  ),
           ],
         ),
       ),
