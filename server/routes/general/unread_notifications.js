@@ -13,13 +13,13 @@ router.get("/", async (req, res) => {
   let params = [destination];
 
   if (destination === "chef" && id) {
-    condition = ' AND kitchen_id = ?';
+    condition += ' AND kitchen_id = ?';
     params.push(id);
   } else if (destination === "user" && id) {
-    condition = ' AND user_id = ?';
+    condition += ' AND user_id = ?';
     params.push(id);
   } else if (destination === "delivery" && id) {
-    condition = ' AND delivery_id = ?';
+    condition += ' AND delivery_id = ?';
     params.push(id);
   } else if (destination !== "admin") {
     return res.status(400).send("Invalid destination or missing id");
