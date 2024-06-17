@@ -1,7 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesService {
-  static const String url = 'http://192.168.43.140:3000/';
+
+  static const String url = 'http://192.168.1.107:3000/';
   
   static Future<String?> getUserName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
