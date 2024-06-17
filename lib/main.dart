@@ -6,6 +6,11 @@ import 'package:untitled/firebase_options.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message: ${message.messageId}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -19,6 +24,7 @@ void main() async {
             appId: "1:13158533461:web:118e6c10b556e6bd6287dc",
             measurementId: "G-S3NFN865JQ"));
     await FirebaseAppCheck.instance.activate();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
