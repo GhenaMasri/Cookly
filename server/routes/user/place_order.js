@@ -26,11 +26,11 @@ router.put("/", async (req, res) => {
     `;
 
   const insertNotificationQuery = `
-      INSERT INTO \`notification\` (user_id, kitchen_id, order_id, message, destination)
-      VALUES (?, ?, ?, ?, ?);
+      INSERT INTO \`notification\` (kitchen_id, order_id, message, destination)
+      VALUES (?, ?, ?, ?);
     `;
 
-  const notificationMessage = `New order placed with ID: ${orderId}`;
+  const notificationMessage = `New order placed. Press to see details`;
   const destColumn = "chef";
 
   try {
@@ -55,7 +55,6 @@ router.put("/", async (req, res) => {
     await pool
       .promise()
       .execute(insertNotificationQuery, [
-        userId,
         kitchenId,
         orderId,
         notificationMessage,

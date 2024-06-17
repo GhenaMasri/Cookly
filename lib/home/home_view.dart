@@ -149,7 +149,7 @@ class _HomeViewState extends State<HomeView> {
   Future<int> unreadNotificationsCount() async {
     int id = await _loadUserId();
     final response = await http.get(Uri.parse(
-        '${SharedPreferencesService.url}unread-notifications?id=$id&destination=user'));
+        '${SharedPreferencesService.url}unread-notifications?destination=user&id=$id'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['count'];

@@ -24,7 +24,24 @@ router.post("/", async (req, res) => {
         res.status(500).send("Error updating values");
         return;
       }
-      res.status(200).send("Order assigned to delivery man and assigned flag updated");
+
+      // send notification to delivery
+      const insertNotificationQuery = `
+      INSERT INTO \`notification\` (delivery_id, order_id, message, destination)
+      VALUES (?, ?, ?, ?);
+    `;
+
+      const notificationMessage = `New order assigned to you. See it in home page to accept or decline`;
+      const destColumn = "delivery";
+
+      pool.execute(insertNotificationQuery, [deliveryId, orderId, notificationMessage, destColumn], (error, results, fields) => {
+        if (error) {
+          console.error("Error sending notification:", error);
+          res.status(500).send("Error sending notification");
+          return;
+        }
+        res.status(200).send("Order assigned to delivery man, assigned flag updated and notification sent");
+      });
     });
   });
 });

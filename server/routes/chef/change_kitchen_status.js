@@ -19,7 +19,7 @@ router.put("/", async (req, res) => {
         res.status(404).send("kitchen not found");
       }
     } catch (error) {
-      console.error("Error updating notification:", error);
+      console.error("Error updating status:", error);
       res.status(500).send("Internal server error");
     }
   });

@@ -75,6 +75,40 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
     }
   }
 
+  Future<Map<String, dynamic>> acceptDeclineOrder(String status) async {
+    final url = Uri.parse('${SharedPreferencesService.url}accept-decline-order?id=$id');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'status': status}),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  Future<int> unreadNotificationsCount() async {
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}unread-notifications?destination=delivery&id=$id'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['count'];
+    } else {
+      throw Exception('Failed to load unread notification count');
+    }
+  }
+
+
   Future<void> _loadDeliveryId() async {
     int? id = await SharedPreferencesService.getDeliveryId();
     setState(() {

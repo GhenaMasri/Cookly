@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/admin/kitchen_details.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common/globs.dart';
 import 'dart:convert';
@@ -30,9 +31,13 @@ class _NotificationsViewState extends State<NotificationsView> {
     } else if (type == "normal") {
       id = await _loadUserId();
       tempType = "user";
+    } else if (type == "admin") {
+      tempType = type;
+    } else if (type == "delivery") {
+      id = await _loadDeliveryId();
+      tempType = type;
     }
-    final String url =
-        '${SharedPreferencesService.url}get-notifications?id=$id&destination=$tempType';
+    final String url = '${SharedPreferencesService.url}get-notifications?destination=$tempType&id=$id';
 
     final Uri uri = Uri.parse(url);
 
@@ -81,6 +86,11 @@ class _NotificationsViewState extends State<NotificationsView> {
   Future<String> _loadUserType() async {
     String? userType = await SharedPreferencesService.getType();
     return userType!;
+  }
+
+  Future<int> _loadDeliveryId() async {
+    int? deliveryId = await SharedPreferencesService.getDeliveryId();
+    return deliveryId!;
   }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -184,6 +194,9 @@ class _NotificationsViewState extends State<NotificationsView> {
                               } else if (type == 'normal') {
                                 pushReplacementWithAnimation(context,
                                     FinalOrderView(orderId: cObj['order_id']));
+                              } else if (type == 'admin') {
+                                pushReplacementWithAnimation(context,
+                                    KitchenDetailsPage(kitchenId: cObj['kitchen_id']));
                               }
                               setState(() {});
                             },
