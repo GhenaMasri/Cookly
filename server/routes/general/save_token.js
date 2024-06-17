@@ -8,8 +8,7 @@ router.post("/", (req, res) => {
   pool.query(
     `UPDATE user 
     SET fcm_token = ? 
-    WHERE id = ? 
-    AND (fcm_token IS NULL OR fcm_token = '')`, [token, userId], (err) => {
+    WHERE id = ? `, [token, userId], (err) => {
       if (err) {
         return res.status(500).send("Server error");
       }

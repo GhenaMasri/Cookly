@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
+const admin = require('firebase-admin');
 
 router.post("/", async (req, res) => {
   const { orderId, deliveryId } = req.body;
@@ -40,6 +41,32 @@ router.post("/", async (req, res) => {
           res.status(500).send("Error sending notification");
           return;
         }
+        ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+        const getTokenQuery = "SELECT fcm_token FROM user WHERE id = (SELECT user_id FROM delivery WHERE id = ?)";
+        pool.execute(getTokenQuery, [deliveryId], (error, results, fields) => {
+          if (error) {
+            console.error("Error sending notification:", error);
+            res.status(500).send("Error sending notification");
+            return;
+          }
+          const registrationToken = results[0].fcm_token;
+          const message = {
+            notification: {
+              title: 'New order',
+              body: 'New order assigned to you, check it in pending orders'
+            },
+            token: registrationToken
+          };
+  
+          admin.messaging().send(message)
+            .then((response) => {
+              console.log('Successfully sent message:', response);
+            })
+            .catch((error) => {
+              console.log('Error sending message:', error);
+          });
+        });
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         res.status(200).send("Order assigned to delivery man, assigned flag updated and notification sent");
       });
     });

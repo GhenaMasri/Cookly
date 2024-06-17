@@ -211,24 +211,6 @@ app.use("/accept-decline-order", acceptDeclineOrderRoute);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const registrationToken = 'd4ocHlA0Q5-i-4EHbHqR4k:APA91bG1LZ6L4qG_NNoAjKMpXNepqJqSoYUV2SSDNwfnNC8GwiMW_i2C_HP9dodqLF_0_hM24317iBaW6kKds3KUgvPeV3mb09IVStph52iNiTpPBqvCvW6pnEQthmtAJYQQaFmyGyxh';
-
-const message = {
-  notification: {
-    title: 'Hello!',
-    body: 'You have a new message.'
-  },
-  token: registrationToken
-};
-
-admin.messaging().send(message)
-  .then((response) => {
-    console.log('Successfully sent message:', response);
-  })
-  .catch((error) => {
-    console.log('Error sending message:', error);
-  });
-
 const port = 3000;
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);

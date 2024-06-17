@@ -61,6 +61,8 @@ class _Signin extends State<Signin> {
           int deliveryId = await getDeliveryId(userData['id']);
           await prefs.setInt('delivery_id', deliveryId);
         }
+        //save FCM token
+        await _saveFCMToken(userData['id']);
         return {'success': true, 'message': response.body};
       } else {
         return {'success': false, 'message': response.body};
@@ -120,14 +122,15 @@ class _Signin extends State<Signin> {
   }
 
   Future<void> _saveFCMToken(int id) async {
-    String fakeToken = 'fakeToken_$id';
+
+    String? token = await FirebaseMessaging.instance.getToken();
     await http.post(
       Uri.parse('${SharedPreferencesService.url}save-token'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
       body: jsonEncode(<String, String>{
-        'token': fakeToken,
+        'token': token!,
         'userId': '$id',
       }),
     );
@@ -347,7 +350,6 @@ class _Signin extends State<Signin> {
                                     bool success = result['success'];
                                     String message = result['message'];
                                     print(success);
-                                    print(message);
                                     ////////////////////////////////////////////////////////////////////////
                                     if (success) {
                                       setState(() {

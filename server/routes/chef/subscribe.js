@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../../db");
+const admin = require('firebase-admin');
 
 router.put("/", async (req, res) => {
   const { id } = req.query;
@@ -100,6 +101,26 @@ router.put("/", async (req, res) => {
         notificationMessage,
         destColumn,
     ]);
+    ////////////////////////////////////////////////// NOTIFICATION //////////////////////////////////////////////////
+    const getTokenQuery = "SELECT fcm_token FROM user WHERE type = ?";
+    const [tokenResult] = await pool.promise().execute(getTokenQuery, [destColumn]);
+    const registrationToken = tokenResult[0].fcm_token;
+    const message = {
+      notification: {
+        title: 'Kitchen subscription',
+        body: 'A kitchen subscriped successfully'
+      },
+      token: registrationToken
+    };
+
+    admin.messaging().send(message)
+      .then((response) => {
+        console.log('Successfully sent message:', response);
+      })
+      .catch((error) => {
+        console.log('Error sending message:', error);
+    });
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     res.status(200).send({ message: "Kitchen subscription updated successfully and notification sent" });
   } catch (error) {
     console.error("Error updating values:", error);
