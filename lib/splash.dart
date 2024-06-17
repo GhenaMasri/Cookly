@@ -4,6 +4,7 @@ import 'package:untitled/delivery/delivery_main.dart';
 import 'package:untitled/welcome_page.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:untitled/main_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -13,9 +14,22 @@ class SplashView extends StatefulWidget {
 }
 
 class _StarupViewState extends State<SplashView> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   @override
   void initState() {
     super.initState();
+    _firebaseMessaging.requestPermission();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Received a message while in foreground: ${message.messageId}');
+      // Handle foreground message
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('Message clicked!');
+      // Handle notification click
+    });
+    FirebaseMessaging.instance.getToken().then((token) {
+      print("Device Token: $token");
+    });
     goWelcomePage();
   }
 
