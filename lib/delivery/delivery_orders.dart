@@ -20,7 +20,7 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
   List<dynamic> pendingOrders = [];
   int? unreadCount;
   Future<void> updateUnreadCountFromNotifications(int newCount) async {
-    unreadCount = 0; /*await unreadNotificationsCount();*/
+    unreadCount = await unreadNotificationsCount();
     setState(() {});
   }
 
@@ -75,28 +75,6 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
     }
   }
 
-  Future<Map<String, dynamic>> acceptDeclineOrder(String status) async {
-    final url = Uri.parse('${SharedPreferencesService.url}accept-decline-order?id=$id');
-
-    try {
-      final response = await http.put(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'status': status}),
-      );
-
-      if (response.statusCode == 200) {
-        return {'success': true, 'message': response.body};
-      } else {
-        return {'success': false, 'message': response.body};
-      }
-    } catch (error) {
-      return {'success': false, 'message': '$error'};
-    }
-  }
-
   Future<int> unreadNotificationsCount() async {
     final response = await http.get(Uri.parse(
         '${SharedPreferencesService.url}unread-notifications?destination=delivery&id=$id'));
@@ -107,7 +85,6 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
       throw Exception('Failed to load unread notification count');
     }
   }
-
 
   Future<void> _loadDeliveryId() async {
     int? id = await SharedPreferencesService.getDeliveryId();
@@ -122,8 +99,7 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
       _status = newStatus;
     });
 
-    Map<String, dynamic> result =
-        await changeDeliveryStatus(_status.toLowerCase());
+    Map<String, dynamic> result = await changeDeliveryStatus(_status.toLowerCase());
     bool success = result['success'];
   }
 
@@ -151,6 +127,7 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
     await _loadDeliveryId();
     _status = await fetchDeliveryStatus();
     await getDeliveryOrders();
+    unreadCount = await unreadNotificationsCount();
   }
 
   @override
