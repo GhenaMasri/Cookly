@@ -17,6 +17,7 @@ router.get("/", (req, res) => {
       k.street,
       k.city,
       k.status,
+      k.special_orders,
       CASE 
         WHEN k.rates_num = 0 THEN 0 
         ELSE k.rate / k.rates_num 
