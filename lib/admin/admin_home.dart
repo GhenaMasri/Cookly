@@ -462,22 +462,25 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                 Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: TColor.primary,
-                          width: 2,
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: TColor.primary,
+                            width: 2,
+                          ),
                         ),
-                      ),
-                      child: CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.transparent,
-                        backgroundImage: CachedNetworkImageProvider(
-                          topKitchen!["logo"],
-                        ),
-                      ),
-                    )),
+                        child: ClipOval(
+                          child: CachedNetworkImage(
+                            imageUrl: topKitchen!["logo"],
+                            width: 70,
+                            height: 70,
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(
+                              color: TColor.primary,
+                            ),
+                          ),
+                        ))),
               ],
             ),
             const SizedBox(width: 16),

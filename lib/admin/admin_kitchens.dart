@@ -222,23 +222,23 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
                       child: Card(
                         color: TColor.white,
                         elevation: 5,
-                        margin: EdgeInsets.symmetric(vertical: 8),
+                        /* margin: EdgeInsets.symmetric(vertical: 8), */
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: ListTile(
-                          leading: ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: kitchen['logo'],
-                              placeholder: (context, url) =>
-                                  CircularProgressIndicator(
-                                color: TColor.primary,
+                          leading: AspectRatio(
+                            aspectRatio: 1.0, // Maintain a square aspect ratio
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: kitchen["logo"],
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(
+                                        color: TColor.primary),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
                               ),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
-                              width: 70,
-                              height: 70,
-                              fit: BoxFit.cover,
                             ),
                           ),
                           title: Text(
