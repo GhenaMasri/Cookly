@@ -32,6 +32,27 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
     }
   }
 
+  Future<Map<String, dynamic>> reportUser(int userId) async {
+    final url = Uri.parse('${SharedPreferencesService.url}report-user?userId=$userId');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
   Future<void> _loadKitchenId() async {
     int? id = await SharedPreferencesService.getKitchenId();
     setState(() {
@@ -231,9 +252,13 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
                                     'Yes',
                                     style: TextStyle(color: TColor.primary),
                                   ),
-                                  onPressed: () {
-                                    // Report Logic
-                                    Navigator.of(context).pop();
+                                  onPressed: () async {
+                                    // show second report alert dialog
+                                    // report user API 
+                                    Map<String, dynamic> result = await reportUser(order['user_id']);
+                                    if (result['success']) {
+                                      Navigator.of(context).pop();
+                                    }
                                   },
                                 ),
                               ],

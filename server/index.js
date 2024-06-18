@@ -67,6 +67,9 @@ app.use("/get-available-delivery", getAvailableDeliveryRoute);
 const assignDeliveryRoute = require("./routes/chef/assign_delivery");
 app.use("/assign-delivery", assignDeliveryRoute);
 
+const reportUserRoute = require("./routes/chef/report_user");
+app.use("/report-user", reportUserRoute);
+
 //////////////////////////////////////////// GENERAL ROUTES //////////////////////////////////////
 
 const foodCategoriesRoute = require("./routes/general/food_categories");
@@ -168,6 +171,9 @@ app.use("/delete-points", deletePointsRoute);
 
 const deleteOrderRoute = require("./routes/user/delete_order");
 app.use("/delete-order", deleteOrderRoute);
+
+const checkReportsRoute = require("./routes/user/check_reports");
+app.use("/check-reports", checkReportsRoute);
 
 /////////////////////////////////////////////// ADMIN ROUTES ///////////////////////////////////////////
 

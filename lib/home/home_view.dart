@@ -26,6 +26,7 @@ class _HomeViewState extends State<HomeView> {
   int? selectedCategoryId;
   List<Map<String, dynamic>> menuArr = [];
   int? unreadCount;
+  bool? isPend;
   @override
   void initState() {
     super.initState();
@@ -41,6 +42,7 @@ class _HomeViewState extends State<HomeView> {
     await _loadUserName();
     await _updateMenuArr();
     unreadCount = await unreadNotificationsCount();
+    isPend = await checkReports();
     try {
       var fetchedCategories = await getKitchenCategories();
       if (mounted) {
@@ -155,6 +157,26 @@ class _HomeViewState extends State<HomeView> {
       return jsonDecode(response.body)['count'];
     } else {
       throw Exception('Failed to load unread notification count');
+    }
+  }
+
+  Future<bool> checkReports() async {
+    int id = await _loadUserId();
+    final url = Uri.parse('${SharedPreferencesService.url}check-reports?userId=$id');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        return responseBody['isPend'];
+      } else {
+        print('Error: ${response.statusCode}');
+        return false;
+      }
+    } catch (error) {
+      print('Error: $error');
+      return false;
     }
   }
 
