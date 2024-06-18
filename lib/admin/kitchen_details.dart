@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common/globs.dart';
 import 'package:http/http.dart' as http;
+
 class KitchenDetailsPage extends StatefulWidget {
   final int kitchenId;
   const KitchenDetailsPage({super.key, required this.kitchenId});
@@ -19,7 +20,8 @@ class _KitchenDetailsPageState extends State<KitchenDetailsPage> {
 
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchKitchenDetails() async {
-    final String apiUrl ='${SharedPreferencesService.url}get-kitchen-details?id=${widget.kitchenId}';
+    final String apiUrl =
+        '${SharedPreferencesService.url}get-kitchen-details?id=${widget.kitchenId}';
 
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -46,6 +48,7 @@ class _KitchenDetailsPageState extends State<KitchenDetailsPage> {
         return "Unknown ordering system";
     }
   }
+
   late Future<void> _initDataFuture;
   @override
   void initState() {
@@ -54,7 +57,7 @@ class _KitchenDetailsPageState extends State<KitchenDetailsPage> {
   }
 
   Future<void> _initData() async {
-   await fetchKitchenDetails();
+    await fetchKitchenDetails();
   }
 
   @override
@@ -179,18 +182,22 @@ class _KitchenDetailsPageState extends State<KitchenDetailsPage> {
                             Icon(Icons.delivery_dining,
                                 color: TColor.primary, size: 20),
                             SizedBox(width: 5),
-                            Text(kitchenInfo!['special_orders'] == 'yes'
-                                ? 'Special orders available'
-                                : 'No special orders available',
+                            Text(
+                                kitchenInfo!['special_orders'] == 'yes'
+                                    ? 'Special orders available'
+                                    : 'No special orders available',
                                 style: TextStyle(
                                     color: TColor.secondaryText, fontSize: 12)),
                           ],
                         ),
                         Row(
                           children: <Widget>[
-                            Icon(Icons.timelapse, color: TColor.primary, size: 20),
+                            Icon(Icons.timelapse,
+                                color: TColor.primary, size: 20),
                             SizedBox(width: 5),
-                            Text(getOrderingSystemText(kitchenInfo!['order_system']),
+                            Text(
+                                getOrderingSystemText(
+                                    kitchenInfo!['order_system']),
                                 style: TextStyle(
                                     color: TColor.secondaryText, fontSize: 12)),
                           ],
@@ -206,13 +213,14 @@ class _KitchenDetailsPageState extends State<KitchenDetailsPage> {
               Text(
                 'Menu Items:',
               ),
-              ListView.builder(
+              Expanded(
+                  child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: kitchenItems.length,
                 itemBuilder: (context, index) {
                   var item = kitchenItems[index];
                   return ClipRRect(
-                      borderRadius: BorderRadius.circular(16.0), 
+                      borderRadius: BorderRadius.circular(16.0),
                       child: Card(
                         elevation: 4,
                         color: TColor.white,
@@ -238,7 +246,7 @@ class _KitchenDetailsPageState extends State<KitchenDetailsPage> {
                         ),
                       ));
                 },
-              ),
+              )),
             ],
           ),
         ));

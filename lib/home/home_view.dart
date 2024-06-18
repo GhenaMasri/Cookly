@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
@@ -43,6 +45,9 @@ class _HomeViewState extends State<HomeView> {
     await _updateMenuArr();
     unreadCount = await unreadNotificationsCount();
     isPend = await checkReports();
+
+    if (isPend!) _showPendAlert();
+
     try {
       var fetchedCategories = await getKitchenCategories();
       if (mounted) {
@@ -61,11 +66,37 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
- Future<void> updateUnreadCountFromNotifications(int newCount) async{
+  Future<void> updateUnreadCountFromNotifications(int newCount) async {
     unreadCount = await unreadNotificationsCount();
     setState(() {
       //unreadCount = newCount;
     });
+  }
+
+  void _showPendAlert() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: TColor.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text('Account Suspended'),
+          content: Text(
+              'Your account is pended, you cannot access our features for a few days.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Ok', style: TextStyle(color: TColor.primary)),
+              onPressed: () {
+                exit(0); // Exit the application
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
 //////////////////////////////////// BACKEND SECTION //////////////////////////////////////
@@ -162,7 +193,8 @@ class _HomeViewState extends State<HomeView> {
 
   Future<bool> checkReports() async {
     int id = await _loadUserId();
-    final url = Uri.parse('${SharedPreferencesService.url}check-reports?userId=$id');
+    final url =
+        Uri.parse('${SharedPreferencesService.url}check-reports?userId=$id');
 
     try {
       final response = await http.get(url);
