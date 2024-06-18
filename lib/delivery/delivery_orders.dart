@@ -20,7 +20,7 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
   List<dynamic> pendingOrders = [];
   int? unreadCount;
   Future<void> updateUnreadCountFromNotifications(int newCount) async {
-    unreadCount = 0; /*await unreadNotificationsCount();*/
+    unreadCount = await unreadNotificationsCount();
     setState(() {});
   }
 
@@ -75,6 +75,17 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
     }
   }
 
+  Future<int> unreadNotificationsCount() async {
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}unread-notifications?destination=delivery&id=$id'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['count'];
+    } else {
+      throw Exception('Failed to load unread notification count');
+    }
+  }
+
   Future<void> _loadDeliveryId() async {
     int? id = await SharedPreferencesService.getDeliveryId();
     setState(() {
@@ -117,6 +128,7 @@ class _DeliveryOrdersPageState extends State<DeliveryOrdersPage> {
     await _loadDeliveryId();
     _status = await fetchDeliveryStatus();
     await getDeliveryOrders();
+    unreadCount = await unreadNotificationsCount();
   }
 
   @override
