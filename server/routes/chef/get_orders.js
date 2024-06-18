@@ -16,7 +16,8 @@ router.get("/", async (req, res) => {
     o.user_number,
     o.delivery,
     o.payment,
-    o.pickup_time
+    o.pickup_time,
+    o.user_id
     FROM orders as o
     INNER JOIN user u ON u.id = o.user_id
     WHERE o.kitchen_id = ? AND o.status = ?`;
