@@ -229,14 +229,16 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
                         child: ListTile(
                           leading: ClipOval(
                             child: CachedNetworkImage(
-                              imageUrl: kitchen["logo"],
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
+                              imageUrl: kitchen['logo'],
                               placeholder: (context, url) =>
                                   CircularProgressIndicator(
                                 color: TColor.primary,
                               ),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
                             ),
                           ),
                           title: Text(
