@@ -216,8 +216,8 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
                       kitchen['is_active'] == 1 ? 'Active' : 'Expired';
                   return InkWell(
                       onTap: () {
-                        pushReplacementWithAnimation(
-                            context, KitchenDetailsPage(kitchenId: kitchen['id']));
+                        pushReplacementWithAnimation(context,
+                            KitchenDetailsPage(kitchenId: kitchen['id']));
                       },
                       child: Card(
                         color: TColor.white,
@@ -233,6 +233,10 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
                               width: 80,
                               height: 80,
                               fit: BoxFit.cover,
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(
+                                color: TColor.primary,
+                              ),
                             ),
                           ),
                           title: Text(

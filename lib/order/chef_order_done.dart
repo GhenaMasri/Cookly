@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
 import 'package:untitled/order/chef_order_details.dart';
@@ -15,6 +16,15 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
   int? kitchenId;
   List<dynamic> orders = [];
 
+  void _showReportReasonDialog(BuildContext context, int userId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ReportReasonDialog(userId: userId);
+      },
+    );
+  }
+
 //////////////////////////////// BACKEND SECTION ////////////////////////////////
   Future<void> fetchOrders() async {
     await _loadKitchenId();
@@ -29,27 +39,6 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
       });
     } else {
       print('Error: ${response.statusCode}, ${response.body}');
-    }
-  }
-
-  Future<Map<String, dynamic>> reportUser(int userId) async {
-    final url = Uri.parse('${SharedPreferencesService.url}report-user?userId=$userId');
-
-    try {
-      final response = await http.put(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return {'success': true, 'message': response.body};
-      } else {
-        return {'success': false, 'message': response.body};
-      }
-    } catch (error) {
-      return {'success': false, 'message': '$error'};
     }
   }
 
@@ -212,7 +201,8 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
                                       (order['delivery'] == 'yes'
                                           ? (order['total_price'] - 10)
                                               .toStringAsFixed(2)
-                                          : order['total_price'].toStringAsFixed(2)),
+                                          : order['total_price']
+                                              .toStringAsFixed(2)),
                                     ),
                                   ],
                                 ),
@@ -232,6 +222,7 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
+                              backgroundColor: TColor.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -252,13 +243,10 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
                                     'Yes',
                                     style: TextStyle(color: TColor.primary),
                                   ),
-                                  onPressed: () async {
-                                    // show second report alert dialog
-                                    // report user API 
-                                    Map<String, dynamic> result = await reportUser(order['user_id']);
-                                    if (result['success']) {
-                                      Navigator.of(context).pop();
-                                    }
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _showReportReasonDialog(
+                                        context, order['user_id']);
                                   },
                                 ),
                               ],
@@ -329,6 +317,117 @@ class _ChefOrderDoneState extends State<ChefOrderDone> {
           },
         ),
       ),
+    );
+  }
+}
+
+
+class ReportReasonDialog extends StatefulWidget {
+  final int userId;
+
+  ReportReasonDialog({required this.userId});
+
+  @override
+  _ReportReasonDialogState createState() => _ReportReasonDialogState();
+}
+
+class _ReportReasonDialogState extends State<ReportReasonDialog> {
+  String _reportReason = 'Fake order';
+
+    Future<Map<String, dynamic>> reportUser(int userId) async {
+    final url =
+        Uri.parse('${SharedPreferencesService.url}report-user?userId=$userId');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': response.body};
+      } else {
+        return {'success': false, 'message': response.body};
+      }
+    } catch (error) {
+      return {'success': false, 'message': '$error'};
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      backgroundColor: Colors.white,
+      title: Text("Report reason:"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Flexible(
+            child: Row(
+              children: [
+                Radio(
+                  activeColor: TColor.primary,
+                  value: "Fake order",
+                  groupValue: _reportReason,
+                  onChanged: (value) {
+                    setState(() {
+                      _reportReason = value.toString();
+                    });
+                  },
+                ),
+                Text("Fake order", style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+          Flexible(
+            child: Row(
+              children: [
+                Radio(
+                  activeColor: TColor.primary,
+                  value: "Did not pickup his order",
+                  groupValue: _reportReason,
+                  onChanged: (value) {
+                    setState(() {
+                      _reportReason = value.toString();
+                    });
+                  },
+                ),
+                Text("Did not pickup his order", style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text("Back", style: TextStyle(color: TColor.primary)),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: Text("Done", style: TextStyle(color: TColor.primary)),
+          onPressed: () async {
+            // Report user API
+            Map<String, dynamic> result = await reportUser(widget.userId);
+            if (result['success']) {
+              IconSnackBar.show(context,
+snackBarType: SnackBarType.success,
+label: 'User Reported Successfully',
+snackBarStyle: SnackBarStyle(
+backgroundColor: TColor.primary,
+labelTextStyle: TextStyle(
+fontWeight: FontWeight.bold, fontSize: 18)));
+              Navigator.of(context).pop();
+            }
+          },
+        ),
+      ],
     );
   }
 }
