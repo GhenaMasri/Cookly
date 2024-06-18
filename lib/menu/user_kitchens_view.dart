@@ -64,6 +64,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
             'street': kitchen['street'],
             'contact': kitchen['contact'],
             'city': kitchen['city'],
+            'special_orders': kitchen['special_orders'],
           };
         }).toList();
       });
