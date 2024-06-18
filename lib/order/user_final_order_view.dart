@@ -304,7 +304,7 @@ class _FinalOrderViewState extends State<FinalOrderView> {
                               width: 15,
                             ),
                             Text(
-                              "${cObj["price"].toString()}₪",
+                              "${cObj["price"].toStringAsFixed(2)}₪",
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 13,
