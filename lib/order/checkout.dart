@@ -401,7 +401,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              widget.totalPrice.toString() + "₪",
+                              widget.totalPrice.toStringAsFixed(2) + "₪",
                               style: TextStyle(
                                   color: TColor.primaryText,
                                   fontSize: 13,
@@ -424,7 +424,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              widget.deliveryCost.toString() + "₪",
+                              widget.deliveryCost.toStringAsFixed(2) + "₪",
                               style: TextStyle(
                                   color: TColor.primaryText,
                                   fontSize: 13,
@@ -477,7 +477,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              checkoutPrice.toString() + "₪",
+                              checkoutPrice!.toStringAsFixed(2) + "₪",
                               style: TextStyle(
                                   color: TColor.primaryText,
                                   fontSize: 15,
