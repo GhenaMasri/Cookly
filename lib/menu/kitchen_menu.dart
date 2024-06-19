@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/common/color_extension.dart';
 import 'package:untitled/common_widget/round_textfield.dart';
 import 'package:untitled/common_widget/slide_animation.dart';
+import 'package:untitled/more/chat.dart';
 import 'package:untitled/more/notification_view.dart';
 import 'package:untitled/menu/rating_page.dart';
 import 'package:untitled/order/cart.dart';
@@ -318,6 +319,22 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
               ],
             ),
           ),
-        ));
+        ),
+        floatingActionButton: widget.mObj['special_orders'] == 'yes'
+            ? FloatingActionButton(
+                onPressed: () {
+                   /* pushReplacementWithAnimation(context,
+                            ChatPage()); */
+                },
+                shape: const CircleBorder(),
+                backgroundColor: TColor.primary,
+                foregroundColor: TColor.white,
+                child: Icon(
+                  Icons.messenger_rounded,
+                ),
+              )
+            : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        );
   }
 }
