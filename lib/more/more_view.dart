@@ -55,6 +55,11 @@ class _MoreViewState extends State<MoreView> {
       (Route<dynamic> route) => false,
     );
   }
+
+  Future<int> _loadKitchenId() async {
+    int? kitchenid = await SharedPreferencesService.getKitchenId();
+    return kitchenid!;
+  }
   /////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -94,7 +99,7 @@ class _MoreViewState extends State<MoreView> {
                     var mObj = moreArr[index] as Map? ?? {};
                     var countBase = mObj["base"] as int? ?? 0;
                     return InkWell(
-                      onTap: () {
+                      onTap: () async {
                         switch (mObj["index"].toString()) {
                         
                           case "1":
@@ -104,10 +109,11 @@ class _MoreViewState extends State<MoreView> {
                                     builder: (context) =>SubscriptionManagementPage()));
 
                           case "2":
+                            int id = await _loadKitchenId();
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => InboxPage()));
+                                    builder: (context) => InboxPage(id: id, type: "chef")));
                           case "3":
                             Navigator.push(
                                 context,
