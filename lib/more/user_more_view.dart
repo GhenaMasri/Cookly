@@ -48,6 +48,11 @@ class _UserMoreViewState extends State<UserMoreView> {
       (Route<dynamic> route) => false,
     );
   }
+
+  Future<int> _loadUserId() async {
+    int? id = await SharedPreferencesService.getId();
+    return id!;
+  }
   /////////////////////////////////////////////////////////////////////////////////
 
   @override
@@ -87,13 +92,14 @@ class _UserMoreViewState extends State<UserMoreView> {
                     var mObj = moreArr[index] as Map? ?? {};
                     var countBase = mObj["base"] as int? ?? 0;
                     return InkWell(
-                      onTap: () {
+                      onTap: () async {
                         switch (mObj["index"].toString()) {
                           case "1":
+                            int id = await _loadUserId();
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => InboxPage()));
+                                    builder: (context) => InboxPage(id: id, type: "user")));
                           case "2":
                             Navigator.push(
                                 context,

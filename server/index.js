@@ -105,6 +105,12 @@ app.use("/change-notification-status", changeNotificationStatusRoute);
 const unreadNotificationsRoute = require("./routes/general/unread_notifications");
 app.use("/unread-notifications", unreadNotificationsRoute);
 
+const sendNotificationRoute = require("./routes/general/send_notification");
+app.use("/send-notification", sendNotificationRoute);
+
+const getUserNameRoute = require("./routes/general/get_user_name");
+app.use("/get-user-name", getUserNameRoute);
+
 //////////////////////////////////////////// MENU ITEM ROUTES //////////////////////////////////////
 
 const newMenuItemRoute = require("./routes/menu item/add_menu_item");

@@ -1,54 +1,119 @@
 import 'package:flutter/material.dart';
-
-import 'dart:async';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:untitled/common/color_extension.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:untitled/common/globs.dart';
 
 class ChatPage extends StatefulWidget {
+  final int kitchenId;
+  final int userId;
+  final String type;
+
+  ChatPage({required this.kitchenId, required this.userId, required this.type});
+
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final List<Map<String, dynamic>> _messages = [];
   final TextEditingController _controller = TextEditingController();
-  final String _myUsername = "Me";
-  final String _otherUsername = "Other";
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Simulate receiving a message after a delay
-    Future.delayed(Duration(seconds: 3), () {
-      _receiveMessage("Hello from the other side!");
+    _scrollToBottomOnNewMessage();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
     });
   }
 
-  void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      setState(() {
-        _messages.add({
-          'text': _controller.text,
-          'username': _myUsername,
-          'isMe': true,
-        });
-        _controller.clear();
-      });
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 
-  void _receiveMessage(String text) {
-    setState(() {
-      _messages.add({
-        'text': text,
-        'username': _otherUsername,
-        'isMe': false,
+  void _scrollToBottomOnNewMessage() {
+    FirebaseFirestore.instance
+        .collection('chats')
+        .doc('${widget.userId}_${widget.kitchenId}')
+        .collection('messages')
+        .orderBy('timestamp')
+        .snapshots()
+        .listen((snapshot) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
       });
     });
   }
 
+  void _sendMessage() async {
+    if (_controller.text.isNotEmpty) {
+      int senderId = (widget.type == 'user') ? widget.userId : widget.kitchenId;
+
+      try {
+        // Check if the chat document exists, if not, create it
+        final chatDocRef = FirebaseFirestore.instance.collection('chats').doc('${widget.userId}_${widget.kitchenId}');
+        final chatDocSnapshot = await chatDocRef.get();
+        
+        if (!chatDocSnapshot.exists) {
+          await chatDocRef.set({
+            'user_id': widget.userId,
+            'kitchen_id': widget.kitchenId,
+          });
+        }
+
+        // Add the message to Firestore
+        await chatDocRef.collection('messages').add({
+          'text': _controller.text,
+          'userId': senderId,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        // Send the notification
+        _sendNotification();
+
+        // Clear the text field
+        _controller.clear();
+        _scrollToBottom();
+      } catch (error) {
+        print("Failed to send message: $error");
+      }
+    }
+  }
+
+  void _sendNotification() async {
+    int sendId = (widget.type == 'user') ? widget.userId : widget.kitchenId;
+    int recId = (widget.type == 'user') ? widget.kitchenId : widget.userId;
+    String recType = (widget.type == 'user') ? "chef" : "user";
+    final url = '${SharedPreferencesService.url}send-notification?sendId=$sendId&recId=$recId&recType=$recType';
+
+    try {
+      await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'text': _controller.text,
+        }),
+      );
+    } catch (error) {
+      print('error sending notification: ${error}');
+      return;
+    }
+  }
+
   Widget _buildMessage(Map<String, dynamic> message) {
-    bool isMe = message['isMe'];
+    int senderId = message['userId'];
+    bool isMe = senderId == (widget.type == 'user' ? widget.userId : widget.kitchenId);
+
+    String senderName = isMe ? 'Me' : (widget.type == 'user' ? 'Kitchen' : 'User');
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.0),
       padding: EdgeInsets.symmetric(horizontal: 15.0),
@@ -56,7 +121,7 @@ class _ChatPageState extends State<ChatPage> {
         crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            message['username'],
+            senderName,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -83,6 +148,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: TColor.white,
@@ -93,11 +165,28 @@ class _ChatPageState extends State<ChatPage> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.all(10.0),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return _buildMessage(_messages[index]);
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('chats')
+                  .doc('${widget.userId}_${widget.kitchenId}')
+                  .collection('messages')
+                  .orderBy('timestamp')
+                  .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                final messages = snapshot.data!.docs;
+                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                return ListView.builder(
+                  controller: _scrollController,
+                  padding: EdgeInsets.all(10.0),
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
+                    return _buildMessage(message.data() as Map<String, dynamic>);
+                  },
+                );
               },
             ),
           ),
@@ -112,9 +201,8 @@ class _ChatPageState extends State<ChatPage> {
                       hintText: 'Enter message...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
-                        
                       ),
-                       focusedBorder: OutlineInputBorder(
+                      focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: TColor.primary, width: 2.0),
                         borderRadius: BorderRadius.circular(10.0),
                       ),

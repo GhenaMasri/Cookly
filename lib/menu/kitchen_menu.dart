@@ -322,9 +322,9 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
         ),
         floatingActionButton: widget.mObj['special_orders'] == 'yes'
             ? FloatingActionButton(
-                onPressed: () {
-                   /* pushReplacementWithAnimation(context,
-                            ChatPage()); */
+                onPressed: () async {
+                  await _loadUserId();
+                  pushReplacementWithAnimation(context, ChatPage(kitchenId: widget.mObj['id'], userId: userId!, type: "user")); 
                 },
                 shape: const CircleBorder(),
                 backgroundColor: TColor.primary,

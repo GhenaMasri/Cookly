@@ -5,6 +5,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:untitled/firebase_options.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:untitled/more/chat.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -46,5 +47,6 @@ class MyApp extends StatelessWidget {
         ),
         // ignore: prefer_const_constructors
         home: SplashView());
+        //home: ChatPage(kitchenId: 6, userId: 38, type: "user",));
   }
 }
