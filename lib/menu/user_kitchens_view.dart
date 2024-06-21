@@ -262,10 +262,10 @@ class _UserKitchensViewState extends State<UserKitchensView> {
                         sliver: SliverGrid(
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 8, // More columns for web
-                            mainAxisSpacing: 10.0,
+                            crossAxisCount: 7, // More columns for web
+                            mainAxisSpacing: 7.0,
                             crossAxisSpacing: 10.0,
-                            childAspectRatio: 7.7 / 12,
+                            childAspectRatio: 8.5 / 12,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {

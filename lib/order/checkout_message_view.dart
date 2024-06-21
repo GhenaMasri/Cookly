@@ -24,7 +24,7 @@ class _CheckoutMessageViewState extends State<CheckoutMessageView> {
           color: TColor.white,
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      child: Column(
+      child: SingleChildScrollView(child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -74,6 +74,6 @@ class _CheckoutMessageViewState extends State<CheckoutMessageView> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

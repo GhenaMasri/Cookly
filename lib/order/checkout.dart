@@ -159,407 +159,472 @@ class _CheckoutViewState extends State<CheckoutView> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: TColor.white,
-        body: SingleChildScrollView(
-          child: Form(
-            key: formState,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Image.asset("assets/img/btn_back.png",
-                              width: 20, height: 20),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Expanded(
-                          child: Text(
-                            "Checkout",
-                            style: TextStyle(
-                                color: TColor.primaryText,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                      ],
+        body: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+          // Determine if the platform is web or mobile
+          bool isWeb = constraints.maxWidth > 600;
+          return SingleChildScrollView(
+            child: Form(
+              key: formState,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (widget.kitchen['order_system'] == 0)
-                          Padding(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Image.asset("assets/img/btn_back.png",
+                                width: 20, height: 20),
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: Text(
+                              "Checkout",
+                              style: TextStyle(
+                                  color: TColor.primaryText,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 25),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (widget.kitchen['order_system'] == 0)
+                            Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Time To Pick Up Next Day",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: TColor.primaryText,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    if (!isWeb)
+                                      TimePickerSpinnerPopUp(
+                                        iconSize: 20,
+                                        mode: CupertinoDatePickerMode.time,
+                                        initTime: DateTime.now(),
+                                        onChange: (dateTime) {
+                                          // Implement your logic with select time
+                                          pickupTime =
+                                              "${dateTime.hour}:${dateTime.minute}";
+                                        },
+                                      )
+                                    else
+                                      CupertinoButton(
+                                        onPressed: () {
+                                          showCupertinoModalPopup(
+                                            context: context,
+                                            builder: (context) {
+                                              return Container(
+                                                height: 250,
+                                                color: Color.fromARGB(
+                                                    255, 255, 255, 255),
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      height: 180,
+                                                      child:
+                                                          CupertinoDatePicker(
+                                                        mode:
+                                                            CupertinoDatePickerMode
+                                                                .time,
+                                                        initialDateTime:
+                                                            DateTime.now(),
+                                                        onDateTimeChanged:
+                                                            (DateTime
+                                                                newDateTime) {
+                                                          setState(() {
+                                                            pickupTime =
+                                                                "${newDateTime.hour}:${newDateTime.minute}";
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    CupertinoButton(
+                                                      child: Text(
+                                                        'OK',
+                                                        style: TextStyle(
+                                                            color:
+                                                                TColor.primary),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: Text(
+                                          pickupTime ?? "Select Time",
+                                          style:
+                                              TextStyle(color: TColor.primary),
+                                        ),
+                                      )
+                                  ],
+                                )),
+                          if (widget.delivery == 'yes')
+                            Padding(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 8),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Time To Pick Up Next Day",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: TColor.primaryText,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  TimePickerSpinnerPopUp(
-                                    iconSize: 20,
-                                    mode: CupertinoDatePickerMode.time,
-                                    initTime: DateTime.now(),
-                                    onChange: (dateTime) {
-                                      // Implement your logic with select time
-                                      pickupTime =
-                                          "${dateTime.hour}:${dateTime.minute}";
-                                    },
-                                  )
-                                ],
-                              )),
-                        if (widget.delivery == 'yes')
+                                vertical: 8,
+                              ),
+                              child: RoundTitleTextfield(
+                                title: "Address",
+                                hintText: "Enter Detaild Address",
+                                controller: txtStreet,
+                                validator: (value) => value!.isEmpty
+                                    ? "This field is required"
+                                    : null,
+                              ),
+                            ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
                             ),
                             child: RoundTitleTextfield(
-                              title: "Address",
-                              hintText: "Enter Detaild Address",
-                              controller: txtStreet,
-                              validator: (value) => value!.isEmpty
-                                  ? "This field is required"
-                                  : null,
+                              title: "Contact Number",
+                              hintText: "Enter Contact Number",
+                              controller: txtNumber,
+                              keyboardType: TextInputType.number,
+                              validator: (value) =>
+                                  value!.isEmpty ? "Couldn't be empty" : null,
                             ),
                           ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                          ),
-                          child: RoundTitleTextfield(
-                            title: "Contact Number",
-                            hintText: "Enter Contact Number",
-                            controller: txtNumber,
-                            keyboardType: TextInputType.number,
-                            validator: (value) =>
-                                value!.isEmpty ? "Couldn't be empty" : null,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(color: TColor.textfield),
-                    height: 8,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Payment method",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: TColor.secondaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                        ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            itemCount: paymentArr.length,
-                            itemBuilder: (context, index) {
-                              var pObj = paymentArr[index] as Map? ?? {};
-                              return Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 15.0, horizontal: 15.0),
-                                decoration: BoxDecoration(
-                                    color: TColor.textfield,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                        color: TColor.secondaryText
-                                            .withOpacity(0.2))),
-                                child: Row(
-                                  children: [
-                                    Image.asset(pObj["icon"].toString(),
-                                        width: 50,
-                                        height: 20,
-                                        fit: BoxFit.contain),
-                                    // const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        pObj["name"],
-                                        style: TextStyle(
-                                            color: TColor.primaryText,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(color: TColor.textfield),
+                      height: 8,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Payment method",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: TColor.secondaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                          ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: paymentArr.length,
+                              itemBuilder: (context, index) {
+                                var pObj = paymentArr[index] as Map? ?? {};
+                                return Container(
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 15.0, horizontal: 15.0),
+                                  decoration: BoxDecoration(
+                                      color: TColor.textfield,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                          color: TColor.secondaryText
+                                              .withOpacity(0.2))),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(pObj["icon"].toString(),
+                                          width: 50,
+                                          height: 20,
+                                          fit: BoxFit.contain),
+                                      // const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          pObj["name"],
+                                          style: TextStyle(
+                                              color: TColor.primaryText,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500),
+                                        ),
                                       ),
-                                    ),
 
-                                    InkWell(
-                                      onTap: () async {
-                                        setState(() {
-                                          selectMethod = index;
-                                        });
-
-                                        if (selectMethod == 1) {
-                                          isValid =
-                                              (await showModalBottomSheet<bool>(
-                                            isDismissible: false,
-                                            isScrollControlled: true,
-                                            backgroundColor: Colors.transparent,
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return Container(
-                                                padding: EdgeInsets.only(
-                                                  bottom: MediaQuery.of(context)
-                                                      .viewInsets
-                                                      .bottom,
-                                                ),
-                                                child: SingleChildScrollView(
-                                                  child: const AddCardView(),
-                                                ),
-                                              );
-                                            },
-                                          ))!;
-
+                                      InkWell(
+                                        onTap: () async {
                                           setState(() {
-                                            payment = 'card';
+                                            selectMethod = index;
                                           });
-                                        } else {
-                                          setState(() {
-                                            payment = 'cash';
-                                          });
-                                        }
-                                      },
-                                      child: Icon(
-                                        selectMethod == index
-                                            ? Icons.radio_button_on
-                                            : Icons.radio_button_off,
-                                        color: TColor.primary,
-                                        size: 25,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            })
-                      ],
+
+                                          if (selectMethod == 1) {
+                                            isValid =
+                                                (await showModalBottomSheet<
+                                                    bool>(
+                                              isDismissible: false,
+                                              isScrollControlled: true,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                  padding: EdgeInsets.only(
+                                                    bottom:
+                                                        MediaQuery.of(context)
+                                                            .viewInsets
+                                                            .bottom,
+                                                  ),
+                                                  child: SingleChildScrollView(
+                                                    child: const AddCardView(),
+                                                  ),
+                                                );
+                                              },
+                                            ))!;
+
+                                            setState(() {
+                                              payment = 'card';
+                                            });
+                                          } else {
+                                            setState(() {
+                                              payment = 'cash';
+                                            });
+                                          }
+                                        },
+                                        child: Icon(
+                                          selectMethod == index
+                                              ? Icons.radio_button_on
+                                              : Icons.radio_button_off,
+                                          color: TColor.primary,
+                                          size: 25,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              })
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(color: TColor.textfield),
-                    height: 8,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Sub Total",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              widget.totalPrice.toStringAsFixed(2) + "₪",
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700),
-                            )
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Delivery Cost",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              widget.deliveryCost.toStringAsFixed(2) + "₪",
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700),
-                            )
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Discount",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              "${discount?.toStringAsFixed(2) ?? '0.00'}₪",
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Divider(
-                          color: TColor.secondaryText.withOpacity(0.5),
-                          height: 1,
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Total",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              checkoutPrice!.toStringAsFixed(2) + "₪",
-                              style: TextStyle(
-                                  color: TColor.primaryText,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700),
-                            )
-                          ],
-                        ),
-                      ],
+                    const SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(color: TColor.textfield),
-                    height: 8,
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: RoundButton(
-                      title: usePointsForDiscount
-                          ? "Unuse points"
-                          : "Use points to get discount",
-                      onPressed: () {
-                        setState(() {
-                          usePointsForDiscount = !usePointsForDiscount;
-                        });
-                        if (usePointsForDiscount) {
-                          getPoints();
-                        } else {
-                          discount = 0.0;
-                          calculateTotalPrice();
-                        }
-                      },
+                    Container(
+                      decoration: BoxDecoration(color: TColor.textfield),
+                      height: 8,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20, horizontal: 25),
-                    child: RoundButton(
-                        title: "Send Order",
-                        onPressed: () async {
-                          bool valid = true;
-                          if (widget.delivery == 'yes')
-                            valid = formState.currentState!.validate();
-                          if (selectMethod == 1 && isValid == false) {
-                            IconSnackBar.show(context,
-                                snackBarType: SnackBarType.fail,
-                                label: 'Fill All Visa Card Details',
-                                snackBarStyle: SnackBarStyle(
-                                    labelTextStyle: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)));
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Sub Total",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                widget.totalPrice.toStringAsFixed(2) + "₪",
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Delivery Cost",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                widget.deliveryCost.toStringAsFixed(2) + "₪",
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Discount",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                "${discount?.toStringAsFixed(2) ?? '0.00'}₪",
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Divider(
+                            color: TColor.secondaryText.withOpacity(0.5),
+                            height: 1,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Total",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                checkoutPrice!.toStringAsFixed(2) + "₪",
+                                style: TextStyle(
+                                    color: TColor.primaryText,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(color: TColor.textfield),
+                      height: 8,
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: RoundButton(
+                        title: usePointsForDiscount
+                            ? "Unuse points"
+                            : "Use points to get discount",
+                        onPressed: () {
+                          setState(() {
+                            usePointsForDiscount = !usePointsForDiscount;
+                          });
+                          if (usePointsForDiscount) {
+                            getPoints();
                           } else {
-                            if (valid) {
-                              Map<String, dynamic> result = await placeOrder();
-                              bool success = result['success'];
-                              String message = result['message'];
-                              print(message);
-                              if (success) {
-                                if (usePointsForDiscount == true) {
-                                  await deletePoints();
+                            discount = 0.0;
+                            calculateTotalPrice();
+                          }
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 20, horizontal: 25),
+                      child: RoundButton(
+                          title: "Send Order",
+                          onPressed: () async {
+                            bool valid = true;
+                            if (widget.delivery == 'yes')
+                              valid = formState.currentState!.validate();
+                            if (selectMethod == 1 && isValid == false) {
+                              IconSnackBar.show(context,
+                                  snackBarType: SnackBarType.fail,
+                                  label: 'Fill All Visa Card Details',
+                                  snackBarStyle: SnackBarStyle(
+                                      labelTextStyle: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18)));
+                            } else {
+                              if (valid) {
+                                Map<String, dynamic> result =
+                                    await placeOrder();
+                                bool success = result['success'];
+                                String message = result['message'];
+                                print(message);
+                                if (success) {
+                                  if (usePointsForDiscount == true) {
+                                    await deletePoints();
+                                  }
+                                  showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      builder: (context) {
+                                        return const CheckoutMessageView();
+                                      });
                                 }
-                                showModalBottomSheet(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: true,
-                                    builder: (context) {
-                                      return const CheckoutMessageView();
-                                    });
                               }
                             }
-                          }
-                        }),
-                  ),
-                ],
+                          }),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ));
+          );
+        }));
   }
 }
