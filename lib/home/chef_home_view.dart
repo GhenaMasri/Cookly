@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icon_snackbar/flutter_icon_snackbar.dart';
@@ -65,7 +64,7 @@ class _ChefHomeViewState extends State<ChefHomeView> {
     }
   }
 
-  Future<void> updateUnreadCountFromNotifications(int newCount) async{
+  Future<void> updateUnreadCountFromNotifications(int newCount) async {
     unreadCount = await unreadNotificationsCount();
     setState(() {
       //unreadCount = newCount;
@@ -208,7 +207,8 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   }
 
   Future<int> unreadNotificationsCount() async {
-    final response = await http.get(Uri.parse('${SharedPreferencesService.url}unread-notifications?destination=chef&id=$kitchenId'));
+    final response = await http.get(Uri.parse(
+        '${SharedPreferencesService.url}unread-notifications?destination=chef&id=$kitchenId'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['count'];
@@ -617,16 +617,24 @@ class _ChefHomeViewState extends State<ChefHomeView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          pushReplacementWithScaleAnimation(context,
-              MenuItemView(menu: menuArr, addItemToList: addItemToList));
-          /*  Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  MenuItemView(menu: menuArr, addItemToList: addItemToList),
+        onPressed: () async {
+          final result = await Navigator.of(context).push(
+            PageRouteBuilder(
+              transitionDuration: Duration(milliseconds: 700),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return ScaleTransition(
+                  scale: animation,
+                  child: child,
+                );
+              },
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return MenuItemView(
+                    menu: menuArr, addItemToList: addItemToList);
+              },
             ),
-          ); */
+          );
+             if(result == true) await _updateMenuArr();
         },
         shape: const CircleBorder(),
         backgroundColor: TColor.primary,

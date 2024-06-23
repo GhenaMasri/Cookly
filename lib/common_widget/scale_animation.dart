@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
-void pushReplacementWithScaleAnimation(BuildContext context, Widget destination) {
+Future<T?> pushReplacementWithScaleAnimation<T, TO>(
+    BuildContext context, Widget destination) {
+  return
   Navigator.of(context).push(
     PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 700),

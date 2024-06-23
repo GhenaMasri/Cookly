@@ -416,7 +416,7 @@ class _MenuItemViewState extends State<MenuItemView> {
                               price: newItem['price'].toDouble(),
                               time: newItem['time'],
                             ));
-                            Navigator.pop(context);
+                            Navigator.pop(context,true);
                           }
                           ////////////////////////////////////////////////////////////////
                         }),
