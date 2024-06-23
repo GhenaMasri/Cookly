@@ -82,7 +82,7 @@ class _KitchenMenuViewState extends State<KitchenMenuView> {
         menuArr = result;
       });
     } catch (error) {
-      print('Error loading menu items: $error');
+      print('Error updating menu items: $error');
     }
   }
 

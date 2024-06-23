@@ -138,7 +138,6 @@ class _ChefHomeViewState extends State<ChefHomeView> {
   Future<void> _updateMenuArr() async {
     try {
       List<MenuItem> items;
-      var fetchedCategories = await getFoodCategories();
       if (txtSearch.text.isNotEmpty) {
         items = await getMenuItems(kitchenId: kitchenId!, name: txtSearch.text);
       } else {
@@ -147,11 +146,10 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       if (mounted) {
         setState(() {
           menuArr = items;
-          categories = fetchedCategories;
         });
       }
     } catch (error) {
-      print('Error loading menu items: $error');
+      print('Error updating menu items: $error');
     }
   }
 
@@ -247,9 +245,10 @@ class _ChefHomeViewState extends State<ChefHomeView> {
       _showSubscriptionAlert();
     }
     try {
+      categories = await getFoodCategories();
       await _updateMenuArr();
     } catch (error) {
-      print('Error loading menu items: $error');
+      print('Error updating menu items: $error');
     }
   }
 

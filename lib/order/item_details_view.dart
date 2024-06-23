@@ -574,7 +574,7 @@ class _ItemDetailsViewState extends State<ItemDetailsView> {
                                                     height: 15,
                                                   ),
                                                   Text(
-                                                    "\₪${finalPrice.toString()}",
+                                                    "\₪${finalPrice.toStringAsFixed(2)}",
                                                     style: TextStyle(
                                                         color:
                                                             TColor.primaryText,

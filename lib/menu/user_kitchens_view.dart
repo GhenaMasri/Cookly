@@ -88,7 +88,7 @@ class _UserKitchensViewState extends State<UserKitchensView> {
         kitchens = result;
       });
     } catch (error) {
-      print('Error loading menu items: $error');
+      print('Error loading kitchens: $error');
     }
   }
 

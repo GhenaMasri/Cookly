@@ -288,7 +288,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                     ),
                   ),
                   Text(
-                    "${item['price'].toString()}₪",
+                    "${item['price'].toStringAsFixed(2)}₪",
                     style: TextStyle(
                       color: TColor.primaryText,
                       fontSize: 13,
