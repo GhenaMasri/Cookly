@@ -146,13 +146,22 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
   }
 
   Future<double> fetchKitchenRate() async {
-    final response = await http.get(Uri.parse(
-        '${SharedPreferencesService.url}get-kitchen-rate?id=$kitchenId'));
+    try {
+      final response = await http.get(Uri.parse(
+          '${SharedPreferencesService.url}get-kitchen-rate?id=$kitchenId'));
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body)['rate'];
-    } else {
-      throw Exception('Failed to load kitchen rate');
+      if (response.statusCode == 200) {
+        final rateData = jsonDecode(response.body);
+        if (rateData.containsKey('rate')) {
+          return rateData['rate'].toDouble(); // Ensure it is a double
+        } else {
+          return 0.0; // Default value if rate key is not present
+        }
+      } else {
+        throw Exception('Failed to load kitchen rate');
+      }
+    } catch (error) {
+      return 0.0; // Default value in case of an error
     }
   }
   //////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +217,8 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
     initialSpecialOrders = specialOrders;
     try {
       var fetchedCategories = await getKitchenCategories();
-      setState(() {
+      if (mounted) {
+        setState(() {
         categories = fetchedCategories;
         for (var element in categories) {
           if (element['id'] == category_id) {
@@ -220,6 +230,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
           }
         }
       });
+      }
     } catch (error) {
       print(error);
     }
@@ -335,7 +346,7 @@ class _KitchenProfileViewState extends State<KitchenProfileView> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        "${rate!.toStringAsFixed(2)}",
+                        rate != null ? rate!.toStringAsFixed(2) : "N/A",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
