@@ -115,15 +115,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                       onPressed: () async {
                         if (formState.currentState!.validate()) {
                           formState.currentState!.save();
-                          String result = await resetPassword();
+                          /* String result = await resetPassword(); */
                           bool success = true;
                           String message = "";
-                          print(result);
                           if (success) {
                             errorFlag = false;
                             errorMessage = "";
-                            /*Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => NewPassword()));*/
+                            Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => NewPassword()));
                           } else {
                             setState(() {
                               errorFlag = true;

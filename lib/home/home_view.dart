@@ -154,7 +154,7 @@ class _HomeViewState extends State<HomeView> {
         });
       }
     } catch (error) {
-      print('Error loading menu items: $error');
+      print('Error loading data: $error');
     }
   }
 

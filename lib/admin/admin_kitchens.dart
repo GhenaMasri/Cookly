@@ -73,7 +73,7 @@ class _AdminKitchensPageState extends State<AdminKitchensPage> {
         adminKitchens = result;
       });
     } catch (error) {
-      print('Error loading menu items: $error');
+      print('Error loading kitchens: $error');
     }
   }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
